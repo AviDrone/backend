@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-# TODO rename file
+
 
 def param():
+    # TODO rename file
     MAGNITUDE = 1  # Param 0, Set the distance the drone goes
     HEIGHT = 4  # Param 1, Set the height of the flight path
     DEGREES = 10  # Param 2,Set the amount to rotate in yaw
@@ -18,7 +19,6 @@ def param():
         DEGREE_ERROR,
         DISTANCE_ERROR,
         LAND_THRESHOLD,
-        WINDOW_SIZE
+        WINDOW_SIZE,
     ]
     return param
-

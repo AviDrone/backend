@@ -1,8 +1,3 @@
 pytest
 mypy
-ctypes
-math
-pathlib
-time
-dronekit
-pymavlink
+

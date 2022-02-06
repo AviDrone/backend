@@ -1,5 +1,7 @@
 from unittest import TestCase
+
 from search import functions
+
 
 class Test(TestCase):
     def test_param(self):
@@ -12,10 +14,10 @@ class Test(TestCase):
         LAND_THRESHOLD = 2  # Param 5
         WINDOW_SIZE = 5  # Param 6
 
-        assert(parameter[0] == MAGNITUDE)
-        assert (parameter[1] == HEIGHT)
-        assert (parameter[2] == DEGREES)
-        assert (parameter[3] == DEGREE_ERROR)
-        assert (parameter[4] == DISTANCE_ERROR)
-        assert (parameter[5] == LAND_THRESHOLD)
-        assert (parameter[6] == WINDOW_SIZE)
+        assert parameter[0] == MAGNITUDE
+        assert parameter[1] == HEIGHT
+        assert parameter[2] == DEGREES
+        assert parameter[3] == DEGREE_ERROR
+        assert parameter[4] == DISTANCE_ERROR
+        assert parameter[5] == LAND_THRESHOLD
+        assert parameter[6] == WINDOW_SIZE
