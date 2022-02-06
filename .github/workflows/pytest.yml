@@ -20,11 +20,10 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip setuptools wheel
+          pip install aioconsole
           pip install pyyaml==5.3.1
           pip install pytest
-          pip install dronekit
-          pip install future
-          pip install lxml
+          pip install mavsdk
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
       - name: Test with pytest
         run: |

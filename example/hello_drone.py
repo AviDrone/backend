@@ -1,27 +1,39 @@
-#!/usr/bin/python
-import dronekit_sitl
-from dronekit import connect
+#!/usr/bin/env python3
 
-print("Start simulator (SITL)")
-sitl = dronekit_sitl.start_default()
-connection_string = sitl.connection_string()
+import asyncio
 
-# Connect to the Vehicle.
-print("Connecting to vehicle on: %s" % (connection_string,))
-vehicle = connect(connection_string, wait_ready=True)
+from mavsdk import System
 
-# Get some vehicle attributes (state)
-print("Vehicle State:")
-print(" Battery: %s" % vehicle.battery)
-print(" Is armable?: %s" % vehicle.is_armable)
-print(" Mode: %s" % vehicle.mode.name)  # settable
-print(" GPS: %s" % vehicle.gps_0)
-print(" System status: %s" % vehicle.system_status.state)
-print(" Last Heartbeat: %s" % vehicle.last_heartbeat)
 
-# Close vehicle object before exiting script
-vehicle.close()
+async def run():
 
-# Shut down simulator
-sitl.stop()
-print("Completed")
+    drone = System()
+    await drone.connect()
+
+    print("Waiting for drone to connect...")
+    async for state in drone.core.connection_state():
+        if state.is_connected:
+            print("Drone discovered!")
+            break
+
+    print("Waiting for drone to have a global position estimate...")
+    async for health in drone.telemetry.health():
+        if health.is_global_position_ok:
+            print("Global position estimate ok")
+            break
+
+    print("-- Arming")
+    await drone.action.arm()
+
+    print("-- Taking off")
+    await drone.action.takeoff()
+
+    await asyncio.sleep(5)
+
+    print("-- Landing")
+    await drone.action.land()
+
+
+if __name__ == "__main__":
+    loop = asyncio.get_event_loop()
+    loop.run_until_complete(run())

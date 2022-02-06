@@ -14,15 +14,17 @@ The problems the AviDrone project seeks to solve are as follows:
 
 
 ## Prerequisites
-To get started with the basic drone control you will need [QGroundControl](https://docs.qgroundcontrol.com/master/en/getting_started/download_and_install.html) and [Ardupilot MAVproxy](https://ardupilot.org/mavproxy/docs/getting_started/download_and_installation.html).
+To get started with the basic drone control you will need [QGroundControl](https://docs.qgroundcontrol.com/master/en/getting_started/download_and_install.html) and [MAVSDK-Python](https://github.com/mavlink/MAVSDK-Python).
 They provide full flight control and vehicle setup for PX4 or ArduPilot powered vehicles. This is the software responsible for communicating with the flight controller (PX4 in our case).
 
 ### Libraries
-- [DroneKit](https://dronekit-python.readthedocs.io/en/latest/develop/installation.html) library.
+- [MAVSDK-Python](https://github.com/mavlink/MAVSDK-Python) library.
 
 <!-- TODO add remaining libraries-->
 
 ## Installation
+
+<!-- TODO create setup.py -->
 
 Here's a [walkthrough video](https://youtu.be/glC99FwFnAc) of how to connect once you have all the software ready.
 
