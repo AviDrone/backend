@@ -8,7 +8,7 @@ def param()
 ```
 
 #### Description
-Initializes parameters sent to the drone 
+Initializes parameters sent to the drone
 
 
 #### What the function Returns

@@ -18,12 +18,13 @@ To get started with the basic drone control you will need [QGroundControl](https
 They provide full flight control and vehicle setup for PX4 or ArduPilot powered vehicles. This is the software responsible for communicating with the flight controller (PX4 in our case).
 
 ### Libraries
- - [DroneKit](https://dronekit-python.readthedocs.io/en/latest/develop/installation.html) library.
+- [DroneKit](https://dronekit-python.readthedocs.io/en/latest/develop/installation.html) library.
 
+<!-- TODO add remaining libraries-->
 
 ## Installation
 
-Here's a [walk-through video](https://youtu.be/glC99FwFnAc) of how to connect once you have all the software ready.
+Here's a [walkthrough video](https://youtu.be/glC99FwFnAc) of how to connect once you have all the software ready.
 
 ## Setup
 
@@ -33,10 +34,11 @@ Here's a [walk-through video](https://youtu.be/glC99FwFnAc) of how to connect on
 
 - **RC Controller**: To charge the RC controller battery, you can watch this [other tutorial](https://youtu.be/3DPnaNTAd8I).
 
+<!-- TODO add text description of video-->
 
 ## Contributors
 
-- Samuel Hernandez 
+- Samuel Hernandez
 - Nathaniel Price
 - Jeffrey Grange
 
@@ -48,7 +50,6 @@ Licenced under the [LGPL-2.1](https://www.gnu.org/licenses/lgpl-3.0.html) Licenc
 
 ## Contact
 
+If you have any questions on how or why something was done, feel free to contact me
 ### Email
-If you have any questions on how or why something was done, feel free to contact me at 
-
-- [Samuel S. hernandez](mailto:samuel.hernandez@wallawalla.edu)
+- [Samuel H.](mailto:samuel.hernandez@wallawalla.edu)
