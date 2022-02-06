@@ -10,7 +10,6 @@ connection_string = sitl.connection_string()
 print("Connecting to vehicle on: %s" % (connection_string,))
 vehicle = connect(connection_string, wait_ready=True)
 
-print("Hello!")
 # Get some vehicle attributes (state)
 print("Vehicle State:")
 print(" Battery: %s" % vehicle.battery)
@@ -26,3 +25,4 @@ vehicle.close()
 # Shut down simulator
 sitl.stop()
 print("Completed")
+

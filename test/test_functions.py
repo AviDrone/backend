@@ -1,5 +1,6 @@
 from unittest import TestCase
 
+from dronekit import VehicleMode
 from search import functions
 
 
@@ -21,3 +22,7 @@ class Test(TestCase):
         assert parameter[4] == DISTANCE_ERROR
         assert parameter[5] == LAND_THRESHOLD
         assert parameter[6] == WINDOW_SIZE
+
+    def test_arm_and_takeoff(self):
+        assert VehicleMode("GUIDED") == VehicleMode("GUIDED")
+        assert VehicleMode("AUTO") != VehicleMode("GUIDED")
