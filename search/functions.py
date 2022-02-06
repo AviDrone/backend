@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+import time
 import dronekit_sitl
 from dronekit import connect
 
@@ -13,7 +14,6 @@ avidrone = connect(connection_string, wait_ready=True)
 
 sitl = dronekit_sitl.start_default()
 connection_string = sitl.connection_string()
-
 
 
 def arm_and_takeoff(a_target_altitude):
@@ -78,4 +78,5 @@ def param():
         LAND_THRESHOLD,
         WINDOW_SIZE,
     ]
+
     return param

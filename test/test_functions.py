@@ -1,6 +1,6 @@
 from unittest import TestCase
 
-from dronekit import VehicleMode
+import dronekit
 from search import functions
 
 
@@ -24,5 +24,5 @@ class Test(TestCase):
         assert parameter[6] == WINDOW_SIZE
 
     def test_arm_and_takeoff(self):
-        assert VehicleMode("GUIDED") == VehicleMode("GUIDED")
-        assert VehicleMode("AUTO") != VehicleMode("GUIDED")
+        assert dronekit.VehicleMode("GUIDED") == dronekit.VehicleMode("GUIDED")
+        assert dronekit.VehicleMode("AUTO") != dronekit.VehicleMode("GUIDED")
