@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-import time
 import dronekit_sitl
 from dronekit import connect
 
