@@ -5,7 +5,7 @@
 def parameter():
     """"
     Initial AviDrone Parameters for search mission.
-    """""
+    """ ""
 
     MAGNITUDE = 1  # Param 0, Set the distance the drone goes
     HEIGHT = 4  # Param 1, Set the height of the flight path
