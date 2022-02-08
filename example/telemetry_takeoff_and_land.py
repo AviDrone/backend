@@ -13,8 +13,8 @@ async def run():
     threads):
         - print_altitude: print the altitude
         - print_flight_mode: print the flight mode
-        - observe_is_in_air: this monitors the flight mode and returns when the
-                             drone has been in air and is back on the ground.
+        - observe_is_in_air: this monitors the flight mode and returns
+            when the drone has been in air and is back on the ground.
     Finally, it goes to the actual works: arm the drone, initiate a takeoff
     and finally land.
     Note that "observe_is_in_air" is not necessary, but it ensures that the
@@ -40,9 +40,7 @@ async def run():
     print_flight_mode_task = asyncio.ensure_future(print_flight_mode(drone))
 
     running_tasks = [print_altitude_task, print_flight_mode_task]
-    termination_task = asyncio.ensure_future(
-        observe_is_in_air(drone, running_tasks)
-    )
+    termination_task = asyncio.ensure_future(observe_is_in_air(drone, running_tasks))
 
     # Execute the maneuvers
     print("-- Arming")
