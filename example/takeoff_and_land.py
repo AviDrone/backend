@@ -6,9 +6,12 @@ from mavsdk import System
 
 
 async def run():
-
+    """
+        For more info, see:
+    https://github.com/mavlink/MAVSDK-Python/blob/main/examples/takeoff_and_land.py
+    """
     drone = System()
-    await drone.connect()
+    await drone.connect(system_address="udp://:14540")
 
     print("Waiting for drone to connect...")
     async for state in drone.core.connection_state():
