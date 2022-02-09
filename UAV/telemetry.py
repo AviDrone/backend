@@ -12,11 +12,11 @@ async def run():
     For more info, see:
     http://mavsdk-python-docs.s3-website.eu-central-1.amazonaws.com/plugins/telemetry.html
     https://github.com/mavlink/MAVSDK-Python/blob/main/examples/telemetry.py
-
     """
+
     # Init the drone
     drone = System()
-    await drone.connect(system_address="udp://:14540")
+    await drone.connect(system_address="serial:///dev/ttyACM0")
 
     # Start the tasks
     asyncio.ensure_future(print_battery(drone))
