@@ -1,6 +1,6 @@
 from unittest import TestCase
 
-from uav import uav_parameters
+from UAV import uav_parameters
 
 
 class Test(TestCase):

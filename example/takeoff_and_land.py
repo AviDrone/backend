@@ -10,31 +10,31 @@ async def run():
         For more info, see:
     https://github.com/mavlink/MAVSDK-Python/blob/main/examples/takeoff_and_land.py
     """
-    drone = System()
-    await drone.connect(system_address="udp://:14540")
+    avidrone = System()
+    await avidrone.connect(system_address="udp://:14540")
 
-    print("Waiting for drone to connect...")
-    async for state in drone.core.connection_state():
+    print("Waiting for avidrone to connect...")
+    async for state in avidrone.core.connection_state():
         if state.is_connected:
             print("Drone discovered!")
             break
 
-    print("Waiting for drone to have a global position estimate...")
-    async for health in drone.telemetry.health():
+    print("Waiting for avidrone to have a global position estimate...")
+    async for health in avidrone.telemetry.health():
         if health.is_global_position_ok:
             print("Global position estimate ok")
             break
 
     print("-- Arming")
-    await drone.action.arm()
+    await avidrone.action.arm()
 
     print("-- Taking off")
-    await drone.action.takeoff()
+    await avidrone.action.takeoff()
 
     await asyncio.sleep(5)
 
     print("-- Landing")
-    await drone.action.land()
+    await avidrone.action.land()
 
 
 if __name__ == "__main__":

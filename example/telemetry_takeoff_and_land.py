@@ -78,7 +78,7 @@ async def print_flight_mode(drone):
     async for flight_mode in drone.telemetry.flight_mode():
         if flight_mode != previous_flight_mode:
             previous_flight_mode = flight_mode
-            print(f"Flight mode: {flight_mode}")
+            print("Flight mode: {flight_mode}")
 
 
 async def observe_is_in_air(drone, running_tasks):
