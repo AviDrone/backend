@@ -162,4 +162,13 @@ dmypy.json
 # Executables
 *.exe
 *.out
+<<<<<<< HEAD
 *.app
+=======
+*.app
+
+.vscode
+.vscode/settings.json
+.idea
+.DS_Store
+>>>>>>> ae37b7c4093c6512ed4241b505104a0f92c6474e

@@ -10,4 +10,52 @@ The problems the AviDrone project seeks to solve are as follows:
 
 * Pinpoint a victim's location autonomously
   
+<<<<<<< HEAD
 * Reduce victim search time for avalanche rescue teams.
+=======
+* Reduce victim search time for avalanche rescue teams.
+
+
+## Prerequisites
+To get started with the basic drone control you will need [QGroundControl](https://docs.qgroundcontrol.com/master/en/getting_started/download_and_install.html) and [MAVSDK-Python](https://github.com/mavlink/MAVSDK-Python).
+They provide full flight control and vehicle setup for PX4 or ArduPilot powered vehicles. This is the software responsible for communicating with the flight controller (PX4 in our case).
+
+### Libraries
+- [MAVSDK-Python](https://github.com/mavlink/MAVSDK-Python) library.
+
+<!-- TODO add remaining libraries-->
+
+## Installation
+
+<!-- TODO create setup.py -->
+
+Here's a [walkthrough video](https://youtu.be/glC99FwFnAc) of how to connect once you have all the software ready.
+
+## Setup
+
+### Charging Batteries
+
+- **Drone**: To charge the main battery, you can watch [this tutorial](https://youtu.be/vGsf38B0FbM).
+
+- **RC Controller**: To charge the RC controller battery, you can watch this [other tutorial](https://youtu.be/3DPnaNTAd8I).
+
+<!-- TODO add text description of video-->
+
+## Contributors
+
+- Samuel Hernandez
+- Nathaniel Price
+- Jeffrey Grange
+
+ See the **2020-2021** team's [repository](https://github.com/AviDrone/AvidroneProject) here.
+
+## Licence
+
+Licenced under the [LGPL-2.1](https://www.gnu.org/licenses/lgpl-3.0.html) Licence.
+
+## Contact
+
+If you have any questions on how or why something was done, feel free to contact me
+### Email
+- [Samuel H.](mailto:samuel.hernandez@wallawalla.edu)
+>>>>>>> ae37b7c4093c6512ed4241b505104a0f92c6474e
