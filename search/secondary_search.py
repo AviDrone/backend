@@ -7,20 +7,22 @@ import time
 from mavsdk import System
 from transceiver.direction_distance import directionDistance as Transceiver
 from UAV.gps_data import GPSData
-from UAV.parameter import parameter
+from UAV.parameter import parameter, flight_mode
 
 
 async def secondary_search():
     """
     TODO make more modular
-    For more info on flight modes:
-    http://mavsdk-python-docs.s3-website.eu-central-1.amazonaws.com/plugins/telemetry.html
+
     """
     parameters = parameter()
+    flight_modes = flight_mode()
     default_magnitude = parameters[0]
     default_altitude = parameters[1]
-    default_window_size = parameters[6]
     default_land_threshold = parameters[5]
+    default_window_size = parameters[6]
+
+    STABILIZED = flight_modes[12]
 
     drone = System()
     await drone.connect(system_address="serial:///dev/ttyACM0")
@@ -39,7 +41,7 @@ async def secondary_search():
     print("-- Arming")
     await drone.action.arm()
 
-    print("-- Taking off to altitude: ", default_altitude)
+    print("-- Taking off to altitude (m): ", default_altitude)
     await drone.action.set_takeoff_altitude(default_altitude)
     await drone.action.takeoff()
 
@@ -50,10 +52,10 @@ async def secondary_search():
     print("-- Initializing the gps_window")  # to be default_window_size long
     gps_window = GPSData(default_window_size)
 
-    print("-- Setting STABILIZED flight mode")  # STABILIZED flight mode is 13
-    await drone.telemetry.set_flight_mode(13)  # Originally GUIDED mode
+    print("-- Setting STABILIZED flight mode")
+    await drone.telemetry.set_flight_mode(STABILIZED)  # Originally GUIDED mode
 
-    while drone.telemetry.flight_mode() == 13:
+    while drone.telemetry.flight_mode() == STABILIZED:
         print(
             "Direction: ",
             Transceiver.direction,
@@ -61,18 +63,15 @@ async def secondary_search():
             Transceiver.distance,
         )
 
-        if Transceiver.direction < 2:
-            # Turn left
-            pass
+        if Transceiver.direction < 2:  # Turn left
+            pass  # TODO condition_yaw(-DEGREES, True)
 
-        elif Transceiver.direction > 2:
-            # Turn right
-            pass
+        elif Transceiver.direction > 2:  # Turn right
+            pass  # TODO condition_yaw(DEGREES, True)
 
         elif Transceiver.direction == 2:
             print("Fly forward")
-            # print flight direction
-            global_position = drone.telemetry.position()
+            global_position = drone.telemetry.position()  # print flight direction
             gps_window.add_point(global_position, Transceiver.distance)
 
             if (
