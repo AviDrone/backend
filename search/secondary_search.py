@@ -7,7 +7,7 @@ import time
 from mavsdk import System
 from transceiver.direction_distance import directionDistance as Transceiver
 from UAV.gps_data import GPSData
-from UAV.parameter import parameter, flight_mode
+from UAV.parameter import flight_mode, parameter
 
 
 async def secondary_search():
