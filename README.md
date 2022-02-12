@@ -28,15 +28,6 @@ They provide full flight control and vehicle setup for PX4 or ArduPilot powered 
 
 Here's a [walkthrough video](https://youtu.be/glC99FwFnAc) of how to connect once you have all the software ready.
 
-## Setup
-
-### Charging Batteries
-
-- **Drone**: To charge the main battery, you can watch [this tutorial](https://youtu.be/vGsf38B0FbM).
-
-- **RC Controller**: To charge the RC controller battery, you can watch this [other tutorial](https://youtu.be/3DPnaNTAd8I).
-
-<!-- TODO add text description of video-->
 
 ## Contributors
 

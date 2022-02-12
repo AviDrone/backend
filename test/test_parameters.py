@@ -1,11 +1,12 @@
 from unittest import TestCase
 
-from uav import uav_parameters
+from UAV import parameters
 
 
-class Test(TestCase):
-    def test_parameter(self):
-        parameter = uav_parameters.parameter()
+class Parameters(TestCase):
+    @staticmethod
+    def test_parameter():
+        parameter = parameters.parameter()
         MAGNITUDE = 1  # Parameter 0
         HEIGHT = 4  # Parameter 1
         DEGREES = 10  # Parameter 2
