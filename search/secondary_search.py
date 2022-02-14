@@ -1,31 +1,24 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+"""
+    SECONDARY SEARCH
+"""
+
 import asyncio
 import datetime
 import time
 
 from mavsdk import System
 from mavsdk.offboard import OffboardError, PositionNedYaw
-from transceiver.direction_distance import directionDistance as Transceiver
-from UAV.gps_data import GPSData
-from UAV.parameter import flight_mode, parameter
+
+from transceiver import direction_distance as Transceiver
+from UAV import parameter
 
 signal_found = False
-parameters, flight_modes = parameter(), flight_mode()
-default_magnitude = parameters[0]
-default_altitude = parameters[1]
-default_land_threshold = parameters[5]
-default_window_size = parameters[6]
-
-STABILIZED = flight_modes[12]
 
 
-async def secondary_search():
-    """
-    Source:
-    https://github.com/mavlink/MAVSDK-Python/blob/main/examples/offboard_position_ned.py
-    """
+async def secondary_search() -> None:
 
     # Initiation sequence
 
@@ -105,13 +98,10 @@ async def secondary_search():
                 #  TODO IMPLEMENT
                 #   drone.action.goto_location()
 
-                if (
-                    gps_window.distance[2]
-                    <= default_land_threshold  # Land over local minimum
-                ):
+                if gps_window.distance[2] <= default_land_threshold:
                     signal_found = True
 
-                    print("-- Landing")
+                    print("-- Landing")  # over local minimum
                     await drone.action.land()
 
                     if signal_found:
