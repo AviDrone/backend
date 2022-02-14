@@ -9,86 +9,91 @@ Full documentation is provided at http://python.dronekit.io/examples/mission_bas
 """
 from __future__ import print_function
 
-from dronekit import connect, VehicleMode, LocationGlobalRelative, LocationGlobal, Command
-import time
+# Set up option parsing to get connection string
+import argparse
 import math
+import time
+
+from dronekit import (Command, LocationGlobal, LocationGlobalRelative,
+                      VehicleMode, connect)
 from pymavlink import mavutil
 
-
-#Set up option parsing to get connection string
-import argparse  
-parser = argparse.ArgumentParser(description='Demonstrates basic mission operations.')
-parser.add_argument('--connect', 
-                   help="vehicle connection target string. If not specified, SITL automatically started and used.")
+parser = argparse.ArgumentParser(description="Demonstrates basic mission operations.")
+parser.add_argument(
+    "--connect",
+    help="vehicle connection target string. If not specified, SITL automatically started and used.",
+)
 args = parser.parse_args()
 
 connection_string = args.connect
 sitl = None
 
 
-#Start SITL if no connection string specified
+# Start SITL if no connection string specified
 if not connection_string:
     import dronekit_sitl
+
     sitl = dronekit_sitl.start_default()
     connection_string = sitl.connection_string()
 
 
 # Connect to the Vehicle
-print('Connecting to vehicle on: %s' % connection_string)
+print("Connecting to vehicle on: %s" % connection_string)
 vehicle = connect(connection_string, wait_ready=True)
 
 
 def get_location_metres(original_location, dNorth, dEast):
     """
-    Returns a LocationGlobal object containing the latitude/longitude `dNorth` and `dEast` metres from the 
+    Returns a LocationGlobal object containing the latitude/longitude `dNorth` and `dEast` metres from the
     specified `original_location`. The returned Location has the same `alt` value
     as `original_location`.
 
-    The function is useful when you want to move the vehicle around specifying locations relative to 
+    The function is useful when you want to move the vehicle around specifying locations relative to
     the current vehicle position.
     The algorithm is relatively accurate over small distances (10m within 1km) except close to the poles.
     For more information see:
     http://gis.stackexchange.com/questions/2951/algorithm-for-offsetting-a-latitude-longitude-by-some-amount-of-meters
     """
-    earth_radius=6378137.0 #Radius of "spherical" earth
-    #Coordinate offsets in radians
-    dLat = dNorth/earth_radius
-    dLon = dEast/(earth_radius*math.cos(math.pi*original_location.lat/180))
+    earth_radius = 6378137.0  # Radius of "spherical" earth
+    # Coordinate offsets in radians
+    dLat = dNorth / earth_radius
+    dLon = dEast / (earth_radius * math.cos(math.pi * original_location.lat / 180))
 
-    #New position in decimal degrees
-    newlat = original_location.lat + (dLat * 180/math.pi)
-    newlon = original_location.lon + (dLon * 180/math.pi)
-    return LocationGlobal(newlat, newlon,original_location.alt)
+    # New position in decimal degrees
+    newlat = original_location.lat + (dLat * 180 / math.pi)
+    newlon = original_location.lon + (dLon * 180 / math.pi)
+    return LocationGlobal(newlat, newlon, original_location.alt)
 
 
 def get_distance_metres(a_location1, a_location2):
     """
     Returns the ground distance in metres between two LocationGlobal objects.
 
-    This method is an approximation, and will not be accurate over large distances and close to the 
-    earth's poles. It comes from the ArduPilot test code: 
+    This method is an approximation, and will not be accurate over large distances and close to the
+    earth's poles. It comes from the ArduPilot test code:
     https://github.com/diydrones/ardupilot/blob/master/Tools/autotest/common.py
     """
     dlat = a_location2.lat - a_location1.lat
     dlong = a_location2.lon - a_location1.lon
-    return math.sqrt((dlat*dlat) + (dlong*dlong)) * 1.113195e5
-
+    return math.sqrt((dlat * dlat) + (dlong * dlong)) * 1.113195e5
 
 
 def distance_to_current_waypoint():
     """
-    Gets distance in metres to the current waypoint. 
+    Gets distance in metres to the current waypoint.
     It returns None for the first waypoint (Home location).
     """
     nextwaypoint = vehicle.commands.next
-    if nextwaypoint==0:
+    if nextwaypoint == 0:
         return None
-    missionitem=vehicle.commands[nextwaypoint-1] #commands are zero indexed
+    missionitem = vehicle.commands[nextwaypoint - 1]  # commands are zero indexed
     lat = missionitem.x
     lon = missionitem.y
     alt = missionitem.z
-    targetWaypointLocation = LocationGlobalRelative(lat,lon,alt)
-    distancetopoint = get_distance_metres(vehicle.location.global_frame, targetWaypointLocation)
+    targetWaypointLocation = LocationGlobalRelative(lat, lon, alt)
+    distancetopoint = get_distance_metres(
+        vehicle.location.global_frame, targetWaypointLocation
+    )
     return distancetopoint
 
 
@@ -98,110 +103,400 @@ def download_mission():
     """
     cmds = vehicle.commands
     cmds.download()
-    cmds.wait_ready() # wait until download is complete.
+    cmds.wait_ready()  # wait until download is complete.
 
 
 def search_mission(a_location, length, width):
     """
     Primary search testing, based on dronekit's basic square mission
-    """	
+    """
 
     cmds = vehicle.commands
 
     print(" Clear any existing commands")
-    cmds.clear() 
-    
+    cmds.clear()
+
     print(" Define/add new commands.")
-    # Add new commands. The meaning/order of the parameters is documented in the Command class. 
-     
-    #Add MAV_CMD_NAV_TAKEOFF command. This is ignored if the vehicle is already in the air.
-    cmds.add(Command( 0, 0, 0, mavutil.mavlink.MAV_FRAME_GLOBAL_RELATIVE_ALT, mavutil.mavlink.MAV_CMD_NAV_TAKEOFF, 0, 0, 0, 0, 0, 0, 0, 0, 10))
+    # Add new commands. The meaning/order of the parameters is documented in the Command class.
+
+    # Add MAV_CMD_NAV_TAKEOFF command. This is ignored if the vehicle is already in the air.
+    cmds.add(
+        Command(
+            0,
+            0,
+            0,
+            mavutil.mavlink.MAV_FRAME_GLOBAL_RELATIVE_ALT,
+            mavutil.mavlink.MAV_CMD_NAV_TAKEOFF,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            10,
+        )
+    )
 
     print("Waypoint 1")
     v_dist = -width
     h_dist = 0
     point = get_location_metres(a_location, v_dist, h_dist)
-    cmds.add(Command( 0, 0, 0, mavutil.mavlink.MAV_FRAME_GLOBAL_RELATIVE_ALT, mavutil.mavlink.MAV_CMD_NAV_WAYPOINT, 0, 0, 0, 0, 0, 0, point.lat, point.lon, 11))
+    cmds.add(
+        Command(
+            0,
+            0,
+            0,
+            mavutil.mavlink.MAV_FRAME_GLOBAL_RELATIVE_ALT,
+            mavutil.mavlink.MAV_CMD_NAV_WAYPOINT,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            point.lat,
+            point.lon,
+            11,
+        )
+    )
     print("Waypoint 2")
     h_dist = -length
     point = get_location_metres(a_location, v_dist, h_dist)
-    cmds.add(Command( 0, 0, 0, mavutil.mavlink.MAV_FRAME_GLOBAL_RELATIVE_ALT, mavutil.mavlink.MAV_CMD_NAV_WAYPOINT, 0, 0, 0, 0, 0, 0, point.lat, point.lon, 12))
+    cmds.add(
+        Command(
+            0,
+            0,
+            0,
+            mavutil.mavlink.MAV_FRAME_GLOBAL_RELATIVE_ALT,
+            mavutil.mavlink.MAV_CMD_NAV_WAYPOINT,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            point.lat,
+            point.lon,
+            12,
+        )
+    )
     print("Waypoint 3")
-    v_dist += -width 
+    v_dist += -width
     point = get_location_metres(a_location, v_dist, h_dist)
-    cmds.add(Command( 0, 0, 0, mavutil.mavlink.MAV_FRAME_GLOBAL_RELATIVE_ALT, mavutil.mavlink.MAV_CMD_NAV_WAYPOINT, 0, 0, 0, 0, 0, 0, point.lat, point.lon, 13))
+    cmds.add(
+        Command(
+            0,
+            0,
+            0,
+            mavutil.mavlink.MAV_FRAME_GLOBAL_RELATIVE_ALT,
+            mavutil.mavlink.MAV_CMD_NAV_WAYPOINT,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            point.lat,
+            point.lon,
+            13,
+        )
+    )
     print("Waypoint 4")
     h_dist = 0
     point = get_location_metres(a_location, v_dist, h_dist)
-    cmds.add(Command( 0, 0, 0, mavutil.mavlink.MAV_FRAME_GLOBAL_RELATIVE_ALT, mavutil.mavlink.MAV_CMD_NAV_WAYPOINT, 0, 0, 0, 0, 0, 0, point.lat, point.lon, 14))
+    cmds.add(
+        Command(
+            0,
+            0,
+            0,
+            mavutil.mavlink.MAV_FRAME_GLOBAL_RELATIVE_ALT,
+            mavutil.mavlink.MAV_CMD_NAV_WAYPOINT,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            point.lat,
+            point.lon,
+            14,
+        )
+    )
     print("Waypoint 5")
-    v_dist += -width 
+    v_dist += -width
     point = get_location_metres(a_location, v_dist, h_dist)
-    cmds.add(Command( 0, 0, 0, mavutil.mavlink.MAV_FRAME_GLOBAL_RELATIVE_ALT, mavutil.mavlink.MAV_CMD_NAV_WAYPOINT, 0, 0, 0, 0, 0, 0, point.lat, point.lon, 15))
+    cmds.add(
+        Command(
+            0,
+            0,
+            0,
+            mavutil.mavlink.MAV_FRAME_GLOBAL_RELATIVE_ALT,
+            mavutil.mavlink.MAV_CMD_NAV_WAYPOINT,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            point.lat,
+            point.lon,
+            15,
+        )
+    )
     print("Waypoint 6")
     h_dist = -length
     point = get_location_metres(a_location, v_dist, h_dist)
-    cmds.add(Command( 0, 0, 0, mavutil.mavlink.MAV_FRAME_GLOBAL_RELATIVE_ALT, mavutil.mavlink.MAV_CMD_NAV_WAYPOINT, 0, 0, 0, 0, 0, 0, point.lat, point.lon, 16))
+    cmds.add(
+        Command(
+            0,
+            0,
+            0,
+            mavutil.mavlink.MAV_FRAME_GLOBAL_RELATIVE_ALT,
+            mavutil.mavlink.MAV_CMD_NAV_WAYPOINT,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            point.lat,
+            point.lon,
+            16,
+        )
+    )
     print("Waypoint 7")
-    v_dist += -width 
+    v_dist += -width
     point = get_location_metres(a_location, v_dist, h_dist)
-    cmds.add(Command( 0, 0, 0, mavutil.mavlink.MAV_FRAME_GLOBAL_RELATIVE_ALT, mavutil.mavlink.MAV_CMD_NAV_WAYPOINT, 0, 0, 0, 0, 0, 0, point.lat, point.lon, 17))
+    cmds.add(
+        Command(
+            0,
+            0,
+            0,
+            mavutil.mavlink.MAV_FRAME_GLOBAL_RELATIVE_ALT,
+            mavutil.mavlink.MAV_CMD_NAV_WAYPOINT,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            point.lat,
+            point.lon,
+            17,
+        )
+    )
     print("Waypoint 8")
     h_dist = 0
     point = get_location_metres(a_location, v_dist, h_dist)
-    cmds.add(Command( 0, 0, 0, mavutil.mavlink.MAV_FRAME_GLOBAL_RELATIVE_ALT, mavutil.mavlink.MAV_CMD_NAV_WAYPOINT, 0, 0, 0, 0, 0, 0, point.lat, point.lon, 18))
-    print("Waypoint 9")    
-    v_dist += -width 
+    cmds.add(
+        Command(
+            0,
+            0,
+            0,
+            mavutil.mavlink.MAV_FRAME_GLOBAL_RELATIVE_ALT,
+            mavutil.mavlink.MAV_CMD_NAV_WAYPOINT,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            point.lat,
+            point.lon,
+            18,
+        )
+    )
+    print("Waypoint 9")
+    v_dist += -width
     point = get_location_metres(a_location, v_dist, h_dist)
-    cmds.add(Command( 0, 0, 0, mavutil.mavlink.MAV_FRAME_GLOBAL_RELATIVE_ALT, mavutil.mavlink.MAV_CMD_NAV_WAYPOINT, 0, 0, 0, 0, 0, 0, point.lat, point.lon, 19))
+    cmds.add(
+        Command(
+            0,
+            0,
+            0,
+            mavutil.mavlink.MAV_FRAME_GLOBAL_RELATIVE_ALT,
+            mavutil.mavlink.MAV_CMD_NAV_WAYPOINT,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            point.lat,
+            point.lon,
+            19,
+        )
+    )
     print("Waypoint 10")
     h_dist = -length
     point = get_location_metres(a_location, v_dist, h_dist)
-    cmds.add(Command( 0, 0, 0, mavutil.mavlink.MAV_FRAME_GLOBAL_RELATIVE_ALT, mavutil.mavlink.MAV_CMD_NAV_WAYPOINT, 0, 0, 0, 0, 0, 0, point.lat, point.lon, 20))
+    cmds.add(
+        Command(
+            0,
+            0,
+            0,
+            mavutil.mavlink.MAV_FRAME_GLOBAL_RELATIVE_ALT,
+            mavutil.mavlink.MAV_CMD_NAV_WAYPOINT,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            point.lat,
+            point.lon,
+            20,
+        )
+    )
     print("Waypoint 11")
     h_dist = 0
     point = get_location_metres(a_location, v_dist, h_dist)
-    cmds.add(Command( 0, 0, 0, mavutil.mavlink.MAV_FRAME_GLOBAL_RELATIVE_ALT, mavutil.mavlink.MAV_CMD_NAV_WAYPOINT, 0, 0, 0, 0, 0, 0, point.lat, point.lon, 14))
+    cmds.add(
+        Command(
+            0,
+            0,
+            0,
+            mavutil.mavlink.MAV_FRAME_GLOBAL_RELATIVE_ALT,
+            mavutil.mavlink.MAV_CMD_NAV_WAYPOINT,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            point.lat,
+            point.lon,
+            14,
+        )
+    )
     print("Waypoint 12")
-    v_dist += -width 
+    v_dist += -width
     point = get_location_metres(a_location, v_dist, h_dist)
-    cmds.add(Command( 0, 0, 0, mavutil.mavlink.MAV_FRAME_GLOBAL_RELATIVE_ALT, mavutil.mavlink.MAV_CMD_NAV_WAYPOINT, 0, 0, 0, 0, 0, 0, point.lat, point.lon, 15))
+    cmds.add(
+        Command(
+            0,
+            0,
+            0,
+            mavutil.mavlink.MAV_FRAME_GLOBAL_RELATIVE_ALT,
+            mavutil.mavlink.MAV_CMD_NAV_WAYPOINT,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            point.lat,
+            point.lon,
+            15,
+        )
+    )
     print("Waypoint 13")
-    v_dist += -width 
+    v_dist += -width
     point = get_location_metres(a_location, v_dist, h_dist)
-    cmds.add(Command( 0, 0, 0, mavutil.mavlink.MAV_FRAME_GLOBAL_RELATIVE_ALT, mavutil.mavlink.MAV_CMD_NAV_WAYPOINT, 0, 0, 0, 0, 0, 0, point.lat, point.lon, 19))
+    cmds.add(
+        Command(
+            0,
+            0,
+            0,
+            mavutil.mavlink.MAV_FRAME_GLOBAL_RELATIVE_ALT,
+            mavutil.mavlink.MAV_CMD_NAV_WAYPOINT,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            point.lat,
+            point.lon,
+            19,
+        )
+    )
     print("Waypoint 14")
     h_dist = -length
     point = get_location_metres(a_location, v_dist, h_dist)
-    cmds.add(Command( 0, 0, 0, mavutil.mavlink.MAV_FRAME_GLOBAL_RELATIVE_ALT, mavutil.mavlink.MAV_CMD_NAV_WAYPOINT, 0, 0, 0, 0, 0, 0, point.lat, point.lon, 20))
+    cmds.add(
+        Command(
+            0,
+            0,
+            0,
+            mavutil.mavlink.MAV_FRAME_GLOBAL_RELATIVE_ALT,
+            mavutil.mavlink.MAV_CMD_NAV_WAYPOINT,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            point.lat,
+            point.lon,
+            20,
+        )
+    )
 
     # #add dummy waypoint "5" at point 4 (lets us know when have reached destination)
-    cmds.add(Command( 0, 0, 0, mavutil.mavlink.MAV_FRAME_GLOBAL_RELATIVE_ALT, mavutil.mavlink.MAV_CMD_NAV_WAYPOINT, 0, 0, 0, 0, 0, 0, point.lat, point.lon, 16))    
+    cmds.add(
+        Command(
+            0,
+            0,
+            0,
+            mavutil.mavlink.MAV_FRAME_GLOBAL_RELATIVE_ALT,
+            mavutil.mavlink.MAV_CMD_NAV_WAYPOINT,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            point.lat,
+            point.lon,
+            16,
+        )
+    )
 
     print(" Upload new commands to vehicle")
     cmds.upload()
 
+
 def primary_search_mission(a_location, length, width):
     """
     Primary search testing, based on dronekit's basic square mission
-    """	
+    """
 
     cmds = vehicle.commands
 
     print(" Clear any existing commands")
-    cmds.clear() 
-    
+    cmds.clear()
+
     print(" Define/add new commands.")
-    # Add new commands. The meaning/order of the parameters is documented in the Command class. 
-     
-    #Add MAV_CMD_NAV_TAKEOFF command. This is ignored if the vehicle is already in the air.
-    cmds.add(Command( 0, 0, 0, mavutil.mavlink.MAV_FRAME_GLOBAL_RELATIVE_ALT, mavutil.mavlink.MAV_CMD_NAV_TAKEOFF, 0, 0, 0, 0, 0, 0, 0, 0, 10))
+    # Add new commands. The meaning/order of the parameters is documented in the Command class.
+
+    # Add MAV_CMD_NAV_TAKEOFF command. This is ignored if the vehicle is already in the air.
+    cmds.add(
+        Command(
+            0,
+            0,
+            0,
+            mavutil.mavlink.MAV_FRAME_GLOBAL_RELATIVE_ALT,
+            mavutil.mavlink.MAV_CMD_NAV_TAKEOFF,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            10,
+        )
+    )
 
     v_dist = 0
     h_dist = 0
     step = 0
-    for i in range(1,9):
-        print("Waypoint %s and step = %s" % (i,step))
+    for i in range(1, 9):
+        print("Waypoint %s and step = %s" % (i, step))
         if step == 0:
             h_dist = 0
         elif (step == 1) or (step == 3):
@@ -209,47 +504,184 @@ def primary_search_mission(a_location, length, width):
         else:
             h_dist = -length
         step += 1
-        step = step % 4    
+        step = step % 4
         point = get_location_metres(a_location, v_dist, h_dist)
-        cmds.add(Command( 0, 0, 0, mavutil.mavlink.MAV_FRAME_GLOBAL_RELATIVE_ALT, mavutil.mavlink.MAV_CMD_NAV_WAYPOINT, 0, 0, 0, 0, 0, 0, point.lat, point.lon, 11))
- 
+        cmds.add(
+            Command(
+                0,
+                0,
+                0,
+                mavutil.mavlink.MAV_FRAME_GLOBAL_RELATIVE_ALT,
+                mavutil.mavlink.MAV_CMD_NAV_WAYPOINT,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                point.lat,
+                point.lon,
+                11,
+            )
+        )
+
     # add dummy waypoint at final point (lets us know when have reached destination)
-    cmds.add(Command( 0, 0, 0, mavutil.mavlink.MAV_FRAME_GLOBAL_RELATIVE_ALT, mavutil.mavlink.MAV_CMD_NAV_WAYPOINT, 0, 0, 0, 0, 0, 0, point.lat, point.lon, 16))    
+    cmds.add(
+        Command(
+            0,
+            0,
+            0,
+            mavutil.mavlink.MAV_FRAME_GLOBAL_RELATIVE_ALT,
+            mavutil.mavlink.MAV_CMD_NAV_WAYPOINT,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            point.lat,
+            point.lon,
+            16,
+        )
+    )
 
     print(" Upload new commands to vehicle")
-    cmds.upload()    
+    cmds.upload()
+
 
 def adds_square_mission(a_location, aSize):
     """
-    Adds a takeoff command and four waypoint commands to the current mission. 
+    Adds a takeoff command and four waypoint commands to the current mission.
     The waypoints are positioned to form a square of side length 2*aSize around the specified LocationGlobal (a_location).
 
-    The function assumes vehicle.commands matches the vehicle mission state 
+    The function assumes vehicle.commands matches the vehicle mission state
     (you must have called download at least once in the session and after clearing the mission)
-    """	
+    """
 
     cmds = vehicle.commands
 
     print(" Clear any existing commands")
-    cmds.clear() 
-    
-    print(" Define/add new commands.")
-    # Add new commands. The meaning/order of the parameters is documented in the Command class. 
-     
-    #Add MAV_CMD_NAV_TAKEOFF command. This is ignored if the vehicle is already in the air.
-    cmds.add(Command( 0, 0, 0, mavutil.mavlink.MAV_FRAME_GLOBAL_RELATIVE_ALT, mavutil.mavlink.MAV_CMD_NAV_TAKEOFF, 0, 0, 0, 0, 0, 0, 0, 0, 10))
+    cmds.clear()
 
-    #Define the four MAV_CMD_NAV_WAYPOINT locations and add the commands
+    print(" Define/add new commands.")
+    # Add new commands. The meaning/order of the parameters is documented in the Command class.
+
+    # Add MAV_CMD_NAV_TAKEOFF command. This is ignored if the vehicle is already in the air.
+    cmds.add(
+        Command(
+            0,
+            0,
+            0,
+            mavutil.mavlink.MAV_FRAME_GLOBAL_RELATIVE_ALT,
+            mavutil.mavlink.MAV_CMD_NAV_TAKEOFF,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            10,
+        )
+    )
+
+    # Define the four MAV_CMD_NAV_WAYPOINT locations and add the commands
     point1 = get_location_metres(a_location, aSize, -aSize)
     point2 = get_location_metres(a_location, aSize, aSize)
     point3 = get_location_metres(a_location, -aSize, aSize)
     point4 = get_location_metres(a_location, -aSize, -aSize)
-    cmds.add(Command( 0, 0, 0, mavutil.mavlink.MAV_FRAME_GLOBAL_RELATIVE_ALT, mavutil.mavlink.MAV_CMD_NAV_WAYPOINT, 0, 0, 0, 0, 0, 0, point1.lat, point1.lon, 11))
-    cmds.add(Command( 0, 0, 0, mavutil.mavlink.MAV_FRAME_GLOBAL_RELATIVE_ALT, mavutil.mavlink.MAV_CMD_NAV_WAYPOINT, 0, 0, 0, 0, 0, 0, point2.lat, point2.lon, 12))
-    cmds.add(Command( 0, 0, 0, mavutil.mavlink.MAV_FRAME_GLOBAL_RELATIVE_ALT, mavutil.mavlink.MAV_CMD_NAV_WAYPOINT, 0, 0, 0, 0, 0, 0, point3.lat, point3.lon, 13))
-    cmds.add(Command( 0, 0, 0, mavutil.mavlink.MAV_FRAME_GLOBAL_RELATIVE_ALT, mavutil.mavlink.MAV_CMD_NAV_WAYPOINT, 0, 0, 0, 0, 0, 0, point4.lat, point4.lon, 14))
-    #add dummy waypoint "5" at point 4 (lets us know when have reached destination)
-    cmds.add(Command( 0, 0, 0, mavutil.mavlink.MAV_FRAME_GLOBAL_RELATIVE_ALT, mavutil.mavlink.MAV_CMD_NAV_WAYPOINT, 0, 0, 0, 0, 0, 0, point4.lat, point4.lon, 14))    
+    cmds.add(
+        Command(
+            0,
+            0,
+            0,
+            mavutil.mavlink.MAV_FRAME_GLOBAL_RELATIVE_ALT,
+            mavutil.mavlink.MAV_CMD_NAV_WAYPOINT,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            point1.lat,
+            point1.lon,
+            11,
+        )
+    )
+    cmds.add(
+        Command(
+            0,
+            0,
+            0,
+            mavutil.mavlink.MAV_FRAME_GLOBAL_RELATIVE_ALT,
+            mavutil.mavlink.MAV_CMD_NAV_WAYPOINT,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            point2.lat,
+            point2.lon,
+            12,
+        )
+    )
+    cmds.add(
+        Command(
+            0,
+            0,
+            0,
+            mavutil.mavlink.MAV_FRAME_GLOBAL_RELATIVE_ALT,
+            mavutil.mavlink.MAV_CMD_NAV_WAYPOINT,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            point3.lat,
+            point3.lon,
+            13,
+        )
+    )
+    cmds.add(
+        Command(
+            0,
+            0,
+            0,
+            mavutil.mavlink.MAV_FRAME_GLOBAL_RELATIVE_ALT,
+            mavutil.mavlink.MAV_CMD_NAV_WAYPOINT,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            point4.lat,
+            point4.lon,
+            14,
+        )
+    )
+    # add dummy waypoint "5" at point 4 (lets us know when have reached destination)
+    cmds.add(
+        Command(
+            0,
+            0,
+            0,
+            mavutil.mavlink.MAV_FRAME_GLOBAL_RELATIVE_ALT,
+            mavutil.mavlink.MAV_CMD_NAV_WAYPOINT,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            point4.lat,
+            point4.lon,
+            14,
+        )
+    )
 
     print(" Upload new commands to vehicle")
     cmds.upload()
@@ -266,66 +698,74 @@ def arm_and_takeoff(aTargetAltitude):
         print(" Waiting for vehicle to initialise...")
         time.sleep(1)
 
-        
     print("Arming motors")
     # Copter should arm in GUIDED mode
     vehicle.mode = VehicleMode("GUIDED")
     vehicle.armed = True
 
-    while not vehicle.armed:      
+    while not vehicle.armed:
         print(" Waiting for arming...")
         time.sleep(1)
 
     print("Taking off!")
-    vehicle.simple_takeoff(aTargetAltitude) # Take off to target altitude
+    vehicle.simple_takeoff(aTargetAltitude)  # Take off to target altitude
 
-    # Wait until the vehicle reaches a safe height before processing the goto (otherwise the command 
+    # Wait until the vehicle reaches a safe height before processing the goto (otherwise the command
     #  after Vehicle.simple_takeoff will execute immediately).
     while True:
-        print(" Altitude: ", vehicle.location.global_relative_frame.alt)      
-        if vehicle.location.global_relative_frame.alt>=aTargetAltitude*0.95: #Trigger just below target alt.
+        print(" Altitude: ", vehicle.location.global_relative_frame.alt)
+        if (
+            vehicle.location.global_relative_frame.alt >= aTargetAltitude * 0.95
+        ):  # Trigger just below target alt.
             print("Reached target altitude")
             break
         time.sleep(1)
 
-        
-print('Create a new mission (for current location)')
+
+print("Create a new mission (for current location)")
 # adds_square_mission(vehicle.location.global_frame,50)
-primary_search_mission(vehicle.location.global_frame,200,50)
+primary_search_mission(vehicle.location.global_frame, 200, 50)
 
 # From Copter 3.3 you will be able to take off using a mission item. Plane must take off using a mission item (currently).
 arm_and_takeoff(10)
 
 print("Starting mission")
 # Reset mission set to first (0) waypoint
-vehicle.commands.next=0
+vehicle.commands.next = 0
 
 # Set mode to AUTO to start mission
 vehicle.mode = VehicleMode("AUTO")
 
 
-# Monitor mission. 
-# Demonstrates getting and setting the command number 
-# Uses distance_to_current_waypoint(), a convenience function for finding the 
+# Monitor mission.
+# Demonstrates getting and setting the command number
+# Uses distance_to_current_waypoint(), a convenience function for finding the
 #   distance to the next waypoint.
 
 while True:
-    nextwaypoint=vehicle.commands.next
-    print('Distance to waypoint (%s): %s' % (nextwaypoint, distance_to_current_waypoint()))
-  
+    nextwaypoint = vehicle.commands.next
+    print(
+        "Distance to waypoint (%s): %s" % (nextwaypoint, distance_to_current_waypoint())
+    )
+
     # if nextwaypoint==3: #Skip to next waypoint
     #     print('Skipping to Waypoint 5 when reach waypoint 3')
     #     vehicle.commands.next = 5
-    if nextwaypoint==15: #Dummy waypoint - as soon as we reach waypoint 4 this is true and we exit.
-        print("Exit 'standard' mission when start heading to final waypoint (%s)" % (nextwaypoint))
-        break;
+    if (
+        nextwaypoint == 15
+    ):  # Dummy waypoint - as soon as we reach waypoint 4 this is true and we exit.
+        print(
+            "Exit 'standard' mission when start heading to final waypoint (%s)"
+            % (nextwaypoint)
+        )
+        break
     time.sleep(1)
 
-print('Return to launch')
+print("Return to launch")
 vehicle.mode = VehicleMode("RTL")
 
 
-#Close vehicle object before exiting script
+# Close vehicle object before exiting script
 print("Close vehicle object")
 vehicle.close()
 

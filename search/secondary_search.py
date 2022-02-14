@@ -1,20 +1,10 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-
-<<<<<<< HEAD
 """
     SECONDARY SEARCH
+    # TODO implement secondary search
 """
 
-=======
-<<<<<<< HEAD
-# TODO implement secondary search
-
-
-def secondary_search():
-    pass
-=======
->>>>>>> fe5b0493bc548fb865f0328bfed82074bacb8457
 import asyncio
 import datetime
 import time
