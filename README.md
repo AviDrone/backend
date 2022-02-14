@@ -12,6 +12,9 @@ The problems the AviDrone project seeks to solve are as follows:
 
 * Pinpoint a victim's location autonomously
   
+<<<<<<< HEAD
+* Reduce victim search time for avalanche rescue teams.
+=======
 * Reduce victim search time for avalanche rescue teams.
 
 
@@ -48,3 +51,4 @@ Licenced under the [LGPL-2.1](https://www.gnu.org/licenses/lgpl-3.0.html) Licenc
 If you have any questions on how or why something was done, feel free to contact me
 ### Email
 - [Samuel H.](mailto:samuel.hernandez@wallawalla.edu)
+>>>>>>> ae37b7c4093c6512ed4241b505104a0f92c6474e
