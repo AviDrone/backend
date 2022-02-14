@@ -1,6 +1,13 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-# TODO implement primary search
+"""
+    PRIMARY SEARCH
+"""
+import asyncio
+import datetime
+import time
+
+
 def primary_search():
-    pass
+    pass  # TODO implement primary search

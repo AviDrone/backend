@@ -73,3 +73,10 @@ Prints the following information:
 - GPS_info
 - In_air
 - Position
+
+
+## Sources
+
+[Flight Modes](https://docs.px4.io/master/en/config/flight_mode.html)
+
+[Flight Modes DOCS](http://mavsdk-python-docs.s3-website.eu-central-1.amazonaws.com/plugins/telemetry.html)

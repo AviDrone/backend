@@ -13,3 +13,8 @@ In secondary search, the UAV follows the acquired signal and lands over it.
 ### Resources
 
 For more information, see: [How avalanche beacons work](https://avalanche.org/avalanche-encyclopedia/avalanche-transceiver-beacon/).
+ 
+### Sources:
+
+MAVSDK Reference: [Offboard_position_ned example](https://github.com/mavlink/MAVSDK-Python/blob/main/examples/offboard_position_ned.py)
+ 
