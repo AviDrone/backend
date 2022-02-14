@@ -61,7 +61,7 @@ def get_location_metres(original_location, dNorth, dEast):
     return LocationGlobal(newlat, newlon,original_location.alt)
 
 
-def get_distance_metres(aLocation1, aLocation2):
+def get_distance_metres(a_location1, a_location2):
     """
     Returns the ground distance in metres between two LocationGlobal objects.
 
@@ -69,8 +69,8 @@ def get_distance_metres(aLocation1, aLocation2):
     earth's poles. It comes from the ArduPilot test code: 
     https://github.com/diydrones/ardupilot/blob/master/Tools/autotest/common.py
     """
-    dlat = aLocation2.lat - aLocation1.lat
-    dlong = aLocation2.lon - aLocation1.lon
+    dlat = a_location2.lat - a_location1.lat
+    dlong = a_location2.lon - a_location1.lon
     return math.sqrt((dlat*dlat) + (dlong*dlong)) * 1.113195e5
 
 
@@ -101,7 +101,7 @@ def download_mission():
     cmds.wait_ready() # wait until download is complete.
 
 
-def search_mission(aLocation, aLength, aWidth):
+def search_mission(a_location, length, width):
     """
     Primary search testing, based on dronekit's basic square mission
     """	
@@ -118,61 +118,61 @@ def search_mission(aLocation, aLength, aWidth):
     cmds.add(Command( 0, 0, 0, mavutil.mavlink.MAV_FRAME_GLOBAL_RELATIVE_ALT, mavutil.mavlink.MAV_CMD_NAV_TAKEOFF, 0, 0, 0, 0, 0, 0, 0, 0, 10))
 
     print("Waypoint 1")
-    v_dist = -aWidth
+    v_dist = -width
     h_dist = 0
-    point = get_location_metres(aLocation, v_dist, h_dist)
+    point = get_location_metres(a_location, v_dist, h_dist)
     cmds.add(Command( 0, 0, 0, mavutil.mavlink.MAV_FRAME_GLOBAL_RELATIVE_ALT, mavutil.mavlink.MAV_CMD_NAV_WAYPOINT, 0, 0, 0, 0, 0, 0, point.lat, point.lon, 11))
     print("Waypoint 2")
-    h_dist = -aLength
-    point = get_location_metres(aLocation, v_dist, h_dist)
+    h_dist = -length
+    point = get_location_metres(a_location, v_dist, h_dist)
     cmds.add(Command( 0, 0, 0, mavutil.mavlink.MAV_FRAME_GLOBAL_RELATIVE_ALT, mavutil.mavlink.MAV_CMD_NAV_WAYPOINT, 0, 0, 0, 0, 0, 0, point.lat, point.lon, 12))
     print("Waypoint 3")
-    v_dist += -aWidth 
-    point = get_location_metres(aLocation, v_dist, h_dist)
+    v_dist += -width 
+    point = get_location_metres(a_location, v_dist, h_dist)
     cmds.add(Command( 0, 0, 0, mavutil.mavlink.MAV_FRAME_GLOBAL_RELATIVE_ALT, mavutil.mavlink.MAV_CMD_NAV_WAYPOINT, 0, 0, 0, 0, 0, 0, point.lat, point.lon, 13))
     print("Waypoint 4")
     h_dist = 0
-    point = get_location_metres(aLocation, v_dist, h_dist)
+    point = get_location_metres(a_location, v_dist, h_dist)
     cmds.add(Command( 0, 0, 0, mavutil.mavlink.MAV_FRAME_GLOBAL_RELATIVE_ALT, mavutil.mavlink.MAV_CMD_NAV_WAYPOINT, 0, 0, 0, 0, 0, 0, point.lat, point.lon, 14))
     print("Waypoint 5")
-    v_dist += -aWidth 
-    point = get_location_metres(aLocation, v_dist, h_dist)
+    v_dist += -width 
+    point = get_location_metres(a_location, v_dist, h_dist)
     cmds.add(Command( 0, 0, 0, mavutil.mavlink.MAV_FRAME_GLOBAL_RELATIVE_ALT, mavutil.mavlink.MAV_CMD_NAV_WAYPOINT, 0, 0, 0, 0, 0, 0, point.lat, point.lon, 15))
     print("Waypoint 6")
-    h_dist = -aLength
-    point = get_location_metres(aLocation, v_dist, h_dist)
+    h_dist = -length
+    point = get_location_metres(a_location, v_dist, h_dist)
     cmds.add(Command( 0, 0, 0, mavutil.mavlink.MAV_FRAME_GLOBAL_RELATIVE_ALT, mavutil.mavlink.MAV_CMD_NAV_WAYPOINT, 0, 0, 0, 0, 0, 0, point.lat, point.lon, 16))
     print("Waypoint 7")
-    v_dist += -aWidth 
-    point = get_location_metres(aLocation, v_dist, h_dist)
+    v_dist += -width 
+    point = get_location_metres(a_location, v_dist, h_dist)
     cmds.add(Command( 0, 0, 0, mavutil.mavlink.MAV_FRAME_GLOBAL_RELATIVE_ALT, mavutil.mavlink.MAV_CMD_NAV_WAYPOINT, 0, 0, 0, 0, 0, 0, point.lat, point.lon, 17))
     print("Waypoint 8")
     h_dist = 0
-    point = get_location_metres(aLocation, v_dist, h_dist)
+    point = get_location_metres(a_location, v_dist, h_dist)
     cmds.add(Command( 0, 0, 0, mavutil.mavlink.MAV_FRAME_GLOBAL_RELATIVE_ALT, mavutil.mavlink.MAV_CMD_NAV_WAYPOINT, 0, 0, 0, 0, 0, 0, point.lat, point.lon, 18))
     print("Waypoint 9")    
-    v_dist += -aWidth 
-    point = get_location_metres(aLocation, v_dist, h_dist)
+    v_dist += -width 
+    point = get_location_metres(a_location, v_dist, h_dist)
     cmds.add(Command( 0, 0, 0, mavutil.mavlink.MAV_FRAME_GLOBAL_RELATIVE_ALT, mavutil.mavlink.MAV_CMD_NAV_WAYPOINT, 0, 0, 0, 0, 0, 0, point.lat, point.lon, 19))
     print("Waypoint 10")
-    h_dist = -aLength
-    point = get_location_metres(aLocation, v_dist, h_dist)
+    h_dist = -length
+    point = get_location_metres(a_location, v_dist, h_dist)
     cmds.add(Command( 0, 0, 0, mavutil.mavlink.MAV_FRAME_GLOBAL_RELATIVE_ALT, mavutil.mavlink.MAV_CMD_NAV_WAYPOINT, 0, 0, 0, 0, 0, 0, point.lat, point.lon, 20))
     print("Waypoint 11")
     h_dist = 0
-    point = get_location_metres(aLocation, v_dist, h_dist)
+    point = get_location_metres(a_location, v_dist, h_dist)
     cmds.add(Command( 0, 0, 0, mavutil.mavlink.MAV_FRAME_GLOBAL_RELATIVE_ALT, mavutil.mavlink.MAV_CMD_NAV_WAYPOINT, 0, 0, 0, 0, 0, 0, point.lat, point.lon, 14))
     print("Waypoint 12")
-    v_dist += -aWidth 
-    point = get_location_metres(aLocation, v_dist, h_dist)
+    v_dist += -width 
+    point = get_location_metres(a_location, v_dist, h_dist)
     cmds.add(Command( 0, 0, 0, mavutil.mavlink.MAV_FRAME_GLOBAL_RELATIVE_ALT, mavutil.mavlink.MAV_CMD_NAV_WAYPOINT, 0, 0, 0, 0, 0, 0, point.lat, point.lon, 15))
     print("Waypoint 13")
-    v_dist += -aWidth 
-    point = get_location_metres(aLocation, v_dist, h_dist)
+    v_dist += -width 
+    point = get_location_metres(a_location, v_dist, h_dist)
     cmds.add(Command( 0, 0, 0, mavutil.mavlink.MAV_FRAME_GLOBAL_RELATIVE_ALT, mavutil.mavlink.MAV_CMD_NAV_WAYPOINT, 0, 0, 0, 0, 0, 0, point.lat, point.lon, 19))
     print("Waypoint 14")
-    h_dist = -aLength
-    point = get_location_metres(aLocation, v_dist, h_dist)
+    h_dist = -length
+    point = get_location_metres(a_location, v_dist, h_dist)
     cmds.add(Command( 0, 0, 0, mavutil.mavlink.MAV_FRAME_GLOBAL_RELATIVE_ALT, mavutil.mavlink.MAV_CMD_NAV_WAYPOINT, 0, 0, 0, 0, 0, 0, point.lat, point.lon, 20))
 
     # #add dummy waypoint "5" at point 4 (lets us know when have reached destination)
@@ -181,7 +181,7 @@ def search_mission(aLocation, aLength, aWidth):
     print(" Upload new commands to vehicle")
     cmds.upload()
 
-def primary_search_mission(aLocation, aLength, aWidth):
+def primary_search_mission(a_location, length, width):
     """
     Primary search testing, based on dronekit's basic square mission
     """	
@@ -205,12 +205,12 @@ def primary_search_mission(aLocation, aLength, aWidth):
         if step == 0:
             h_dist = 0
         elif (step == 1) or (step == 3):
-            v_dist -= aWidth
+            v_dist -= width
         else:
-            h_dist = -aLength
+            h_dist = -length
         step += 1
         step = step % 4    
-        point = get_location_metres(aLocation, v_dist, h_dist)
+        point = get_location_metres(a_location, v_dist, h_dist)
         cmds.add(Command( 0, 0, 0, mavutil.mavlink.MAV_FRAME_GLOBAL_RELATIVE_ALT, mavutil.mavlink.MAV_CMD_NAV_WAYPOINT, 0, 0, 0, 0, 0, 0, point.lat, point.lon, 11))
  
     # add dummy waypoint at final point (lets us know when have reached destination)
@@ -219,10 +219,10 @@ def primary_search_mission(aLocation, aLength, aWidth):
     print(" Upload new commands to vehicle")
     cmds.upload()    
 
-def adds_square_mission(aLocation, aSize):
+def adds_square_mission(a_location, aSize):
     """
     Adds a takeoff command and four waypoint commands to the current mission. 
-    The waypoints are positioned to form a square of side length 2*aSize around the specified LocationGlobal (aLocation).
+    The waypoints are positioned to form a square of side length 2*aSize around the specified LocationGlobal (a_location).
 
     The function assumes vehicle.commands matches the vehicle mission state 
     (you must have called download at least once in the session and after clearing the mission)
@@ -240,10 +240,10 @@ def adds_square_mission(aLocation, aSize):
     cmds.add(Command( 0, 0, 0, mavutil.mavlink.MAV_FRAME_GLOBAL_RELATIVE_ALT, mavutil.mavlink.MAV_CMD_NAV_TAKEOFF, 0, 0, 0, 0, 0, 0, 0, 0, 10))
 
     #Define the four MAV_CMD_NAV_WAYPOINT locations and add the commands
-    point1 = get_location_metres(aLocation, aSize, -aSize)
-    point2 = get_location_metres(aLocation, aSize, aSize)
-    point3 = get_location_metres(aLocation, -aSize, aSize)
-    point4 = get_location_metres(aLocation, -aSize, -aSize)
+    point1 = get_location_metres(a_location, aSize, -aSize)
+    point2 = get_location_metres(a_location, aSize, aSize)
+    point3 = get_location_metres(a_location, -aSize, aSize)
+    point4 = get_location_metres(a_location, -aSize, -aSize)
     cmds.add(Command( 0, 0, 0, mavutil.mavlink.MAV_FRAME_GLOBAL_RELATIVE_ALT, mavutil.mavlink.MAV_CMD_NAV_WAYPOINT, 0, 0, 0, 0, 0, 0, point1.lat, point1.lon, 11))
     cmds.add(Command( 0, 0, 0, mavutil.mavlink.MAV_FRAME_GLOBAL_RELATIVE_ALT, mavutil.mavlink.MAV_CMD_NAV_WAYPOINT, 0, 0, 0, 0, 0, 0, point2.lat, point2.lon, 12))
     cmds.add(Command( 0, 0, 0, mavutil.mavlink.MAV_FRAME_GLOBAL_RELATIVE_ALT, mavutil.mavlink.MAV_CMD_NAV_WAYPOINT, 0, 0, 0, 0, 0, 0, point3.lat, point3.lon, 13))
