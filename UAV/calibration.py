@@ -7,7 +7,11 @@ from mavsdk import System
 # TODO test this with our own drone.
 
 
+<<<<<<< HEAD
 async def run():
+=======
+async def calibrate():
+>>>>>>> cb7f8bcdbfa52b56a9cf9c4d100d32f0f54aedaf
     """
     For more info, see:
     http://mavsdk-python-docs.s3-website.eu-central-1.amazonaws.com/plugins/calibration.html
@@ -41,4 +45,8 @@ async def run():
 
 if __name__ == "__main__":
     loop = asyncio.get_event_loop()
+<<<<<<< HEAD
     loop.run_until_complete(run())
+=======
+    loop.run_until_complete(calibrate())
+>>>>>>> cb7f8bcdbfa52b56a9cf9c4d100d32f0f54aedaf
