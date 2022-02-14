@@ -22,7 +22,7 @@ from datetime import datetime
 
 #Set up option parsing to get connection string
 import argparse  
-parser = argparse.ArgumentParser(description='Generates max, min and current interval between message sent and ack recieved. Will start and connect to SITL if no connection string specified.')
+parser = argparse.ArgumentParser(description='Generates max, min and current interval between message sent and ack received. Will start and connect to SITL if no connection string specified.')
 parser.add_argument('--connect', 
                    help="vehicle connection target string. If not specified, SITL automatically started and used.")
 args = parser.parse_args()
