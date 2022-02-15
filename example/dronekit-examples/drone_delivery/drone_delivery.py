@@ -19,8 +19,7 @@ import time
 
 import cherrypy
 import simplejson
-from dronekit import (LocationGlobal, LocationGlobalRelative, VehicleMode,
-                      connect)
+from dronekit import LocationGlobal, LocationGlobalRelative, VehicleMode, connect
 from jinja2 import Environment, FileSystemLoader
 
 parser = argparse.ArgumentParser(

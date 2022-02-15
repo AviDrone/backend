@@ -1,181 +1,188 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+from __future__ import print_function
 
 import asyncio
 import datetime
+import pathlib
 import time
+import serial
 
-from mavsdk import System
-from mavsdk.offboard import OffboardError, PositionNedYaw
-from transceiver.direction_distance import directionDistance as Transceiver
-from UAV.gps_data import GPSData
-from UAV.parameter import flight_mode, parameter
+from dronekit import (LocationGlobal, LocationGlobalRelative,
+                      VehicleMode, connect)
+from pymavlink import mavutil
+from transceiver.direction_distance import DirectionDistance as transceiver
+from UAV import default_parameters
 
-signal_found = False
-parameters, flight_modes = parameter(), flight_mode()
-default_magnitude = parameters[0]
-default_altitude = parameters[1]
-default_land_threshold = parameters[5]
-default_window_size = parameters[6]
+default = default_parameters.parameter()
 
-STABILIZED = flight_modes[12]
+default_degrees = default[2]
+default_altitude = default[4]
+default_land_threshold = default[5]
+
+drone = connect("/dev/serial0", baud=57600)
+print("-- Waiting for drone to connect...")
+vehicle.wait_ready("-- Drone Found!")
 
 
-async def secondary_search():
-    """
-    Source:
-    https://github.com/mavlink/MAVSDK-Python/blob/main/examples/offboard_position_ned.py
-    """
+def arm() -> None:
+    print("-- Waiting for drone to initialize...")
+    while not drone.is_armable:
+        time.sleep(1)
 
-    # Initiation sequence
+    drone.mode = VehicleMode("GUIDED")
+    drone.armed = True
 
-    drone = System()
-    await drone.connect(system_address="serial:///dev/ttyACM0")
-    print("Waiting for drone to connect...")
-    async for state in drone.core.connection_state():
-        if state.is_connected:
-            print("Drone discovered!")
+    print("-- Arming...")
+    while not vehicle.is_armable:
+        time.sleep(1)
+
+
+def takeoff_to(default_altitude):
+    print(f"-- Taking off to altitude (m): {default_altitude} \n")
+    drone.simple_takeoff(target_altitude)
+
+    while True:
+        if vehicle.location.global_relative_frame.alt >= aTargetAltitude * 0.95:
+            print(f"-- Reached {default_altitude}m")
             break
+        time.sleep(1)
 
-    print("Waiting for drone to have a global position estimate...")
-    async for health in drone.telemetry.health():
-        if health.is_global_position_ok:
-            print("Global position estimate ok")
-            break
 
-    print("-- Arming")
-    await drone.action.arm()
+def condition_yaw(heading, relative=False):
+    """
+    Modified to allow for clockwise and counter-clockwise operation
+    """
+    original_yaw = vehicle.attitude.yaw
+    if relative:
+        is_relative = 1  # yaw relative to direction of travel
+    else:
+        is_relative = 0  # yaw is an absolute angle
 
-    print("-- Setting initial set point")
-    await drone.offboard.set_position_ned(PositionNedYaw(0.0, 0.0, 0.0, 0.0))
+    if heading < 0:
+        heading = abs(heading)
+        cw = -1
+    else:
+        cw = 1
 
-    print("-- Starting offboard")
-    try:
-        await drone.offboard.start()
-    except OffboardError as error:
-        print(
-            "Starting offboard." f" mode failed with error code: {error._result.result}"
-        )
-        print("-- Disarming")
-        await drone.action.disarm()
-        return
+    # create the CONDITION_YAW command using command_long_encode()
+    msg = vehicle.message_factory.command_long_encode(
+        0,  # target system
+        0,  # target component
+        mavutil.mavlink.MAV_CMD_CONDITION_YAW,  # command
+        0,  # confirmation
+        heading,  # param 1, yaw in degrees
+        0,  # param 2, yaw speed deg/s
+        cw,  # param 3, direction -1 ccw, 1 cw
+        is_relative,  # param 4, relative offset 1, absolute angle 0
+        0,
+        0,
+        0,
+    )  # param 5 ~ 7 not used
+    # send command to vehicle
+    vehicle.send_mavlink(msg)
 
-    print("-- Taking off to altitude (m): ", default_altitude, "\n")
-    await drone.action.set_takeoff_altitude(default_altitude)
-    await drone.action.takeoff()
-    # Initiation sequence
+    """
+    Adding additional code to make drone wait till the wobbling settles down
+    before moving forward.
+    """
+    heading_rad = heading * math.pi / 180
+    target_yaw = original_yaw + cw * heading_rad
 
-    print("-- Initializing secondary search mission", "\n")
-    print("-- Initializing the gps_window")  # to be default_window_size long
-    gps_window = GPSData(default_window_size)
+    # 1 Degree of error....
+    while abs(target_yaw - vehicle.attitude.yaw) % math.pi > 0.01745 * DEGREE_ERROR:
+        print("Turn error: ", abs(target_yaw - vehicle.attitude.yaw) % math.pi)
+        time.sleep(0.25)
 
-    print("-- Setting STABILIZED flight mode")
-    await drone.telemetry.set_flight_mode(STABILIZED)  # Originally GUIDED mode
 
-    while drone.telemetry.flight_mode() == STABILIZED:
+def initialize():
+    arm()
+    if drone.armed:
+        print(f"-- Armed: {drone.armed}")
+        takeoff_to(default_altitude)
 
-        if Transceiver.direction < 2:  # Turn left
-            print("-- Turn to face East")
-            await drone.offboard.set_position_ned(
-                PositionNedYaw(0.0, 0.0, 0.0, -90.0)  # North  # East  # Down  # South
-            )
-            await asyncio.sleep(5)
 
-        elif Transceiver.direction > 2:  # Turn right
-            print("-- Turn to face West")
-            await drone.offboard.set_position_ned(PositionNedYaw(0.0, 0.0, 0.0, -90.0))
-            await asyncio.sleep(5)
+print("-- Initializing the gps_window")  # to be default_window_size long
+gps_window = GPSData(default_window_size)
 
-        elif Transceiver.direction == 2:  # Continue forward
-            print("Fly forward")
-            global_position = drone.telemetry.position()
-            gps_window.add_point(global_position, Transceiver.distance)
+print("-- Setting GUIDED flight mode")
+while vehicle.mode.name != "GUIDED":
+    print("Waiting for GUIDED mode")
+    time.sleep(1)
 
-            center_point = (gps_window.window_size - 1) / 2
-            last_point = gps_window.window_size - 1
 
-            # If the minimum is the center point of the gps_window,
-            # we need to go back to that location
+def secondary_search() -> None:
+    signal_found = False
+    print("\n -- SECONDARY SEARCH -- \n")
+    initialize()  # UAV
 
+    print("-- transceiver reading (direction, distance):")
+    while vehicle.mode.name == "GUIDED":
+        transceiver = read_transceiver()
+        print(transceiver.direction, ", ", transceiver.distance)
+
+        if transceiver.direction < 2:  # Turn left
+            print("-- Turning left")
+            condition_yaw(-DEGREES, True)
+
+        elif transceiver.direction > 2:  # Turn right
+            print("-- Turning right")
+            condition_yaw(DEGREES, True)
+
+        elif transceiver.direction == 2:  # Continue forward
+            print("-- Continuing forward")
+            gps_window.add_point(get_global_pos(), direction_distance.distance)
             if (
-                gps_window.get_minimum_index() == center_point
+                gps_window.get_minimum_index() == ((gps_window.window_size - 1) / 2)
                 and len(gps_window.gps_points) == gps_window.window_size
             ):
 
-                #  TODO IMPLEMENT
-                #   drone.action.goto_location()
+                # If the minimum is the center point of the gps_window we need to go
+                # back to that location, Min index = middle
 
-                if (
-                    gps_window.distance[2]
-                    <= default_land_threshold  # Land over local minimum
-                ):
+                simple_goto_wait(
+                    gps_window.gps_points[int((gps_window.window_size - 1) / 2)]
+                )
+
+                if gps_window.distance[2] <= default_land_threshold:
+                    print("-- Landing")
+                    vehicle.mode = VehicleMode("LAND")
                     signal_found = True
 
-                    print("-- Landing")
-                    await drone.action.land()
-
-                    if signal_found:
-                        current_time = datetime.datetime.now()
-
-                        print("--- SIGNAL FOUND --- ", f"-- time: {current_time}")
-                        print(f"-- location: {global_position}")
+                if signal_found:
+                    current_time = datetime.datetime.now()
+                    print("--- SIGNAL FOUND --- ", f"-- time: {current_time}")
+                    print(f"-- location: {global_position}")
 
                 else:
                     print("Not close, continuing")
                     gps_window.purge_gps_window()
 
             elif (
-                gps_window.get_minimum_index() == last_point
+                gps_window.get_minimum_index() == (gps_window.window_size - 1)
                 and len(gps_window.gps_points) == gps_window.window_size
             ):
 
-                # If the minimum data point is
-                # the last one in the array we have gone
+                # If the minimum data point is the last one in the array,
+                print("too far in the wrong direction")
 
-                print("too far, and in the wrong direction")
-
-                # TODO REFACTOR
-                #  condition_yaw(180, True)
-                # TODO REFACTOR
-                #  simple_goto_wait(
-                #  gps_window.gps_points[gps_window.window_size - 1]
-                #  )
+                condition_yaw(180, True)
+                simple_goto_wait(gps_window.gps_points[gps_window.window_size - 1])
                 gps_window.purge_gps_window()
 
             elif gps_window.get_minimum_index() == 0:
-
                 # If the minimum data point is in the first index,
                 print("continue forward")
-
-                # TODO REFACTOR
-                #  better_goto(
-                #  default_magnitude,
-                #  vehicle.attitude.yaw
-                #  , vehicle
-                #  )
+                better_goto(MAGNITUDE, vehicle.attitude.yaw, vehicle)
 
             else:
                 print(f"Did not find signal at altitude: {default_altitude}")
                 print("Climbing...")
-                # TODO REFACTOR
-                #  better_goto(
-                #  default_magnitude,
-                #  vehicle.attitude.yaw,
-                #  vehicle
-                #  )
-
+                better_goto(MAGNITUDE, vehicle.attitude.yaw, vehicle)
         time.sleep(2)
-
-    print("-- Stopping offboard")
-    try:
-        await drone.offboard.stop()
-    except OffboardError as error:
-        print(
-            "Stopping offboard. ",
-            f"mode failed with error code: {error._result.result}",
-        )
 
 
 if __name__ == "__main__":
     loop = asyncio.get_event_loop()
-    loop.run_until_complete(secondary_search())
+    loop.run_until_complete(initialize())
+    secondary_search()

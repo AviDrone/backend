@@ -20,8 +20,7 @@ import argparse
 import math
 import time
 
-from dronekit import (LocationGlobal, LocationGlobalRelative, VehicleMode,
-                      connect)
+from dronekit import LocationGlobal, LocationGlobalRelative, VehicleMode, connect
 from pymavlink import mavutil  # Needed for command message definitions
 
 parser = argparse.ArgumentParser(
