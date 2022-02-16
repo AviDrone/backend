@@ -5,7 +5,7 @@
 import ctypes
 import pathlib
 
-from direction_distance import DirectionDistance
+from transceiver_output import DirectionDistance
 
 
 def read_transceiver():

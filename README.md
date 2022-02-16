@@ -5,8 +5,6 @@
 ![stars](https://img.shields.io/github/stars/AviDrone/AviDrone?style=social)
 ![forks](https://img.shields.io/github/forks/AviDrone/AviDrone?style=social)
 
-<!-- TODO add shields -->
-
 ## Project Motivations
 
 Avalanches kill over 150 people worldwide every year. After getting caught in an avalanche, your chances of survival in the first 15 minutes are around 90%. After 30 minutes, your chances drop to 30%. Rescue teams must get to avalanche victims in the fastest time possible.
@@ -26,9 +24,8 @@ To get started with the basic drone control you will need [QGroundControl](https
 They provide full flight control and vehicle setup for PX4 or ArduPilot powered vehicles. This is the software responsible for communicating with the flight controller (PX4 in our case).
 
 ### Libraries
-- [MAVSDK-Python](https://github.com/mavlink/MAVSDK-Python)
-- [aioconsole](https://github.com/vxgmichel/aioconsole)
-<!-- TODO add remaining libraries-->
+- [Ardupilot](https://ardupilot.org/dev/docs/droneapi-tutorial.html#)
+
 
 ## Installation
 
