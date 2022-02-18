@@ -1,11 +1,8 @@
 from unittest import TestCase
-
 from avidrone.search import default_parameters
 
-
-class Parameters(TestCase):
-    @staticmethod
-    def test_parameter():
+class Parameter(TestCase):
+    def test_parameter(self):
         parameter = default_parameters.parameter()
         MAGNITUDE = 1
         HEIGHT = 4
