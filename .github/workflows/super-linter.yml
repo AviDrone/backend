@@ -3,7 +3,7 @@ name: Super-linter
 
 on:
   push:
-    branches: [ main ]
+    branches: [ develop ]
   pull_request:
     branches: [ main ]
 jobs:

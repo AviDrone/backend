@@ -1,6 +1,6 @@
 from unittest import TestCase
 
-from search import default_parameters
+from avidrone.search import default_parameters
 
 
 class Parameters(TestCase):

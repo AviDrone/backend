@@ -13,7 +13,6 @@ import read_transceiver
 from dronekit import LocationGlobal, VehicleMode, connect
 from gps_data import GPSData
 from pymavlink import mavutil
-from transceiver_output import DirectionDistance
 
 default = default_parameters.parameter()
 default_size = len(default)
@@ -245,7 +244,7 @@ while drone.mode.name != "GUIDED":
 def secondary_search() -> None:
     print("-- SECONDARY SEARCH --")
     signal_found = False
-    initialize()  # UAV
+    initialize()  # uav
 
     while drone.mode.name == "GUIDED":
         transceiver = read_transceiver()
