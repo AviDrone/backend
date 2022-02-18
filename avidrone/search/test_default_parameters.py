@@ -2,6 +2,7 @@ from unittest import TestCase
 
 from avidrone.search import default_parameters
 
+
 class Parameter(TestCase):
     def test_parameter(self):
         parameter = default_parameters.parameter()
