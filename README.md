@@ -1,7 +1,6 @@
 # AviDrone
 
 ![license](https://img.shields.io/github/license/AviDrone/AviDrone)
-![downloads](https://img.shields.io/github/downloads/AviDrone/AviDrone/total)
 ![stars](https://img.shields.io/github/stars/AviDrone/AviDrone?style=social)
 ![forks](https://img.shields.io/github/forks/AviDrone/AviDrone?style=social)
 
