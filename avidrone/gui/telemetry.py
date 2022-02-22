@@ -210,7 +210,7 @@ time.sleep(2)
 
 print("\n Attempt to remove observer added with `on_attribute` decorator (should fail)")
 try:
-    vehicle.remove_attribute_listener('mode', decorated_mode_callback)
+    vehicle.remove_attribute_listener("mode", decorated_mode_callback)
 except:
     print(" Exception: Cannot remove observer added using decorator")
 
@@ -218,7 +218,6 @@ except:
 # Demonstrate getting callback on any attribute change
 def wildcard_callback(self, attr_name, value):
     print(" CALLBACK: (%s): %s" % (attr_name, value))
-    
 print("\nAdd attribute callback detecting ANY attribute change")     
 vehicle.add_attribute_listener("*", wildcard_callback)
 
