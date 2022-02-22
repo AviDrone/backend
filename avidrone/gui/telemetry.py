@@ -215,24 +215,6 @@ except:
     print(" Exception: Cannot remove observer added using decorator")
 
 
-# Demonstrate getting callback on any attribute change
-def wildcard_callback(self, attr_name, value):
-    print(" CALLBACK: (%s): %s" % (attr_name, value))
-
-
-
-print("Add attribute callback detecting ANY attribute change") 
-vehicle.add_attribute_listener("*", wildcard_callback)
-
-
-print(" Wait 1s so callback invoked before observer removed")
-time.sleep(1)
-
-print(" Remove Vehicle attribute observer")
-# Remove observer added with `add_attribute_listener()`
-vehicle.remove_attribute_listener("*", wildcard_callback)
-
-
 # Get/Set Vehicle Parameters
 print("\nRead and write parameters")
 print(" Read vehicle param 'THR_MIN': %s" % vehicle.parameters["THR_MIN"])
