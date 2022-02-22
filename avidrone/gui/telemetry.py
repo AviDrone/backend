@@ -59,11 +59,16 @@ print(" Autopilot capabilities")
 print("   Supports MISSION_FLOAT message type: %s" % vehicle.capabilities.mission_float)
 print("   Supports PARAM_FLOAT message type: %s" % vehicle.capabilities.param_float)
 print("   Supports MISSION_INT message type: %s" % vehicle.capabilities.mission_int)
-print("   Supports COMMAND_INT message type: %s" % vehicle.capabilities.command_int)
-print("   Supports PARAM_UNION message type: %s" %vehicle.capabilities.param_union)
+print("   Supports PARAM_UNION message type: %s" % vehicle.capabilities.param_union)
 print("   Supports ftp for file transfers: %s" % vehicle.capabilities.ftp)
-print("   Supports commanding attitude offboard: %s" % vehicle.capabilities.set_attitude_target)
-print("   Supports set position + velocity targets in global scaled integers: %s" % vehicle.capabilities.set_altitude_target_global_int)
+print(
+    "   Supports commanding attitude offboard: %s"
+    % vehicle.capabilities.set_attitude_target
+)
+print(
+    "   Supports set position + velocity targets in global scaled integers: %s"
+    % vehicle.capabilities.set_altitude_target_global_int
+)
 print("   Supports terrain protocol / data handling: %s" % vehicle.capabilities.terrain)
 print("   Supports direct actuator control: %s" % vehicle.capabilities.set_actuator_target)
 print("   Supports the flight termination command: %s" % vehicle.capabilities.flight_termination)
