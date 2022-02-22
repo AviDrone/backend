@@ -220,7 +220,7 @@ def wildcard_callback(self, attr_name, value):
     print(" CALLBACK: (%s): %s" % (attr_name, value))
     
 print("\nAdd attribute callback detecting ANY attribute change")     
-vehicle.add_attribute_listener('*', wildcard_callback)
+vehicle.add_attribute_listener("*", wildcard_callback)
 
 
 print(" Wait 1s so callback invoked before observer removed")
@@ -228,7 +228,7 @@ time.sleep(1)
 
 print(" Remove Vehicle attribute observer")
 # Remove observer added with `add_attribute_listener()`
-vehicle.remove_attribute_listener('*', wildcard_callback)
+vehicle.remove_attribute_listener("*", wildcard_callback)
 
 
 # Get/Set Vehicle Parameters
@@ -236,7 +236,7 @@ print("\nRead and write parameters")
 print(" Read vehicle param 'THR_MIN': %s" % vehicle.parameters["THR_MIN"])
 
 print(" Write vehicle param 'THR_MIN' : 10")
-vehicle.parameters['THR_MIN'] = 10
+vehicle.parameters["THR_MIN"] = 10
 print(" Read new value of param 'THR_MIN': %s" % vehicle.parameters["THR_MIN"])
 
 
@@ -256,7 +256,7 @@ def decorated_thr_min_callback(self, attr_name, value):
     print(" PARAMETER CALLBACK: %s changed to: %s" % (attr_name, value))
 
 
-print("Write vehicle param \"THR_MIN\" : 20 (and wait for callback)")
+print("Write vehicle param 'THR_MIN' : 20 (and wait for callback)")
 vehicle.parameters["THR_MIN"] = 20
 for x in range(1, 5):
     # Callbacks may not be updated for a few seconds
@@ -284,7 +284,7 @@ vehicle.parameters["THR_MIN"] = 30
 # Reset variables to sensible values.
 print("\nReset vehicle attributes/parameters and exit")
 vehicle.mode = VehicleMode("STABILIZE")
-#vehicle.armed = False
+# vehicle.armed = False
 vehicle.parameters["THR_MIN"] = 130
 vehicle.parameters["THR_MID"] = 500
 
