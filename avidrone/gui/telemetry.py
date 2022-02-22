@@ -218,10 +218,9 @@ except:
 # Demonstrate getting callback on any attribute change
 def wildcard_callback(self, attr_name, value):
     print(" CALLBACK: (%s): %s" % (attr_name, value))
-
-
-print("Add attribute callback detecting ANY attribute change")
-vehicle.add_attribute_listener"'*", wildcard_callback)
+    
+print("\nAdd attribute callback detecting ANY attribute change")     
+vehicle.add_attribute_listener('*', wildcard_callback)
 
 
 print(" Wait 1s so callback invoked before observer removed")
