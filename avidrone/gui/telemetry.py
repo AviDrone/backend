@@ -22,7 +22,6 @@ import dronekit_sitl
 from dronekit import VehicleMode, connect
 
 parser = argparse.ArgumentParser(
-
     description="Print out vehicle state information. Connects to SITL on local PC by default."
 )
 parser.add_argument(
@@ -109,7 +108,6 @@ print(" Mode: %s" % vehicle.mode.name)  # settable
 print(" Armed: %s" % vehicle.armed)  # settable
 
 
-
 # Get Vehicle Home location - will be `None` until first set by autopilot
 while not vehicle.home_location:
     cmds = vehicle.commands
@@ -137,12 +135,14 @@ print(
 cmds = vehicle.commands
 cmds.download()
 cmds.wait_ready()
-print(" New Home Location (from vehicle - altitude should be 222): %s" % vehicle.home_location)
-
+print(
+    " New Home Location (from vehicle - altitude should be 222): %s"
+    % vehicle.home_location
+)
 
 print("\nSet Vehicle.mode = GUIDED (currently: %s)" % vehicle.mode.name)
 vehicle.mode = VehicleMode("GUIDED")
-while not vehicle.mode.name =="'GUIDED":  # Wait until mode has changed
+while not vehicle.mode.name =="GUIDED":  # Wait until mode has changed
     print(" Waiting for mode change ...")
     time.sleep(1)
 
@@ -220,8 +220,8 @@ def wildcard_callback(self, attr_name, value):
     print(" CALLBACK: (%s): %s" % (attr_name, value))
 
 
-print("\nAdd attribute callback detecting ANY attribute change")
-vehicle.add_attribute_listener('*', wildcard_callback)
+print("Add attribute callback detecting ANY attribute change")
+vehicle.add_attribute_listener"'*", wildcard_callback)
 
 
 print(" Wait 1s so callback invoked before observer removed")
@@ -234,11 +234,11 @@ vehicle.remove_attribute_listener('*', wildcard_callback)
 
 # Get/Set Vehicle Parameters
 print("\nRead and write parameters")
-print(" Read vehicle param 'THR_MIN': %s" % vehicle.parameters['THR_MIN'])
+print(" Read vehicle param 'THR_MIN': %s" % vehicle.parameters["THR_MIN"])
 
 print(" Write vehicle param 'THR_MIN' : 10")
 vehicle.parameters['THR_MIN'] = 10
-print(" Read new value of param 'THR_MIN': %s" % vehicle.parameters['THR_MIN'])
+print(" Read new value of param 'THR_MIN': %s" % vehicle.parameters["THR_MIN"])
 
 
 print("\nPrint all parameters (iterate `vehicle.parameters`):")
@@ -252,16 +252,16 @@ print("\nCreate parameter observer using decorator")
 # Observer added using decorator can't be removed.
 
 
-@vehicle.parameters.on_attribute('THR_MIN')
+@vehicle.parameters.on_attribute("THR_MIN")
 def decorated_thr_min_callback(self, attr_name, value):
     print(" PARAMETER CALLBACK: %s changed to: %s" % (attr_name, value))
 
 
-print("Write vehicle param 'THR_MIN' : 20 (and wait for callback)")
-vehicle.parameters['THR_MIN'] = 20
+print("Write vehicle param "THR_MIN" : 20 (and wait for callback)")
+vehicle.parameters["THR_MIN"] = 20
 for x in range(1, 5):
     # Callbacks may not be updated for a few seconds
-    if vehicle.parameters['THR_MIN'] == 20:
+    if vehicle.parameters["THR_MIN"] == 20:
         break
     time.sleep(1)
 
@@ -274,19 +274,20 @@ def any_parameter_callback(self, attr_name, value):
     print(" ANY PARAMETER CALLBACK: %s changed to: %s" % (attr_name, value))
 
 
-# Add observer for the vehicle's any/all parameters parameter (defined using wildcard string ``'*'``)
-vehicle.parameters.add_attribute_listener('*', any_parameter_callback)
+# Add observer for the vehicle's any/all parameters
+# parameter (defined using wildcard string ``'*'``)
+vehicle.parameters.add_attribute_listener("*", any_parameter_callback)
 print(" Change THR_MID and THR_MIN parameters (and wait for callback)")
-vehicle.parameters['THR_MID'] = 400
-vehicle.parameters['THR_MIN'] = 30
+vehicle.parameters["THR_MID"] = 400
+vehicle.parameters["THR_MIN"] = 30
 
 
 # Reset variables to sensible values.
 print("\nReset vehicle attributes/parameters and exit")
 vehicle.mode = VehicleMode("STABILIZE")
 #vehicle.armed = False
-vehicle.parameters['THR_MIN'] = 130
-vehicle.parameters['THR_MID'] = 500
+vehicle.parameters["THR_MIN"] = 130
+vehicle.parameters["THR_MID"] = 500
 
 
 # Close vehicle object before exiting script
