@@ -19,7 +19,7 @@ from dronekit import (
     LocationGlobalRelative,
     VehicleMode,
     connect,
-    )
+)
 from pymavlink import mavutil
 
 parser = argparse.ArgumentParser(description="Demonstrates basic mission operations.")
