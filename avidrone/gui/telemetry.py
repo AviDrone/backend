@@ -68,8 +68,6 @@ print("   Supports PARAM_UNION message type: %s" %
 print("   Supports ftp for file transfers: %s" % vehicle.capabilities.ftp)
 print("   Supports commanding attitude offboard: %s" %
       vehicle.capabilities.set_attitude_target)
-print("   Supports commanding position and velocity targets in local NED frame: %s" %
-      vehicle.capabilities.set_attitude_target_local_ned)
 print("   Supports set position + velocity targets in global scaled integers: %s" %
       vehicle.capabilities.set_altitude_target_global_int)
 print("   Supports terrain protocol / data handling: %s" %
