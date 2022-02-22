@@ -256,7 +256,7 @@ def decorated_thr_min_callback(self, attr_name, value):
     print(" PARAMETER CALLBACK: %s changed to: %s" % (attr_name, value))
 
 
-print("Write vehicle param "THR_MIN" : 20 (and wait for callback)")
+print("Write vehicle param \"THR_MIN\" : 20 (and wait for callback)")
 vehicle.parameters["THR_MIN"] = 20
 for x in range(1, 5):
     # Callbacks may not be updated for a few seconds
