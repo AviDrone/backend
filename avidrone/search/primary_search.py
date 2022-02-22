@@ -13,13 +13,8 @@ import datetime
 import math
 import time
 
-from dronekit import (
-    Command,
-    LocationGlobal,
-    LocationGlobalRelative,
-    VehicleMode,
-    connect,
-)
+from dronekit import (Command, LocationGlobal, LocationGlobalRelative,
+                      VehicleMode, connect)
 from pymavlink import mavutil
 
 parser = argparse.ArgumentParser(description="Demonstrates basic mission operations.")

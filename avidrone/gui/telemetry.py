@@ -14,11 +14,13 @@ Source:
 https://dronekit-python.readthedocs.io/en/latest/examples/vehicle_state.html
 """
 from __future__ import print_function
-from dronekit import connect, VehicleMode
-import time
 
 # Set up option parsing to get connection string
 import argparse
+import time
+
+from dronekit import VehicleMode, connect
+
 parser = argparse.ArgumentParser(
     description='Print out vehicle state information. Connects to SITL on local PC by default.')
 parser.add_argument('--connect',
