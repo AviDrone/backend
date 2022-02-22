@@ -142,7 +142,7 @@ print(
 
 print("\nSet Vehicle.mode = GUIDED (currently: %s)" % vehicle.mode.name)
 vehicle.mode = VehicleMode("GUIDED")
-while not vehicle.mode.name =="GUIDED":  # Wait until mode has changed
+while not vehicle.mode.name == "GUIDED":  # Wait until mode has changed
     print(" Waiting for mode change ...")
     time.sleep(1)
 
@@ -180,21 +180,21 @@ def attitude_callback(self, attr_name, value):
 
 
 print("\nAdd `attitude` attribute callback/observer on `vehicle`")
-vehicle.add_attribute_listener('attitude', attitude_callback)
+vehicle.add_attribute_listener("attitude", attitude_callback)
 
 print(" Wait 2s so callback invoked before observer removed")
 time.sleep(2)
 
 print(" Remove Vehicle.attitude observer")
 # Remove observer added with `add_attribute_listener()` specifying the attribute and callback function
-vehicle.remove_attribute_listener('attitude', attitude_callback)
+vehicle.remove_attribute_listener("attitude", attitude_callback)
 
 
 # Add mode attribute callback using decorator (callbacks added this way cannot be removed).
 print("\nAdd `mode` attribute callback/observer using decorator")
 
 
-@vehicle.on_attribute('mode')
+@vehicle.on_attribute("mode")
 def decorated_mode_callback(self, attr_name, value):
     # `attr_name` is the observed attribute (used if callback is used for multiple attributes)
     # `attr_name` - the observed attribute (used if callback is used for multiple attributes)
