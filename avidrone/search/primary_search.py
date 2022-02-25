@@ -7,7 +7,7 @@
 from __future__ import print_function
 
 # Set up option parsing to get connection string
-import prog
+import argparse
 import asyncio
 import datetime
 import math
@@ -22,7 +22,7 @@ from dronekit import (
 )
 from pymavlink import mavutil
 
-parser = prog.ArgumentParser(description="Demonstrates basic mission operations.")
+parser = argparse.ArgumentParser(description="Demonstrates basic mission operations.")
 parser.add_argument(
     "--connect",
     help="vehicle connection target string. If not specified, SITL automatically started and used.",
