@@ -4,6 +4,7 @@
 import avidrone.search.default_parameters as parameters
 
 import argparse
+import os
 
 
 if __name__== "__main__":
@@ -24,6 +25,8 @@ if __name__== "__main__":
 
     if args.primary:
         print("primary search")
+        os.system("python avidrone/search/primary_search.py")
 
     if args.secondary:
         print("secondary search")
+        os.system("python avidrone/search/secondary_search.py")

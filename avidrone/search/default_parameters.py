@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+
+
 # Default
 MAGNITUDE = 1  # Set the distance the drone goes
 ALTITUDE = 4  # Set the altitude of the flight path
