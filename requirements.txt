@@ -1,5 +1,6 @@
 pytest
 mypy
-dronekit
+dronekit~=2.9.2
 serial
-argparse
+argparse~=1.4.0
+asyncio~=3.4.3

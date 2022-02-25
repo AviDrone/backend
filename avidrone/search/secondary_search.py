@@ -14,7 +14,6 @@ from dronekit import LocationGlobal, VehicleMode, connect
 from gps_data import GPSData
 from pymavlink import mavutil
 
-
 print(f"-- default size: {default.DEGREES}")
 print(f"-- default altitude: {default.ALTITUDE}")
 print(f"-- default land threshold: {default.LAND_THRESHOLD} \n")
@@ -237,7 +236,7 @@ def secondary_search() -> None:
     initialize()  # uav
 
     while drone.mode.name == "GUIDED":
-        transceiver = read_transceiver()
+        transceiver = read_transceiver()  # TODO implement read_transceiver
         print(transceiver.direction, ", ", transceiver.distance)
 
         if transceiver.direction < 2:  # Turn left
