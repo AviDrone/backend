@@ -270,7 +270,7 @@ while True:
     ):  # Dummy waypoint - as soon as we reach waypoint 4 this is true and we exit.
         print(
             "Exit 'standard' mission when start heading to final waypoint (%s)"
-            % (nextwaypoint)
+            % nextwaypoint
         )
         break
     time.sleep(1)

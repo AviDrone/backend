@@ -15,6 +15,7 @@ https://dronekit-python.readthedocs.io/en/latest/examples/vehicle_state.html
 """
 from __future__ import print_function
 
+
 import argparse
 import time
 
