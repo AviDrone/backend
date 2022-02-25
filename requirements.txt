@@ -1,4 +1,9 @@
 pytest
 mypy
-dronekit
+dronekit~=2.9.2
 serial
+
+prog~=2.0.1
+asyncio~=3.4.3
+pymavlink~=2.4.19
+pathlib~=1.0.1

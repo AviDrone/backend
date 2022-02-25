@@ -15,13 +15,13 @@ https://dronekit-python.readthedocs.io/en/latest/examples/vehicle_state.html
 """
 from __future__ import print_function
 
-import argparse
+import prog
 import time
 
 import dronekit_sitl
 from dronekit import VehicleMode, connect
 
-parser = argparse.ArgumentParser(
+parser = prog.ArgumentParser(
     description="Print out vehicle state information. Connects to SITL on local PC by default."
 )
 parser.add_argument(

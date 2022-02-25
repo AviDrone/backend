@@ -3,34 +3,25 @@
 
 from __future__ import print_function
 
-import argparse
+import prog
 import datetime
 import math
 import time
 
-import default_parameters
+import default_parameters as default
 import read_transceiver
 from dronekit import LocationGlobal, VehicleMode, connect
 from gps_data import GPSData
 from pymavlink import mavutil
 
-default = default_parameters.parameter()
-default_size = len(default)
 
-default_magnitude = default[0]
-default_altitude = default[1]
-default_degrees = default[2]
-default_degree_error = default[3]
-default_distance_error = default[4]
-default_land_threshold = default[5]
-default_window_size = default[6]
+IS_TEST = False
 
-print(f"-- default size: {default_degrees}")
-print(f"-- default altitude: {default_altitude}")
-print(f"-- default land threshold: {default_land_threshold} \n")
+print(f"-- default altitude: {default.ALTITUDE}")
+print(f"-- default land threshold: {default.LAND_THRESHOLD} \n")
 
 
-parser = argparse.ArgumentParser(description="Demonstrates basic mission operations.")
+parser = prog.ArgumentParser(description="Demonstrates basic mission operations.")
 parser.add_argument(
     "--connect",
     help="drone connection target string. If not specified, SITL automatically started and used.",
@@ -144,12 +135,12 @@ def simple_goto_wait(goto_checkpoint):
 
     distance = better_get_distance_meters(get_global_pos(), goto_checkpoint)
 
-    while distance >= default_distance_error and drone.mode.name == "GUIDED":
+    while distance >= default.DISTANCE_ERROR and drone.mode.name == default.FLIGHT_MODE:  # GUIDED
         print(distance)
         distance = better_get_distance_meters(get_global_pos(), goto_checkpoint)
         time.sleep(1)
 
-    if drone.mode.name != "GUIDED":
+    if drone.mode.name != default.FLIGHT_MODE:
         drone.simple_goto(drone.location.global_frame)
         print("Halting simple_goto")
 
@@ -194,7 +185,7 @@ def condition_yaw(heading, relative=False):
     target_yaw = original_yaw + cw * heading_rad
 
     while (
-        abs(target_yaw - drone.attitude.yaw) % math.pi > 0.01745 * default_degree_error
+        abs(target_yaw - drone.attitude.yaw) % math.pi > 0.01745 * default.DEGREE_ERROR
     ):
         print(
             "Turn error: ", abs(target_yaw - drone.attitude.yaw) % math.pi
@@ -202,14 +193,13 @@ def condition_yaw(heading, relative=False):
         time.sleep(0.25)
 
 
-def takeoff_to(default_altitude):
-    target_altitude = default_altitude
-    print(f"-- Taking off to altitude (m): {default_altitude} \n")
-    drone.simple_takeoff(target_altitude)
+def takeoff_to(default):
+    print(f"-- Taking off to altitude (m): {default.ALTITUDE} \n")
+    drone.simple_takeoff(default.ALTITUDE)
 
     while True:
-        if drone.location.global_relative_frame.alt >= target_altitude * 0.95:
-            print(f"-- Reached {default_altitude}m")
+        if drone.location.global_relative_frame.alt >= default.ALTITUDE * 0.95:
+            print(f"-- Reached {default.ALTITUDE}m")
             break
         time.sleep(1)
 
@@ -219,7 +209,7 @@ def initialize():
     while not drone.is_armable:
         time.sleep(1)
 
-    drone.mode = VehicleMode("GUIDED")
+    drone.mode = VehicleMode(default.FLIGHT_MODE)
     drone.armed = True
 
     print("-- Arming...")
@@ -228,16 +218,16 @@ def initialize():
 
     if drone.armed:
         print(f"-- Armed: {drone.armed}")
-        takeoff_to(default_altitude)
+        takeoff_to(default.ALTITUDE)
 
 
 print("-- Initializing the gps window")  # to be default_window_size long
-gps_window = GPSData(default_window_size)
+gps_window = GPSData(default.WINDOW_SIZE)
 
 print("-- Setting GUIDED flight mode")
 print("-- Waiting for GUIDED mode...")
 
-while drone.mode.name != "GUIDED":
+while drone.mode.name != default.FLIGHT_MODE:
     time.sleep(1)
 
 
@@ -246,8 +236,8 @@ def secondary_search() -> None:
     signal_found = False
     initialize()  # uav
 
-    while drone.mode.name == "GUIDED":
-        transceiver = read_transceiver()
+    while drone.mode.name == default.FLIGHT_MODE:
+        transceiver = read_transceiver()  # Fix
         print(transceiver.direction, ", ", transceiver.distance)
 
         if transceiver.direction < 2:  # Turn left
@@ -273,7 +263,7 @@ def secondary_search() -> None:
                     gps_window.gps_points[int((gps_window.window_size - 1) / 2)]
                 )
 
-                if gps_window.distance[2] <= default_land_threshold:
+                if gps_window.distance[2] <= default.LAND_THRESHOLD:
                     print("-- Landing")
                     drone.mode = VehicleMode("LAND")
                     signal_found = True
@@ -301,13 +291,14 @@ def secondary_search() -> None:
             elif gps_window.get_minimum_index() == 0:
                 # If the minimum data point is in the first index,
                 print("continue forward")
-                better_goto(default_magnitude, drone.attitude.yaw, drone)
+                better_goto(default.MAGNITUDE, drone.attitude.yaw, drone)
 
             else:
-                print(f"Did not find signal at altitude: {default_altitude}")
+                print(f"Did not find signal at altitude: {default.ALTITUDE}")
                 print("Climbing...")
-                better_goto(default_magnitude, drone.attitude.yaw, drone)
+                better_goto(default.MAGNITUDE, drone.attitude.yaw, drone)
         time.sleep(2)
 
 
-secondary_search()
+def run():
+    secondary_search()
