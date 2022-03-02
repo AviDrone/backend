@@ -16,7 +16,6 @@ from dronekit import (
     VehicleMode,
     connect,
 )
-
 from pymavlink import mavutil
 import primary_search as primary_search
 import secondary_search as secondary_search
@@ -50,7 +49,7 @@ def run():
     # Run secondary search
     # If secondary search complete
         # Create message
-        # send message trough GUI
+        # send message using GUI
     # end secondary search
     # Assert search is complete
     print("Running search!!")  # TODO implement
