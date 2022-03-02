@@ -23,7 +23,9 @@ import secondary_search as secondary_search
 
 def run():
     # Assert the UAV is ready and armed
-    parser = argparse.ArgumentParser(description="Demonstrates basic mission operations.")
+    parser = argparse.ArgumentParser(
+        description="Demonstrates basic mission operations."
+    )
     parser.add_argument(
         "--connect",
         help="vehicle connection target string. If not specified, SITL automatically started and used.",
