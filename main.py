@@ -9,6 +9,7 @@ import avidrone.search.default_parameters as parameters
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     group = parser.add_mutually_exclusive_group()
+
     group.add_argument("--primary", action="store_true", help="primary search only")
     group.add_argument("--secondary", action="store_true", help="secondary search only")
     parser.add_argument(
