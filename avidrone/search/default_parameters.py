@@ -2,27 +2,20 @@
 # -*- coding: utf-8 -*-
 
 
-def parameter():
-    """"
-    Initial Avidrone Parameters for search mission.
-    """ ""
+# Default
+MAGNITUDE = 1  # Set the distance the vehicle goes
+ALTITUDE = 4  # Set the altitude of the flight path
+DEGREES = 10  # Set the amount to rotate in yaw
+DEGREE_ERROR = 2  # Number of degrees error for rotation
+DISTANCE_ERROR = 0.35  # Error in distance before target reached
+LAND_THRESHOLD = 2  # Error in distance before target reached
+WINDOW_SIZE = 5  # Set the size of the gps window original: 5
 
-    MAGNITUDE = 1  # Param 0, Set the distance the drone goes
-    HEIGHT = 4  # Param 1, Set the height of the flight path
-    DEGREES = 10  # Param 2,Set the amount to rotate in yaw
-    DEGREE_ERROR = 2  # Param 3, Number of degrees error for rotation
-    DISTANCE_ERROR = 0.35  # Param 4, Error in distance before target reached
-    LAND_THRESHOLD = 2  # Param 5, Error in distance before target reached
-    WINDOW_SIZE = 5  # Param 6, Set the size of the gps window original: 5
+# Testing
+IS_TEST = False
 
-    params = [
-        MAGNITUDE,
-        HEIGHT,
-        DEGREES,
-        DEGREE_ERROR,
-        DISTANCE_ERROR,
-        LAND_THRESHOLD,
-        WINDOW_SIZE,
-    ]
+# Flight Mode
+FLIGHT_MODE = "GUIDED"
 
-    return params
+# Verbose Output
+IS_VERBOSE = False
