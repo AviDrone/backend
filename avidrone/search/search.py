@@ -20,12 +20,14 @@ from dronekit import (
 import default_parameters as default
 import secondary_search
 
+
 def run():
     print(f"-- default size: {default.DEGREES}")
     print(f"-- default altitude: {default.ALTITUDE}")
     print(f"-- default land threshold: {default.LAND_THRESHOLD} \n")
 
     secondary_search.run()
+
 
 if __name__ == "__main__":
     run()
