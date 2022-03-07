@@ -38,6 +38,7 @@ class Search:
             * 1.113195e5
         )
 
+
     def get_location(self, original_location, d_north, d_east):
         earth_radius = 6378137.0  # Radius of "spherical" earth
         # Coordinate offsets in radians
