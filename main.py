@@ -3,6 +3,7 @@
 
 import argparse
 import os
+import logging as log
 
 import avidrone.search.default_parameters as parameters
 
@@ -23,7 +24,7 @@ if __name__ == "__main__":
 
     print("\n********\nAVIDRONE\n********\n")
     if args.verbose:
-        print("--Verbose: True")
+        log.info("--Verbose: True")
         parameters.IS_VERBOSE = True
 
     if args.primary:
