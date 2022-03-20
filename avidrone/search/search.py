@@ -7,9 +7,11 @@ import asyncio
 import datetime
 import math
 import time
+import logging as log
 
+import default_parameters as default
 import primary_search as primary_search
-import secondary_search as secondary_search
+import secondary
 from dronekit import (
     Command,
     LocationGlobal,
@@ -17,14 +19,12 @@ from dronekit import (
     VehicleMode,
     connect,
 )
-import default_parameters as default
-import secondary
 
 
 def run():
-    print(f"-- default size: {default.DEGREES}")
-    print(f"-- default altitude: {default.ALTITUDE}")
-    print(f"-- default land threshold: {default.LAND_THRESHOLD} \n")
+    log.info(f"-- default size: {default.DEGREES}")
+    log.info(f"-- default altitude: {default.ALTITUDE}")
+    log.info(f"-- default land threshold: {default.LAND_THRESHOLD} \n")
 
     secondary.run()
 

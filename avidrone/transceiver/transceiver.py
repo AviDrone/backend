@@ -1,11 +1,5 @@
 class Transceiver:
-    def __init__(
-            self,
-            position,
-            signal_status,
-            direction,
-            distance
-    ):
+    def __init__(self, position, signal_status, direction,distance):
         self.position = position
         self.signal_status = signal_status
         self.direction = direction
@@ -17,20 +11,8 @@ class Transceiver:
     def get_position(self, x, y, z):
         pass
 
-
-class Signal(Transceiver):
-    def __init__(
-            self,
-            position,
-            signal_status,
-            direction,
-            distance
-        ):
-        super().__init__(position, signal_status, direction, distance)
-
-    def signal_status(self, status):
-        signal_detected = False
+    def signal_status(self, signal_status):
+        signal_detected = signal_status
         signal_acquired = False
-
         if signal_detected: signal_acquired = True
         return signal_acquired

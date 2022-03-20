@@ -19,7 +19,8 @@ from mission_methods import Search
 def run():
     print("-- SECONDARY SEARCH --")
     parser = argparse.ArgumentParser(
-        description="Demonstrates basic mission operations.")
+        description="Demonstrates basic mission operations."
+    )
     parser.add_argument(
         "--connect",
         help="vehicle connection target string. If not specified, SITL automatically started and used.",
@@ -105,6 +106,7 @@ def run():
                 log.info("Climbing...")
                 go_to_location(default.MAGNITUDE, vehicle.attitude.yaw, vehicle)
         time.sleep(2)
+
 
 if __name__ == "__main__":
     run()

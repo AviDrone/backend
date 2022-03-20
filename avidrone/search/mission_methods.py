@@ -8,6 +8,7 @@ import asyncio
 import datetime
 import math
 import time
+
 import default_parameters as default
 from dronekit import (
     Command,
@@ -36,12 +37,13 @@ class Search:
             * 1.113195e5
         )
 
-
     def get_location(self, original_location, d_north, d_east):
         earth_radius = 6378137.0  # Radius of "spherical" earth
         # Coordinate offsets in radians
         d_lat = d_north / earth_radius
-        d_lon = d_east / (earth_radius * math.cos(math.pi * original_location.lat / 180))
+        d_lon = d_east / (
+                earth_radius * math.cos(math.pi * original_location.lat / 180)
+        )
 
         # New position in decimal degrees
         new_lat = original_location.lat + (d_lat * 180 / math.pi)
