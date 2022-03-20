@@ -1,21 +1,40 @@
 class Transceiver:
-    def __init__(self, position, signal_status, direction,distance):
-        self.position = position
+    def __init__(self, position, signal_status):
+        self.min_range = 5
+        self.max_range = 27
         self.signal_status = signal_status
-        self.direction = direction
-        self.distance = distance
+        self.position = [-1, -1]  # default, transceiver signal not acquired
 
-    def set_position(self, x, y, z):
-        position = [x,y,z]  # TODO implement
-        return position
-    
-
-    def get_position(self, x, y, z):
-        position = [x,y,z]  # TODO implement
-        return position
-
+    @staticmethod
     def signal_status(self, signal_status):
-        signal_detected = signal_status
         signal_acquired = False
-        if signal_detected: signal_acquired = True
+        signal_detected = signal_status
+
+        if signal_detected:
+            signal_acquired = True
         return signal_acquired
+
+    @staticmethod
+    def bin_direction(self):
+        """
+        0 = forward
+        1 = left
+        2 = right
+        """
+        new_direction = -1  # default, error
+        direction = position[0]
+        distance = position[1]
+
+        if direction == 2:
+            new_direction = 0
+        elif direction < 2 and distance < min_range:
+            new_direction = 1
+        elif direction > 2 and distance < max_range:
+            new_direction = 2
+
+        return new_direction
+
+    @staticmethod
+    def degrees_of_rotation(self):
+        rotation = [0, 45, 90, 135, 180, 225, 270, 315]
+        return rotation
