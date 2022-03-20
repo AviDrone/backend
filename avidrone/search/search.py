@@ -9,6 +9,8 @@ import datetime
 import math
 import time
 
+import primary_search as primary_search
+import secondary_search as secondary_search
 from dronekit import (
     Command,
     LocationGlobal,
@@ -17,8 +19,6 @@ from dronekit import (
     connect,
 )
 from pymavlink import mavutil
-import primary_search as primary_search
-import secondary_search as secondary_search
 
 
 def run():
@@ -45,13 +45,13 @@ def run():
     # Initiate primary search
     # run rectangular primary search
     # If signal is detected
-        # End primary search
+    # End primary search
     # Assert primary search ended
     # Initiate secondary search
     # Run secondary search
     # If secondary search complete
-        # Create message
-        # send message using GUI
+    # Create message
+    # send message using GUI
     # end secondary search
     # Assert search is complete
     print("Running search!!")  # TODO implement
