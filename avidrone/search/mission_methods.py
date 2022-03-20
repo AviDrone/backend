@@ -8,7 +8,7 @@ import asyncio
 import datetime
 import math
 import time
-
+import default_parameters as default
 from dronekit import (
     Command,
     LocationGlobal,
@@ -16,8 +16,6 @@ from dronekit import (
     VehicleMode,
     connect,
 )
-
-import default_parameters as default
 from gps_data import GPSData
 
 

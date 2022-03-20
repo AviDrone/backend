@@ -8,10 +8,8 @@ import datetime
 import math
 import time
 
-
 import primary_search as primary_search
 import secondary_search as secondary_search
-
 from dronekit import (
     Command,
     LocationGlobal,
@@ -19,7 +17,6 @@ from dronekit import (
     VehicleMode,
     connect,
 )
-
 import default_parameters as default
 import secondary
 

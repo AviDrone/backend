@@ -6,8 +6,8 @@ class Transceiver:
             direction,
             distance
     ):
-        position = self.position
-        signal_status = self.signal
+        self.position = position
+        self.signal_status = signal_status
         self.direction = direction
         self.distance = distance
 
