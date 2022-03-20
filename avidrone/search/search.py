@@ -8,7 +8,10 @@ import datetime
 import math
 import time
 
-import dronekit_sitl
+
+import primary_search as primary_search
+import secondary_search as secondary_search
+
 from dronekit import (
     Command,
     LocationGlobal,
