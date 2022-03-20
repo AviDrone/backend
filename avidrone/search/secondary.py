@@ -5,16 +5,16 @@ from __future__ import print_function
 
 import argparse
 import datetime
+import logging as log
 import math
 import time
-import logging as log
-
-from dronekit import LocationGlobal, VehicleMode, connect
 
 import default_parameters as default
 import read_transceiver
+from dronekit import LocationGlobal, VehicleMode, connect
 from gps_data import GPSData
 from mission_methods import Search
+
 
 def run():
     print("-- SECONDARY SEARCH --")

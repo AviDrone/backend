@@ -2,8 +2,8 @@
 # -*- coding: utf-8 -*-
 
 import argparse
-import os
 import logging as log
+import os
 
 import avidrone.search.default_parameters as parameters
 
@@ -31,7 +31,7 @@ if __name__ == "__main__":
         os.system("python avidrone/search/primary_search.py")
 
     elif args.secondary:
-        os.system("python3 avidrone/search/secondary_search.py")
+        os.system("python3 avidrone/search/secondary.py")
 
     else:
         os.system("python3 avidrone/search/search.py")
