@@ -6,10 +6,13 @@ class Transceiver:
         self.distance = distance
 
     def set_position(self, x, y, z):
-        pass
+        position = [x,y,z]  # TODO implement
+        return position
+    
 
     def get_position(self, x, y, z):
-        pass
+        position = [x,y,z]  # TODO implement
+        return position
 
     def signal_status(self, signal_status):
         signal_detected = signal_status

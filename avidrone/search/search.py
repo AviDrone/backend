@@ -5,9 +5,9 @@ from __future__ import print_function
 import argparse
 import asyncio
 import datetime
+import logging as log
 import math
 import time
-import logging as log
 
 import default_parameters as default
 import primary_search as primary_search
