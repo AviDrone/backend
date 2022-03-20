@@ -149,7 +149,7 @@ while not vehicle.mode.name == "GUIDED":  # Wait until mode has changed
 
 # Check that vehicle is armable
 while not vehicle.is_armable:
-    print(" Waiting for vehicle to initialize...")
+    print(" Waiting for vehicle to start...")
     time.sleep(1)
     # If required, you can provide additional information about initialization
     # using `vehicle.gps_0.fix_type` and `vehicle.mode.name`.

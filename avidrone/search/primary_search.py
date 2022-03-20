@@ -22,29 +22,6 @@ from dronekit import (
 )
 from pymavlink import mavutil
 
-parser = argparse.ArgumentParser(description="Demonstrates basic mission operations.")
-parser.add_argument(
-    "--connect",
-    help="vehicle connection target string. If not specified, SITL automatically started and used.",
-)
-args = parser.parse_args()
-
-connection_string = args.connect
-sitl = None
-
-
-# Start SITL if no connection string specified
-if not connection_string:
-    import dronekit_sitl
-
-    sitl = dronekit_sitl.start_default()
-    connection_string = sitl.connection_string()
-
-
-# Connect to the Vehicle
-print("Connecting to vehicle on: %s" % connection_string)
-vehicle = connect(connection_string, wait_ready=True)
-
 
 def get_location_metres(original_location, dNorth, dEast):
     """

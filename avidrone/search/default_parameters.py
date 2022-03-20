@@ -3,7 +3,7 @@
 
 
 # Default
-MAGNITUDE = 1  # Set the distance the drone goes
+MAGNITUDE = 1  # Set the distance the vehicle goes
 ALTITUDE = 4  # Set the altitude of the flight path
 DEGREES = 10  # Set the amount to rotate in yaw
 DEGREE_ERROR = 2  # Number of degrees error for rotation

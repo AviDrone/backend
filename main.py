@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import argparse
+import logging as log
 import os
 
 import avidrone.search.default_parameters as parameters
@@ -23,13 +24,14 @@ if __name__ == "__main__":
 
     print("\n********\nAVIDRONE\n********\n")
     if args.verbose:
-        print("--Verbose output")
+        log.info("--Verbose: True")
         parameters.IS_VERBOSE = True
 
     if args.primary:
-        print("primary search")
         os.system("python avidrone/search/primary_search.py")
 
-    if args.secondary:
-        print("secondary search")
-        os.system("python avidrone/search/secondary_search.py")
+    elif args.secondary:
+        os.system("python3 avidrone/search/secondary.py")
+
+    else:
+        os.system("python3 avidrone/search/search.py")
