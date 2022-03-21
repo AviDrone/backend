@@ -33,8 +33,3 @@ class Transceiver:
             new_direction = 2
 
         return new_direction
-
-    @staticmethod
-    def degrees_of_rotation(self):
-        rotation = [0, 45, 90, 135, 180, 225, 270, 315]
-        return rotation

@@ -1,10 +1,10 @@
-import csv
+import transceiver
 
 mockTransceiver_data = open(
-    "mockTransceiver_data.csv", "w", encoding="UTF8", newline=""
+    "mockTransceiver_data.txt", "w", encoding="UTF8", newline=""
 )
-writer = csv.writer(mockTransceiver_data)
 
+writer = csv.writer(mockTransceiver_data)
 header = ["degree of rotation", "detected", "consistent"]
 
 data = [0, 2, 1]
