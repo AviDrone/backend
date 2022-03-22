@@ -5,11 +5,11 @@
     PRIMARY SEARCH
 """
 from __future__ import print_function
-
 # Set up option parsing to get connection string
 import argparse
 import asyncio
 import datetime
+import logging as log
 import math
 import time
 
@@ -21,7 +21,6 @@ from dronekit import (
     connect,
 )
 from pymavlink import mavutil
-
 # Set up option parsing to get connection string
 import argparse
 
