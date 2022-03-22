@@ -42,7 +42,7 @@ class Search:
         # Coordinate offsets in radians
         d_lat = d_north / earth_radius
         d_lon = d_east / (
-                earth_radius * math.cos(math.pi * original_location.lat / 180)
+            earth_radius * math.cos(math.pi * original_location.lat / 180)
         )
 
         # New position in decimal degrees
@@ -150,8 +150,8 @@ class Search:
         target_yaw = original_yaw + cw * heading_rad
 
         while (
-                abs(target_yaw - vehicle.attitude.yaw) % math.pi
-                > 0.01745 * default.DEGREE_ERROR
+            abs(target_yaw - vehicle.attitude.yaw) % math.pi
+            > 0.01745 * default.DEGREE_ERROR
         ):
             error_degree = abs(target_yaw - vehicle.attitude.yaw) % math.pi
             print("Turn error: ", error_degree)  # 1 degree

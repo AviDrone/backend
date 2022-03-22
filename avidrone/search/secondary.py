@@ -29,7 +29,6 @@ def run():
     args = parser.parse_args()
 
     connection_string = args.connect
-    sitl = None
 
     # Start SITL if no connection string specified
     if not connection_string:
@@ -93,7 +92,9 @@ def run():
                 log.info("too far in the wrong direction")
 
                 Search.condition_yaw(180, True)
-                Search.simple_goto_wait(gps_window.gps_points[gps_window.window_size - 1])
+                Search.simple_goto_wait(
+                    gps_window.gps_points[gps_window.window_size - 1]
+                )
                 gps_window.purge_gps_window()
 
             elif gps_window.get_minimum_index() == 0:

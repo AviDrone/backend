@@ -8,6 +8,7 @@ from __future__ import print_function
 
 # Set up option parsing to get connection string
 import argparse
+import logging as log
 import time
 
 import numpy as np
@@ -54,6 +55,9 @@ args = parser.parse_args()
 connection_string = args.connect
 sitl = None
 
+# Connect to the vehicle
+log.info("Connecting to vehicle on: %s", connection_string)
+vehicle = connect(connection_string, wait_ready=True)
 
 # Start SITL if no connection string specified
 if not connection_string:
