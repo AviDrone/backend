@@ -28,7 +28,7 @@ if __name__ == "__main__":
         parameters.IS_VERBOSE = True
 
     if args.primary:
-        os.system("python avidrone/search/primary_search.py")
+        os.system("python avidrone/search/primary.py")
 
     elif args.secondary:
         os.system("python3 avidrone/search/secondary.py")
