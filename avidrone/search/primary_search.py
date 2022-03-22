@@ -5,6 +5,8 @@
     PRIMARY SEARCH
 """
 from __future__ import print_function
+
+# Set up option parsing to get connection string
 # Set up option parsing to get connection string
 import argparse
 import asyncio
@@ -13,16 +15,9 @@ import logging as log
 import math
 import time
 
-from dronekit import (
-    Command,
-    LocationGlobal,
-    LocationGlobalRelative,
-    VehicleMode,
-    connect,
-)
+from dronekit import (Command, LocationGlobal, LocationGlobalRelative,
+                      VehicleMode, connect)
 from pymavlink import mavutil
-# Set up option parsing to get connection string
-import argparse
 
 parser = argparse.ArgumentParser(description="Demonstrates basic mission operations.")
 parser.add_argument(
