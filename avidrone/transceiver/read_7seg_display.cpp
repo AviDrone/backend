@@ -14,7 +14,7 @@ int main (int argc, char** argv) {
 bool arrayEqual(bool read_data[7], const bool number[7]) {
     int count = 0;
     for (int i = 0; i < 7; i++) {
-        if (read_data[i] == number[i]) { count++;}
+        if (read_data[i] == number[i]) { count++; }
     }
     if (count == 7) { return true; }
     else { return false; }

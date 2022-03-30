@@ -11,11 +11,11 @@ from __future__ import print_function
 import argparse
 import asyncio
 import datetime
-import dronekit_sitl
 import logging as log
 import math
 import time
 
+import dronekit_sitl
 from dronekit import (
     Command,
     LocationGlobal,

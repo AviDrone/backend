@@ -1,9 +1,9 @@
 class Transceiver:
-    def __init__(self, position):
+    def __init__(self, position, signal_status):
         position = [-1, -1]
         self.min_range = 5
         self.max_range = 27
-        self.signal_status = False
+        self.signal_status = signal_status
         self.position = position    # default, transceiver signal not acquired
 
     @staticmethod
@@ -21,8 +21,8 @@ class Transceiver:
         0 = forward
         1 = left
         2 = right
-        
-        """        
+        """      
+
         new_direction = -1  # default, error
         direction = position[0]
         distance = position[1]

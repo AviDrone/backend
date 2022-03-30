@@ -22,13 +22,13 @@ To get started with the basic drone control you will need [QGroundControl](https
 
 ### Libraries
 
-*[Ardupilot](https://ardupilot.org/dev/docs/droneapi-tutorial.html#)
+* [Ardupilot](https://ardupilot.org/dev/docs/droneapi-tutorial.html#)
 
 ## Installation
 
 <!-- TODO create setup.py -->
 
-Here's a [walk-through video](https://youtu.be/glC99FwFnAc) of how to connect once you have all the software ready.
+Here's a [walkthrough video](https://youtu.be/glC99FwFnAc) of how to connect once you have all the software ready.
 
 ## Contributors
 
