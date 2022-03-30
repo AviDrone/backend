@@ -175,16 +175,24 @@ rebase.sh
 
 revert.sh
 Utils
-time-log/w22/Week1.md
-time-log/w22/Week2.md
-time-log/w22/Week3.md
-time-log/w22/Week5.md
-time-log/w22/Week4.md
-time-log/w22/Week7.md
-time-log/w22/Week8.md
-time-log/w22/Week9.md
-time-log/w22/Week6.md
-time-log/w22/Week10.md
 
 avidrone/gui/build-qgroundcontrol-Desktop_x86_darwin_generic_mach_o_64bit-Debug
 time-log/README.md
+docs/time-log/README.md
+.gitignore
+docs/time-log/s22/Week1.md
+.gitignore
+docs/time-log/w22/Week1.md
+.gitignore
+docs/time-log/w22/Week2.md
+docs/time-log/w22/Week3.md
+.gitignore
+docs/time-log/w22/Week4.md
+docs/time-log/w22/Week5.md
+docs/time-log/w22/Week6.md
+docs/time-log/w22/Week7.md
+docs/time-log/w22/Week8.md
+.gitignore
+docs/time-log/w22/Week9.md
+.gitignore
+docs/time-log/w22/Week10.md

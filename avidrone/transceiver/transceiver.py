@@ -34,7 +34,3 @@ class Transceiver:
             new_direction = 2
 
         return new_direction
-
-    @staticmethod
-    def distance(self, position):
-        pass
