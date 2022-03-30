@@ -11,12 +11,18 @@ from __future__ import print_function
 import argparse
 import asyncio
 import datetime
+import dronekit_sitl
 import logging as log
 import math
 import time
 
-from dronekit import (Command, LocationGlobal, LocationGlobalRelative,
-                      VehicleMode, connect)
+from dronekit import (
+    Command,
+    LocationGlobal,
+    LocationGlobalRelative,
+    VehicleMode,
+    connect,
+)
 from pymavlink import mavutil
 
 parser = argparse.ArgumentParser(description="Demonstrates basic mission operations.")
@@ -35,11 +41,10 @@ vehicle = connect(connection_string, wait_ready=True)
 
 # Start SITL if no connection string specified
 if not connection_string:
-    import dronekit_sitl
-
     sitl = dronekit_sitl.start_default()
     connection_string = sitl.connection_string()
-    
+
+
 def get_location_metres(original_location, dNorth, dEast):
     """
     Returns a LocationGlobal object containing the latitude/longitude `dNorth` and `dEast` metres from the
@@ -68,16 +73,16 @@ def rectangular_primary_search(a_location, length, width):
     Primary search testing, based on dronekit's basic square mission
     """
 
-    cmds = vehicle.commands
+    vehicle_commands = vehicle.commands
 
     print(" Clear any existing commands")
-    cmds.clear()
+    vehicle_commands.clear()
 
     print(" Define/add new commands.")
     # Add new commands. The meaning/order of the parameters is documented in the Command class.
 
     # Add MAV_CMD_NAV_TAKEOFF command. This is ignored if the vehicle is already in the air.
-    cmds.add(
+    vehicle_commands.add(
         Command(
             0,
             0,
@@ -110,7 +115,7 @@ def rectangular_primary_search(a_location, length, width):
         step += 1
         step = step % 4
         point = get_location_metres(a_location, v_dist, h_dist)
-        cmds.add(
+        vehicle_commands.add(
             Command(
                 0,
                 0,
@@ -130,7 +135,7 @@ def rectangular_primary_search(a_location, length, width):
         )
 
     # add dummy waypoint at final point (lets us know when have reached destination)
-    cmds.add(
+    vehicle_commands.add(
         Command(
             0,
             0,
@@ -150,7 +155,7 @@ def rectangular_primary_search(a_location, length, width):
     )
 
     print(" Upload new commands to vehicle")
-    cmds.upload()
+    vehicle_commands.upload()
 
 
 def get_distance_metres(a_location1, a_location2):
@@ -161,9 +166,9 @@ def get_distance_metres(a_location1, a_location2):
     earth's poles. It comes from the ArduPilot test code:
     https://github.com/diydrones/ardupilot/blob/master/Tools/autotest/common.py
     """
-    dlat = a_location2.lat - a_location1.lat
-    dlong = a_location2.lon - a_location1.lon
-    return math.sqrt((dlat * dlat) + (dlong * dlong)) * 1.113195e5
+    d_lat = a_location2.lat - a_location1.lat
+    d_long = a_location2.lon - a_location1.lon
+    return math.sqrt((d_lat * d_lat) + (d_long * d_long)) * 1.113195e5
 
 
 def distance_to_current_waypoint():
@@ -189,9 +194,9 @@ def download_mission():
     """
     Download the current mission from the vehicle.
     """
-    cmds = vehicle.commands
-    cmds.download()
-    cmds.wait_ready()  # wait until download is complete.
+    vehicle_commands = vehicle.commands
+    vehicle_commands.download()
+    vehicle_commands.wait_ready()  # wait until download is complete.
 
 
 def arm_and_takeoff(aTargetAltitude):

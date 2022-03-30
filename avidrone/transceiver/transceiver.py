@@ -4,7 +4,7 @@ class Transceiver:
         self.min_range = 5
         self.max_range = 27
         self.signal_status = False
-        self.position = position # default, transceiver signal not acquired
+        self.position = position    # default, transceiver signal not acquired
 
     @staticmethod
     def signal_status(self):
@@ -21,6 +21,7 @@ class Transceiver:
         0 = forward
         1 = left
         2 = right
+        
         """        
         new_direction = -1  # default, error
         direction = position[0]
