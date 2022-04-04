@@ -6,6 +6,10 @@ class Transceiver:
         self.signal_status = signal_status
         self.position = position    # default, transceiver signal not acquired
 
+    def position(self, x_1, y_1, z_1):
+        pos = [x_1, y_1, z_1]
+        return pos
+
     @staticmethod
     def signal_status(self):
         signal_acquired = False
