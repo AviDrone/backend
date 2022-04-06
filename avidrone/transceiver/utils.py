@@ -15,14 +15,12 @@ def mock_beacon(uav_position, beacon_position):
     z_2 = beacon_position[2]
 
     displacement = get_displacement(x_1, x_2, y_1, y_2, z_1, z_2)
-    uclidean_distance = get_euclidean_distance(displacement)
+    euclidean_distance = get_euclidean_distance(displacement)
     displacement_n = normalize_vector(displacement)
     distance = get_distance(displacement)
     theta = vector_angle(displacement_n, distance)
     direction = calculate_direction(theta)
 
-
-    print(theta)
     return direction, distance
 
 

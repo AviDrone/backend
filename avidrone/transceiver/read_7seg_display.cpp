@@ -1,6 +1,7 @@
 // Copyright 2022 Avidrone
 
-#include "read.h" // Only runs on Raspberry Pi
+#inlcude "read.h"
+#include "read_7seg_display.h"  // Only runs on Raspberry Pi
 #include <fstream>
 #include <iostream>
 
@@ -120,21 +121,21 @@ double dir_decode(bool read_dir[5]) {
 double dist_to_double(char dist[4]) {
   if ((dist[0] == 'x') && (dist[1] == 'x') && (dist[2] == 'x')) { // xxx
     return -1;
-  } else if ((dist[1] == 'x') && (dist[2] == 'x')) { // rxx
+  } else if ((dist[1] == 'x') && (dist[2] == 'x')) {  // rxx
     return -1;
-  } else if ((dist[0] == 'x') && (dist[2] == 'x')) { // xrx
+  } else if ((dist[0] == 'x') && (dist[2] == 'x')) {  // xrx
     return -1;
-  } else if ((dist[0] == 'x') && (dist[1] == 'x')) { // xxr
+  } else if ((dist[0] == 'x') && (dist[1] == 'x')) {  // xxr
     return -1;
-  } else if ((dist[0] != 'x') && (dist[1] == '.') && (dist[2] == 'x')) { // rrx
+  } else if ((dist[0] != 'x') && (dist[1] == '.') && (dist[2] == 'x')) {  // rrx
     return -1;
-  } else if ((dist[0] != 'x') && (dist[1] == 'x') && (dist[2] != 'x')) { // rxr
+  } else if ((dist[0] != 'x') && (dist[1] == 'x') && (dist[2] != 'x')) {  // rxr
     dist[1] = dist[2];
     dist[2] = 'x';
     return atof(dist);
-  } else if ((dist[0] != 'x') && (dist[1] == '.') && (dist[2] != 'x')) { // rrr
+  } else if ((dist[0] != 'x') && (dist[1] == '.') && (dist[2] != 'x')) {  // rrr
     return atof(dist);
-  } else if ((dist[0] == 'x') && (dist[1] == '.') && (dist[2] != 'x')) { // xrr
+  } else if ((dist[0] == 'x') && (dist[1] == '.') && (dist[2] != 'x')) {  // xrr
     dist[0] = '0';
     return atof(dist);
   } else {
