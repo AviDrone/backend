@@ -1,14 +1,10 @@
 class Transceiver:
-    def __init__(self, position, signal_status):
+    def __init__(self):
         position = [-1, -1]
         self.min_range = 5
         self.max_range = 27
-        self.signal_status = signal_status
-        self.position = position  # default, transceiver signal not acquired
-
-    def position(self, x_1, y_1, z_1):
-        pos = [x_1, y_1, z_1]
-        return pos
+        self.signal_status = False
+        self.position = [0, 0, 0]  # default, transceiver signal not acquired
 
     @staticmethod
     def signal_status(self):
