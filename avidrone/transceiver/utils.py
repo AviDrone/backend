@@ -1,5 +1,5 @@
-import random
 import math
+import random
 
 import numpy as np
 
@@ -87,7 +87,7 @@ def calculate_direction(theta):
 
 
 if __name__ == "__main__":
-    uav_position = [12, 12, 0]
-    beacon_position = [6, 6, 0]
+    uav_position = [12, 12, 0]  # Example
+    beacon_position = [6, 6, 0]  # Example
     mock_beacon_ = mock_beacon(uav_position, beacon_position)
     print("Direction, Distance: ", mock_beacon_)

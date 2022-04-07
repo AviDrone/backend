@@ -1,6 +1,6 @@
 // Copyright 2022 Avidrone
 
-#inlcude "read.h"
+#include "read.h"
 #include "read_7seg_display.h"  // Only runs on Raspberry Pi
 #include <fstream>
 #include <iostream>
