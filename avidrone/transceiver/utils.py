@@ -1,66 +1,59 @@
 import random
+import math
 
 import numpy as np
 
 
-def mock_beacon(uav_position, beacon_position):
-    # UAV position (Currently random values)
-    x_1 = uav_position[0]
-    y_1 = uav_position[1]
-    z_1 = uav_position[2]
+def mock_beacon(uav_pos, beacon_pos):
+    # UAV position
+    x_1 = uav_pos[0]
+    y_1 = uav_pos[1]
+    z_1 = uav_pos[2]
 
-    # Beacon position (Currently random values)
-    x_2 = beacon_position[0]
-    y_2 = beacon_position[1]
-    z_2 = beacon_position[2]
+    # Beacon position
+    x_2 = beacon_pos[0]
+    y_2 = beacon_pos[1]
+    z_2 = beacon_pos[2]
 
-    displacement = get_displacement(x_1, x_2, y_1, y_2, z_1, z_2)
-    euclidean_distance = get_euclidean_distance(displacement)
-    displacement_n = normalize_vector(displacement)
-    distance = get_distance(displacement)
-    theta = vector_angle(displacement_n, distance)
+    disp = get_displacement(x_1, x_2, y_1, y_2, z_1, z_2)
+    euclidean_dist = get_euclidean_distance(disp)
+    disp_n = normalize_vector(disp)
+    dist = get_distance(disp)
+    theta = vector_angle(disp_n)
     direction = calculate_direction(theta)
 
-    return direction, distance
+    return direction, euclidean_dist
 
 
 def get_displacement(x_1, x_2, y_1, y_2, z_1=0, z_2=0):
-    displacement = [x_2 - x_1, y_2 - y_1, z_2 - z_1]
-    return displacement
+    return [x_2 - x_1, y_2 - y_1, z_2 - z_1]
 
 
-def get_distance(displacement):
-    dx = displacement[0]
-    dy = displacement[1]
-    return (dx**2 + dy**2) ** -2
+def get_distance(disp):
+    return (disp[0]**2 + disp[1]**2) ** -2
 
 
-def get_euclidean_distance(displacement):
-    dx = displacement[0]
-    dy = displacement[1]
-    dz = displacement[2]
-    return (dx**2 + dy**2 + dz**2) ** -2
+def get_euclidean_distance(disp):
+    return (disp[0]**2 + disp[1]**2 + disp[2]**2) ** -2
 
 
-def normalize_vector(displacement):
-    d_v = displacement
-    normalized_v_d_array = d_v / np.linalg.norm(d_v)
-    normalized_v_d = normalized_v_d_array.tolist()
-    return normalized_v_d
+def normalize_vector(disp):
+    d_v = disp / np.linalg.norm(disp)
+    d_v_normal = d_v.tolist()
+    return d_v_normal
 
 
-def vector_angle(displacement, distance):
-    fwd = [1, 0, 0]  # UAV's forward vector.
-    a = np.dot(displacement, fwd)
-    print(a / distance)
-    theta = np.arccos(a / distance)
+def vector_angle(disp):
+    fwd = [1, 0]  # UAV's forward vector.
+    v_d = [disp[0], disp[1]]
+    d_xy = get_distance(disp)
+    theta = np.arccos(np.dot(v_d, fwd) / d_xy)
 
-    # Random value to account for measurement inconsistencies.
-    # Using -15 and 15 makes it likely that the beacon gets the
-    # wrong direction roughly a third of the time.
+    # To account for measurement inconsistencies. We use a random value between
+    # -15 and 15. That makes it likely that the beacon gets the wrong direction
+    # roughly a third of the time.
 
-    theta = theta + random.uniform(-15, 15)
-    return theta
+    return theta + random.uniform(-15, 15)
 
 
 def calculate_direction(theta):
@@ -72,28 +65,29 @@ def calculate_direction(theta):
     led 4: Theta +30 to +90
 
     """
-    direction = -1  # Initial, unknown direction.
+
+    led_dir = -1
 
     if -90 <= theta < -30:
-        direction = 0
+        led_dir = 0
 
     if -30 <= theta < -10:
-        direction = 1
+        led_dir = 1
 
     if -10 <= theta < 10:
-        direction = 2
+        led_dir = 2
 
     if 10 <= theta < 30:
-        direction = 3
+        led_dir = 3
 
     if 30 <= theta <= 90:
-        direction = 4
+        led_dir = 4
 
-    return direction
+    return led_dir
 
 
 if __name__ == "__main__":
-    uav_position = [10, 6, 2]
-    beacon_position = [5, 1, 0]
-    mock_direction_distance = mock_beacon(uav_position, beacon_position)
-    print(mock_direction_distance)
+    uav_position = [12, 12, 0]
+    beacon_position = [6, 6, 0]
+    mock_beacon_ = mock_beacon(uav_position, beacon_position)
+    print("Direction, Distance: ", mock_beacon_)
