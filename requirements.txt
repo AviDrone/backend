@@ -5,5 +5,4 @@ serial
 argparse~=1.4.0
 asyncio~=3.4.3
 numpy~=1.22.3
-pymavlink~=2.4.19
 pathlib~=1.0.1
