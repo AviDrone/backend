@@ -22,6 +22,7 @@ jobs:
           VALIDATE_ALL_CODEBASE: true
           VALIDATE_PYTHON_FLAKE8: false
           VALIDATE_CLANG_FORMAT: false
+          VALIDATE_CPP: false
           VALIDATE_JSCPD: false
           DEFAULT_BRANCH: main
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
