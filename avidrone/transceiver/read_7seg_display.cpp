@@ -1,7 +1,7 @@
 // Copyright 2022 Avidrone
 
 #include "read.h"
-#include "read_7seg_display.h" // Only runs on Raspberry Pi
+#include "read_7seg_display.h"  // Only runs on Raspberry Pi
 #include <fstream>
 #include <iostream>
 
@@ -141,25 +141,25 @@ double dir_decode(bool read_dir[5]) {
 // of doubles with direction then distance.
 
 double dist_to_double(char dist[4]) {
-  if ((dist[0] == 'x') && (dist[1] == 'x') && (dist[2] == 'x')) { // xxx
+  if ((dist[0] == 'x') && (dist[1] == 'x') && (dist[2] == 'x')) {  // xxx
     return -1;
-  } else if ((dist[1] == 'x') && (dist[2] == 'x')) { // rxx
+  } else if ((dist[1] == 'x') && (dist[2] == 'x')) {  // rxx
     return -1;
-  } else if ((dist[0] == 'x') && (dist[2] == 'x')) { // xrx
+  } else if ((dist[0] == 'x') && (dist[2] == 'x')) {  // xrx
     return -1;
-  } else if ((dist[0] == 'x') && (dist[1] == 'x')) { // xxr
+  } else if ((dist[0] == 'x') && (dist[1] == 'x')) {  // xxr
     return -1;
-  } else if ((dist[0] != 'x') && (dist[1] == '.') && (dist[2] == 'x')) { // rrx
+  } else if ((dist[0] != 'x') && (dist[1] == '.') && (dist[2] == 'x')) {  // rrx
     return -1;
   } else if (
     (dist[0] != 'x') && (dist[1] == 'x') && (dist[2] != 'x')
-  ) { // rxr
+  ) {  // rxr
     dist[1] = dist[2];
     dist[2] = 'x';
     return atof(dist);
-  } else if ((dist[0] != 'x') && (dist[1] == '.') && (dist[2] != 'x')) { // rrr
+  } else if ((dist[0] != 'x') && (dist[1] == '.') && (dist[2] != 'x')) {  // rrr
     return atof(dist);
-  } else if ((dist[0] == 'x') && (dist[1] == '.') && (dist[2] != 'x')) { // xrr
+  } else if ((dist[0] == 'x') && (dist[1] == '.') && (dist[2] != 'x')) {  // xrr
     dist[0] = '0';
     return atof(dist);
   } else {
@@ -190,9 +190,9 @@ void get_dir_dig(double *dir_dig_out) {
   }
   // Perform operations to determine the reading and filter out bad readings
   for (int i = 0; i < NUM_READS; i++) {
-    all_dig_decode[i][0] = 
+    all_dig_decode[i][0] =
       decode_7seg(reinterpret_cast<bool *>(all_dig1_reading[i]));
-    all_dig_decode[i][2] = 
+    all_dig_decode[i][2] =
       decode_7seg(reinterpret_cast<bool *>(all_dig2_reading[i]));
     all_dig_decode[i][3] = '\0';
     if (all_dp_reading[i] == 0) {
