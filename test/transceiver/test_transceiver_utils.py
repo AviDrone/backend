@@ -17,10 +17,8 @@ class Search(TestCase):
         z_2 = 0
         displacement = utils.get_displacement(x_1, x_2, y_1, y_2, z_1, z_2)
         assert displacement == [-5, -1, 0]
-        
         """
         assert True
-
 
     def test_get_euclidean_distance(self):
         """

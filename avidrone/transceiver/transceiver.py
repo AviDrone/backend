@@ -5,7 +5,3 @@ class Transceiver:
         self.max_range = 27
         self.signal_status = False
         self.position = [0, 0, 0]  # default, transceiver signal not acquired
-
-    def signal_status(self):
-        if self.signal_status:
-            return True
