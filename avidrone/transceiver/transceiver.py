@@ -7,4 +7,5 @@ class Transceiver:
         self.position = [0, 0, 0]  # default, transceiver signal not acquired
 
     def signal_status(self):
-        if self.signal_status: return True
+        if self.signal_status:
+            return True
