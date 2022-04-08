@@ -7,6 +7,7 @@ import argparse
 import asyncio
 import datetime
 import math
+import numpy as np
 import time
 
 import transceiver.utils as util
@@ -62,9 +63,11 @@ class Search:
         beacon_pos = [1, 1, 1]  # TODO replace this with actual positions
         return util.mock_beacon(uav_pos, beacon_pos)
 
+
 def start_gps():
     print("-- Initializing the gps window")  # to be default.WINDOW_SIZE long
     gps_window = GPSData(default.WINDOW_SIZE)
+
 
 def start():
     print("-- Waiting for vehicle to start...")
@@ -89,6 +92,7 @@ def start():
     while vehicle.mode.name != "GUIDED":
         time.sleep(1)
 
+
 def takeoff_to(default):
     target_altitude = default.ALTITUDE
     print(f"-- Taking off to altitude (m): {default.ALTITUDE} \n")
@@ -99,6 +103,7 @@ def takeoff_to(default):
             print(f"-- Reached {default.ALTITUDE}m")
             break
         time.sleep(1)
+
 
 def go_to_location(distance, angle, vehicle):
     current_location = vehicle.location.global_frame
@@ -138,6 +143,7 @@ def go_to_location(distance, angle, vehicle):
 
         print("Checkpoint reached")
 
+
 def wobble_wait():
     # make vehicle wait until the wobbling settles down before moving forward.
     heading_rad = heading * math.pi / 180
@@ -145,12 +151,13 @@ def wobble_wait():
     target_yaw = original_yaw + cw * heading_rad
 
     while (
-        abs(target_yaw - vehicle.attitude.yaw) % math.pi
-        > 0.01745 * default.DEGREE_ERROR
+            abs(target_yaw - vehicle.attitude.yaw) % math.pi
+            > 0.01745 * default.DEGREE_ERROR
     ):
         error_degree = abs(target_yaw - vehicle.attitude.yaw) % math.pi
         print("Turn error: ", error_degree)  # 1 degree
         time.sleep(0.25)
+
 
 def condition_yaw(heading, relative=False):
     """
@@ -183,3 +190,82 @@ def condition_yaw(heading, relative=False):
     )  # param 5 ~ 7 not used
     vehicle.send_mavlink(msg)  # send command to vehicle
     wobble_wait()
+
+
+def Rotate_Cloud(Points, V1, V2):
+    # V1 is the current vector which the coordinate system is aligned to
+    # V2 is the vector we want the system aligned to
+    # Points is an (n,3) array of n points (x,y,z)
+    V1 = np.asarray(V1)
+    V2 = np.asarray(V2)
+
+    # Normalize V1 and V2 in case they aren't already
+    V1Len = (V1[0] ** 2 + V1[1] ** 2 + V1[2] ** 2) ** 0.5
+    V2Len = (V2[0] ** 2 + V2[1] ** 2 + V2[2] ** 2) ** 0.5
+    V1 = V1 / V1Len
+    V2 = V2 / V2Len
+
+    # Calculate the vector cross product
+    V1V2Cross = np.cross(V1, V2)
+    V1V2CrossNorm = (V1V2Cross[0] ** 2 + V1V2Cross[1] ** 2 + V1V2Cross[2] ** 2) ** 0.5
+    V1V2CrossNormalized = V1V2Cross / V1V2CrossNorm
+
+    # Dot product
+    V1V2Dot = np.dot(V1, V2)
+    V1Norm = (V1[0] ** 2 + V1[1] ** 2 + V1[2] ** 2) ** 0.5
+    V2Norm = (V2[0] ** 2 + V2[1] ** 2 + V2[2] ** 2) ** 0.5
+
+    # Angle between the vectors
+    Theta = np.arccos(V1V2Dot / (V1Norm * V2Norm))
+    print(Theta)
+
+    # Using Rodrigues' rotation formula (wikipedia):
+    e = V1V2CrossNormalized
+    pts_rotated = np.empty((len(Points), 3))
+    if np.size(Points) == 3:
+        p = Points
+        p_rotated = (
+            np.cos(Theta) * p
+            + np.sin(Theta) * (np.cross(e, p))
+            + (1 - np.cos(Theta)) * np.dot(e, p) * e
+        )
+        pts_rotated = p_rotated
+    else:
+        for i, p in enumerate(Points):
+            p_rotated = (
+                np.cos(Theta) * p
+                + np.sin(Theta) * (np.cross(e, p))
+                + (1 - np.cos(Theta)) * np.dot(e, p) * e
+            )
+            pts_rotated[i] = p_rotated
+    return pts_rotated
+
+
+def Rotate_Vector(Vector, Angle):
+    # Vector is the vector being rotated
+    # Angle is used to rotate Vector and is given in degrees
+
+    # Convert angle to radians
+    Angle_Rad = np.radians(Angle)
+
+    # rotation matrix
+    # See https://en.wikipedia.org/wiki/Rotation_matrix for more information
+    r = np.array(
+        (
+            (np.cos(Angle_Rad), -np.sin(Angle_Rad)),
+            (np.sin(Angle_Rad), np.cos(Angle_Rad)),
+        )
+    )
+
+    # we only care about x and y, not z
+    a_vector = (Vector[0], Vector[1])
+    a_vector = np.asarray(a_vector)
+
+    # vector after rotation
+    rotated = r.dot(a_vector)
+    # print(rotated)
+
+    # return 3D vector
+    NewVector = (rotated[0], rotated[1], Vector[2])
+
+    return NewVector
