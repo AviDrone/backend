@@ -9,8 +9,8 @@ import datetime
 import math
 import time
 
+import transceiver.utils as util
 import default_parameters as default
-import avidrone.transceiver.utils as util
 from dronekit import (
     Command,
     LocationGlobal,
@@ -25,19 +25,12 @@ class Search:
     def __init__(self):
         global_frame = vehicle.location.global_frame
         global_location = LocationGlobal(new_lat, new_lon, original_location.alt)
-        distance = (
-                2
-                * math.asin(
-            math.sqrt(
-                (math.sin((lat_a - lat_b) / 2)) ** 2
-                + math.cos(lat_a)
-                * math.cos(lat_b)
-                * (math.sin((lon_a - lon_b) / 2)) ** 2
-            )
-        )
-                * 1.113195e5
-        )
+        distance = (2 * math.asin(math.sqrt(
+            (math.sin((lat_a - lat_b) / 2)
+             ) ** 2 + math.cos(lat_a) * math.cos(lat_b) *
+            (math.sin((lon_a - lon_b) / 2)) ** 2)) * 1.113195e5)
 
+    @staticmethod
     def get_location(self, original_location, d_north, d_east):
         earth_radius = 6378137.0  # Radius of "spherical" earth
         # Coordinate offsets in radians
@@ -52,25 +45,26 @@ class Search:
 
         return global_location
 
+    @staticmethod
     def get_distance(self, location_a, location_b):
         lat_a, lat_b = location_a.lat, location_b.lat
         lon_a, lon_b = location_a.lat, location_b.lat
 
         return distance
 
+    @staticmethod
     def get_global_pos(self):
         return global_frame
 
+    @staticmethod
     def read_transceiver(self):
         uav_pos = [2, 2, 2]  # TODO replace this with actual positions
         beacon_pos = [1, 1, 1]  # TODO replace this with actual positions
         return util.mock_beacon(uav_pos, beacon_pos)
 
-
 def start_gps():
     print("-- Initializing the gps window")  # to be default.WINDOW_SIZE long
     gps_window = GPSData(default.WINDOW_SIZE)
-
 
 def start():
     print("-- Waiting for vehicle to start...")
@@ -151,13 +145,12 @@ def wobble_wait():
     target_yaw = original_yaw + cw * heading_rad
 
     while (
-            abs(target_yaw - vehicle.attitude.yaw) % math.pi
-            > 0.01745 * default.DEGREE_ERROR
+        abs(target_yaw - vehicle.attitude.yaw) % math.pi
+        > 0.01745 * default.DEGREE_ERROR
     ):
         error_degree = abs(target_yaw - vehicle.attitude.yaw) % math.pi
         print("Turn error: ", error_degree)  # 1 degree
         time.sleep(0.25)
-
 
 def condition_yaw(heading, relative=False):
     """
