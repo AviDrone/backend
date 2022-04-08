@@ -18,7 +18,7 @@ static double all_dir_dig_out[NUM_READS][2];
 // {Dig1, Dig2, Dir} these are the BCM numberings
 
 const int ANODE_PINS[] = { 2, 3, 4 };
- // {a, b, c, d, e, f, g}
+// {a, b, c, d, e, f, g}
 const int CATH_PINS[] = { 17, 27, 22, 5, 10, 11, 9 };
 // {L_most, L, C, R, R_most}
 const int DIR_PINS[] = { 10, 5, 22, 27, 17 };

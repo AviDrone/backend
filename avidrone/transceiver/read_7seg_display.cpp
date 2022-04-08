@@ -60,15 +60,24 @@ void int_a_dig1(void) {
       // for (int i = 0; i < 7;i++)  {
       // all_dig1_reading[interrupt_count][i] = digitalRead(CATH_PINS[i]);
       //}
-      all_dig1_reading[interrupt_count][0] = digitalRead(CATH_PINS[0]);
-      all_dig1_reading[interrupt_count][1] = digitalRead(CATH_PINS[1]);
-      all_dig1_reading[interrupt_count][2] = digitalRead(CATH_PINS[2]);
-      all_dig1_reading[interrupt_count][3] = digitalRead(CATH_PINS[3]);
-      all_dig1_reading[interrupt_count][4] = digitalRead(CATH_PINS[4]);
-      all_dig1_reading[interrupt_count][5] = digitalRead(CATH_PINS[5]);
-      all_dig1_reading[interrupt_count][6] = digitalRead(CATH_PINS[6]);
-      all_dig1_reading[interrupt_count][7] = digitalRead(CATH_PINS[7]);
-      all_dp_reading[interrupt_count] = digitalRead((DP_PIN));
+      all_dig1_reading[interrupt_count][0] =
+        digitalRead(CATH_PINS[0]);
+      all_dig1_reading[interrupt_count][1] =
+        digitalRead(CATH_PINS[1]);
+      all_dig1_reading[interrupt_count][2] =
+        digitalRead(CATH_PINS[2]);
+      all_dig1_reading[interrupt_count][3] =
+        digitalRead(CATH_PINS[3]);
+      all_dig1_reading[interrupt_count][4] =
+        digitalRead(CATH_PINS[4]);
+      all_dig1_reading[interrupt_count][5] =
+        digitalRead(CATH_PINS[5]);
+      all_dig1_reading[interrupt_count][6] =
+        digitalRead(CATH_PINS[6]);
+      all_dig1_reading[interrupt_count][7] =
+        digitalRead(CATH_PINS[7]);
+      all_dp_reading[interrupt_count] =
+        digitalRead((DP_PIN));
     }
   }
 }
@@ -86,26 +95,39 @@ void int_a_dig2(void) {
 void int_a_dir(void) {
   if ((interrupt_count != -1) && (interrupt_count < NUM_READS) &&
       (SETUP_COMPLETE == true)) {
-    all_dir_reading[interrupt_count][0] = digitalRead(DIR_PINS[0]);
-    all_dir_reading[interrupt_count][1] = digitalRead(DIR_PINS[1]);
-    all_dir_reading[interrupt_count][2] = digitalRead(DIR_PINS[2]);
-    all_dir_reading[interrupt_count][3] = digitalRead(DIR_PINS[3]);
-    all_dir_reading[interrupt_count][4] = digitalRead(DIR_PINS[4]);
+    all_dir_reading[interrupt_count][0] =
+      digitalRead(DIR_PINS[0]);
+    all_dir_reading[interrupt_count][1] =
+      digitalRead(DIR_PINS[1]);
+    all_dir_reading[interrupt_count][2] =
+      digitalRead(DIR_PINS[2]);
+    all_dir_reading[interrupt_count][3] =
+      digitalRead(DIR_PINS[3]);
+    all_dir_reading[interrupt_count][4] =
+      digitalRead(DIR_PINS[4]);
   }
 }
 
-// Takes bool array of length 5 representing the direction LEDs formatted as
-// such, {Leftmost, Left, Center, Right, Rightmost} Returns a double from 0-4
-// where zero is returned when the leftmost led is on and 4 is returned when the
-// rightmost LED is on
+// Takes bool array of length 5 representing the direction LEDs
+// formatted as such, {Leftmost, Left, Center, Right, Rightmost}
+// Returns a double from 0-4 where zero is returned when the leftmost
+// led lights is on and 4 is returned when the rightmost LED is on.
 double dir_decode(bool read_dir[5]) {
-  if (((read_dir[0] == 0) && (read_dir[1] == 0)) || (read_dir[0] == 0)) {
+  if (
+    ((read_dir[0] == 0) && (read_dir[1] == 0)) || (read_dir[0] == 0)
+  ) {
     return 0;
-  } else if (((read_dir[2] == 0) && (read_dir[1] == 0)) || (read_dir[1] == 0)) {
+  } else if (
+    ((read_dir[2] == 0) && (read_dir[1] == 0)) || (read_dir[1] == 0)
+  ) {
     return 1;
-  } else if (((read_dir[2] == 0) && (read_dir[3] == 0)) || (read_dir[3] == 0)) {
+  } else if (
+    ((read_dir[2] == 0) && (read_dir[3] == 0)) || (read_dir[3] == 0)
+  ) {
     return 3;
-  } else if (((read_dir[4] == 0) && (read_dir[3] == 0)) || (read_dir[4] == 0)) {
+  } else if (
+    ((read_dir[4] == 0) && (read_dir[3] == 0)) || (read_dir[4] == 0)
+  ) {
     return 4;
   } else if (read_dir[2] == 0) {
     return 2;
@@ -115,8 +137,8 @@ double dir_decode(bool read_dir[5]) {
 }
 
 // Function to return double value of distance
-// Uses char dig[3] and int dir and returns array of doubles with direction then
-// distance
+// Uses char dig[3] and int dir and returns array
+// of doubles with direction then distance.
 
 double dist_to_double(char dist[4]) {
   if ((dist[0] == 'x') && (dist[1] == 'x') && (dist[2] == 'x')) { // xxx
@@ -129,7 +151,9 @@ double dist_to_double(char dist[4]) {
     return -1;
   } else if ((dist[0] != 'x') && (dist[1] == '.') && (dist[2] == 'x')) { // rrx
     return -1;
-  } else if ((dist[0] != 'x') && (dist[1] == 'x') && (dist[2] != 'x')) { // rxr
+  } else if (
+    (dist[0] != 'x') && (dist[1] == 'x') && (dist[2] != 'x')
+  ) { // rxr
     dist[1] = dist[2];
     dist[2] = 'x';
     return atof(dist);
@@ -166,8 +190,10 @@ void get_dir_dig(double *dir_dig_out) {
   }
   // Perform operations to determine the reading and filter out bad readings
   for (int i = 0; i < NUM_READS; i++) {
-    all_dig_decode[i][0] = decode_7seg(reinterpret_cast<bool *>(all_dig1_reading[i]));
-    all_dig_decode[i][2] = decode_7seg(reinterpret_cast<bool *>(all_dig2_reading[i]));
+    all_dig_decode[i][0] = 
+      decode_7seg(reinterpret_cast<bool *>(all_dig1_reading[i]));
+    all_dig_decode[i][2] = 
+      decode_7seg(reinterpret_cast<bool *>(all_dig2_reading[i]));
     all_dig_decode[i][3] = '\0';
     if (all_dp_reading[i] == 0) {
       all_dig_decode[i][1] = '.';
@@ -176,10 +202,13 @@ void get_dir_dig(double *dir_dig_out) {
       all_dig_decode[i][2] = '\0';
     }
     all_dir_dig_out[i][1] = dist_to_double(all_dig_decode[i]);
-    all_dir_dig_out[i][0] = dir_decode(reinterpret_cast<bool *>(all_dir_reading[i]));
+    all_dir_dig_out[i][0] = dir_decode(
+      reinterpret_cast<bool *>(all_dir_reading[i])
+    );
   }
 
-  // int dir_counts[6] = {0}; // Directional LEDs 0-4 and then -1 if not read
+  // Directional LEDs 0-4 and then -1 if not read
+  // int dir_counts[6] = {0};
   int dir_counts[5] = {0};
   for (int i = 0; i < NUM_READS; i++) {
     double count_dir = all_dir_dig_out[i][0];
@@ -189,7 +218,7 @@ void get_dir_dig(double *dir_dig_out) {
     //    dir_counts[(int)count_dir]++;
     //}
     if (count_dir != -1) {
-      dir_counts[(int)count_dir]++;
+      dir_counts[(static_cast<int>(count_dir)]++;
     }
   }
   int max_index = 0;
