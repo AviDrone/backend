@@ -1,7 +1,7 @@
 // Copyright 2022 Avidrone
 
 #include "read.h"
-#include "read_7seg_display.h"  // Only runs on Raspberry Pi
+#include "avidrone/transceiver/read_7seg_display.h"
 #include <fstream>
 #include <iostream>
 
@@ -203,8 +203,7 @@ void get_dir_dig(double *dir_dig_out) {
     }
     all_dir_dig_out[i][1] = dist_to_double(all_dig_decode[i]);
     all_dir_dig_out[i][0] = dir_decode(
-      reinterpret_cast<bool *>(all_dir_reading[i])
-    );
+      reinterpret_cast<bool *>(all_dir_reading[i]));
   }
 
   // Directional LEDs 0-4 and then -1 if not read
