@@ -21,6 +21,52 @@ from dronekit import (
 )
 from gps_data import GPSData
 
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+
+# Default
+MAGNITUDE = 1  # Set the distance the vehicle goes
+ALTITUDE = 4  # Set the altitude of the flight path
+DEGREES = 10  # Set the amount to rotate in yaw
+DEGREE_ERROR = 2  # Number of degrees error for rotation
+DISTANCE_ERROR = 0.35  # Error in distance before target reached
+LAND_THRESHOLD = 2  # Error in distance before target reached
+WINDOW_SIZE = 5  # Set the size of the gps window original: 5
+
+# Testing
+IS_TEST = False
+
+# Flight Mode
+FLIGHT_MODE = "GUIDED"
+
+# Verbose Output
+IS_VERBOSE = False
+
+class GPSData:
+    def __init__(self, window_size):
+        self.window_size = window_size
+        self.gps_points = []
+        self.distance = []
+
+    def add_point(self, new_gps_point, new_distance):
+        self.gps_points.insert(0, new_gps_point)
+        del self.gps_points[self.window_size:]
+        self.distance.insert(0, new_distance)
+        del self.distance[self.window_size:]
+
+    def get_minimum_index(self):
+        minimum_dist_index = 0
+
+        for i in range(0, len(self.distance)):
+            if self.distance[i] < self.distance[minimum_dist_index]:
+                minimum_dist_index = i
+        return minimum_dist_index
+
+    def purge_gps_window(self):
+        self.gps_points.clear()
+        self.distance.clear()
+
 
 class Search:
     def __init__(self):
@@ -192,6 +238,147 @@ def condition_yaw(heading, relative=False):
     wobble_wait()
 
 
+def rotate_cloud(Points, V1, V2):
+    # V1 is the current vector which the coordinate system is aligned to
+    # V2 is the vector we want the system aligned to
+    # Points is an (n,3) array of n points (x,y,z)
+    V1 = np.asarray(V1)
+    V2 = np.asarray(V2)
+
+    # Normalize V1 and V2 in case they aren't already
+    V1Len = (V1[0] ** 2 + V1[1] ** 2 + V1[2] ** 2) ** 0.5
+    V2Len = (V2[0] ** 2 + V2[1] ** 2 + V2[2] ** 2) ** 0.5
+    V1 = V1 / V1Len
+    V2 = V2 / V2Len
+
+    # Calculate the vector cross product
+    V1V2Cross = np.cross(V1, V2)
+    V1V2CrossNorm = (V1V2Cross[0] ** 2 + V1V2Cross[1] ** 2 + V1V2Cross[2] ** 2) ** 0.5
+    V1V2CrossNormalized = V1V2Cross / V1V2CrossNorm
+
+    # Dot product
+    V1V2Dot = np.dot(V1, V2)
+    V1Norm = (V1[0] ** 2 + V1[1] ** 2 + V1[2] ** 2) ** 0.5
+    V2Norm = (V2[0] ** 2 + V2[1] ** 2 + V2[2] ** 2) ** 0.5
+
+    # angle between the vectors
+    Theta = np.arccos(V1V2Dot / (V1Norm * V2Norm))
+    print(Theta)
+
+    # Using Rodrigues' rotation formula (wikipedia):
+    e = V1V2CrossNormalized
+    pts_rotated = np.empty((len(Points), 3))
+    if np.size(Points) == 3:
+        p = Points
+        p_rotated = (
+                np.cos(Theta) * p
+                + np.sin(Theta) * (np.cross(e, p))
+                + (1 - np.cos(Theta)) * np.dot(e, p) * e
+        )
+        pts_rotated = p_rotated
+    else:
+        for i, p in enumerate(Points):
+            p_rotated = (
+                    np.cos(Theta) * p
+                    + np.sin(Theta) * (np.cross(e, p))
+                    + (1 - np.cos(Theta)) * np.dot(e, p) * e
+            )
+            pts_rotated[i] = p_rotated
+    return pts_rotated
+
+
+def rotate_vector(vector, angle):
+    # vector is the vector being rotated
+    # angle is used to rotate vector and is given in degrees
+
+    # Convert angle to radians
+    Angle_Rad = np.radians(angle)
+
+    # rotation matrix
+    # See https://en.wikipedia.org/wiki/Rotation_matrix for more information
+    r = np.array(
+        (
+            (np.cos(Angle_Rad), -np.sin(Angle_Rad)),
+            (np.sin(Angle_Rad), np.cos(Angle_Rad)),
+        )
+    )
+
+    # we only care about x and y, not z
+    a_vector = (vector[0], vector[1])
+    a_vector = np.asarray(a_vector)
+
+    # vector after rotation
+    rotated = r.dot(a_vector)
+    # print(rotated)
+
+    # return 3D vector
+    NewVector = (rotated[0], rotated[1], vector[2])
+
+    return NewVector
+
+def get_location_metres(original_location, dNorth, dEast):
+    """
+    Returns a LocationGlobal object containing the latitude/longitude `dNorth` and `dEast` metres from the
+    specified `original_location`. The returned Location has the same `alt` value
+    as `original_location`.
+
+    The function is useful when you want to move the vehicle around specifying locations relative to
+    the current vehicle position.
+    The algorithm is relatively accurate over small distances (10m within 1km) except close to the poles.
+    For more information see:
+    http://gis.stackexchange.com/questions/2951/algorithm-for-offsetting-a-latitude-longitude-by-some-amount-of-meters
+    """
+    earth_radius = 6378137.0  # Radius of "spherical" earth
+    # Coordinate offsets in radians
+    dLat = dNorth / earth_radius
+    dLon = dEast / (earth_radius * math.cos(math.pi * original_location.lat / 180))
+
+    # New position in decimal degrees
+    newlat = original_location.lat + (dLat * 180 / math.pi)
+    newlon = original_location.lon + (dLon * 180 / math.pi)
+    return LocationGlobal(newlat, newlon, original_location.alt)
+
+
+def get_location_metres_with_alt(original_location, dNorth, dEast, newAlt):
+    """
+    Returns a LocationGlobal object containing the latitude/longitude `dNorth` and `dEast` metres from the
+    specified `original_location`. The returned Location has the same `alt` value
+    as `original_location`.
+
+    The function is useful when you want to move the vehicle around specifying locations relative to
+    the current vehicle position.
+    The algorithm is relatively accurate over small distances (10m within 1km) except close to the poles.
+    For more information see:
+    http://gis.stackexchange.com/questions/2951/algorithm-for-offsetting-a-latitude-longitude-by-some-amount-of-meters
+    """
+    earth_radius = 6378137.0  # Radius of "spherical" earth
+    # Coordinate offsets in radians
+    dLat = dNorth / earth_radius
+    dLon = dEast / (earth_radius * math.cos(math.pi * original_location.lat / 180))
+
+    # New position in decimal degrees
+    newlat = original_location.lat + (dLat * 180 / math.pi)
+    newlon = original_location.lon + (dLon * 180 / math.pi)
+
+    return LocationGlobal(newlat, newlon, newAlt)
+
+
+def get_distance_metres(a_location1, a_location2):
+    """
+    Returns the ground distance in metres between two LocationGlobal objects.
+
+    This method is an approximation, and will not be accurate over large distances and close to the
+    earth's poles. It comes from the ArduPilot test code:
+    https://github.com/diydrones/ardupilot/blob/master/Tools/autotest/common.py
+    """
+    dlat = a_location2.lat - a_location1.lat
+    dlong = a_location2.lon - a_location1.lon
+    return math.sqrt((dlat * dlat) + (dlong * dlong)) * 1.113195e5
+
+
+def get_range(totalLength, dLength):
+    return (totalLength / dLength) * 2
+
 def Rotate_Cloud(Points, V1, V2):
     # V1 is the current vector which the coordinate system is aligned to
     # V2 is the vector we want the system aligned to
@@ -215,7 +402,7 @@ def Rotate_Cloud(Points, V1, V2):
     V1Norm = (V1[0] ** 2 + V1[1] ** 2 + V1[2] ** 2) ** 0.5
     V2Norm = (V2[0] ** 2 + V2[1] ** 2 + V2[2] ** 2) ** 0.5
 
-    # Angle between the vectors
+    # angle between the vectors
     Theta = np.arccos(V1V2Dot / (V1Norm * V2Norm))
     print(Theta)
 
@@ -242,8 +429,8 @@ def Rotate_Cloud(Points, V1, V2):
 
 
 def Rotate_Vector(Vector, Angle):
-    # Vector is the vector being rotated
-    # Angle is used to rotate Vector and is given in degrees
+    # vector is the vector being rotated
+    # angle is used to rotate vector and is given in degrees
 
     # Convert angle to radians
     Angle_Rad = np.radians(Angle)
