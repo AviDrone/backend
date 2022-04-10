@@ -5,7 +5,7 @@ import argparse
 import logging as log
 import os
 
-import avidrone.search.default_parameters as parameters
+import avidrone.search.util as util
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()

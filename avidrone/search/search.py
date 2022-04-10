@@ -9,9 +9,9 @@ import logging as log
 import math
 import time
 
-import util
 import primary
 import secondary
+import util
 from dronekit import (
     Command,
     LocationGlobal,
