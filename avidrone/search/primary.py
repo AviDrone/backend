@@ -12,12 +12,24 @@ import logging as log
 import time
 
 import numpy as np
-from dronekit import (Command, LocationGlobal, LocationGlobalRelative,
-                      VehicleMode, connect)
-from primary_functions import (get_distance_metres, get_location_metres,
-                               get_location_metres_with_alt, get_range)
+from dronekit import (
+    Command,
+    LocationGlobal,
+    LocationGlobalRelative,
+    VehicleMode,
+    connect,
+)
+from util import (
+    get_distance_metres,
+    get_location_metres,
+    get_location_metres_with_alt,
+    get_range,
+    rotate_cloud,
+    rotate_vector,
+)
 from pymavlink import mavutil
-from RotateVectorTools import Rotate_Cloud, Rotate_Vector
+
+# from RotateVectorTools import
 
 # Define variables
 
@@ -32,9 +44,6 @@ dLength = 20
 
 # height of the slope
 totalAlt = 0
-
-# Set up option parsing to get connection string
-import argparse
 
 parser = argparse.ArgumentParser(description="Demonstrates basic mission operations.")
 parser.add_argument(
@@ -58,13 +67,9 @@ if not connection_string:
     connection_string = sitl.connection_string()
 
 
-# Connect to the Vehicle
-print("Connecting to vehicle on: %s" % connection_string)
-vehicle = connect(connection_string, wait_ready=True)
-
 # Rectangular search taking angle and altitude into account
 def rectangular_primary_search_with_alt(
-    a_location, width, dLength, totalLength, totalAlt, angle
+        a_location, width, dLength, totalLength, totalAlt, angle
 ):
     """
     Primary search over a sloped plane in the direction of a specified angle,
@@ -144,7 +149,7 @@ def rectangular_primary_search_with_alt(
     initArray = np.asarray(initArray)
     vector1 = (initArray[1][0], initArray[1][1], 0)
     vector1 = np.asarray(vector1)
-    vector2 = Rotate_Vector(vector1, angle)
+    vector2 = rotate_vector(vector1, angle)
 
     # avoid rare case where a divide by 0 occurs if vector1 = vector2
     if np.array_equal(vector2, vector1):
@@ -152,7 +157,7 @@ def rectangular_primary_search_with_alt(
         rotated = initArray
     else:
         # otherwise, rotate
-        rotated = Rotate_Cloud(initArray, vector1, vector2)
+        rotated = rotate_cloud(initArray, vector1, vector2)
 
     # rotate points
     for i in rotated:
@@ -264,8 +269,8 @@ def rectangular_primary_search_basic(a_location, width, dLength, totalLength, an
     initArray = np.asarray(initArray)
     vector1 = (initArray[1][0], initArray[1][1], 0)
     vector1 = np.asarray(vector1)
-    vector2 = Rotate_Vector(vector1, angle)
-    rotated = Rotate_Cloud(initArray, vector1, vector2)
+    vector2 = rotate_vector(vector1, angle)
+    rotated = rotate_cloud(initArray, vector1, vector2)
 
     # rotate points in array
     print("Rotating")
@@ -373,7 +378,7 @@ def arm_and_takeoff(aTargetAltitude):
     while True:
         print(" Altitude: ", vehicle.location.global_relative_frame.alt)
         if (
-            vehicle.location.global_relative_frame.alt >= aTargetAltitude * 0.95
+                vehicle.location.global_relative_frame.alt >= aTargetAltitude * 0.95
         ):  # Trigger just below target alt.
             print("Reached target altitude")
             break
@@ -397,7 +402,8 @@ else:
         vehicle.location.global_frame, width, dLength, totalLength, totalAlt, my_angle
     )
 
-# From Copter 3.3 you will be able to take off using a mission item. Plane must take off using a mission item (currently).
+# From Copter 3.3 you will be able to take off using a mission item. Plane must take off using a mission item (
+# currently).
 arm_and_takeoff(10 + totalAlt)
 
 print("Starting mission")
@@ -424,18 +430,17 @@ while True:
     )
 
     if nextwaypoint == get_range(
-        totalLength, dLength
+            totalLength, dLength
     ):  # Dummy waypoint - as soon as we reach last waypoint this is true and we exit.
         print(
             "Exit 'standard' mission when start heading to final waypoint (%s)"
-            % (nextwaypoint)
+            % nextwaypoint
         )
         break
     time.sleep(1)
 
 print("Return to launch")
 vehicle.mode = VehicleMode("RTL")
-
 
 # Close vehicle object before exiting script
 print("Close vehicle object")
