@@ -7,11 +7,19 @@ import argparse
 import asyncio
 import datetime
 import math
+<<<<<<< HEAD
 import numpy as np
 import time
 
 import transceiver.utils as util
 import default_parameters as default
+=======
+import time
+
+import default_parameters as default
+import numpy as np
+import transceiver.utils as util
+>>>>>>> f7f68ef464b431aefa526e13320c81f4ae688a05
 from dronekit import (
     Command,
     LocationGlobal,
@@ -19,13 +27,55 @@ from dronekit import (
     VehicleMode,
     connect,
 )
+<<<<<<< HEAD
 from gps_data import GPSData
+=======
+
+IS_VERBOSE = False  # Verbose Output
+IS_TEST = False  # Testing
+
+# DEFAULT PARAMETERS
+MAGNITUDE = 1  # Distance the vehicle goes
+ALTITUDE = 4  # Altitude of the flight path
+DEGREES = 10  # Amount to rotate in yaw
+DEGREE_ERROR = 2  # Number of degrees error for rotation
+DISTANCE_ERROR = 0.35  # Error in distance before target reached
+LAND_THRESHOLD = 2  # Error in distance before target reached
+WINDOW_SIZE = 5  # Size of the gps window original: 5
+FLIGHT_MODE = "GUIDED"
+
+
+class GpsData:
+    def __init__(self, window_size):
+        self.window_size = window_size
+        self.gps_points = []
+        self.distance = []
+
+    def add_point(self, new_gps_point, new_distance):
+        self.gps_points.insert(0, new_gps_point)
+        del self.gps_points[self.window_size:]
+        self.distance.insert(0, new_distance)
+        del self.distance[self.window_size:]
+
+    def get_minimum_index(self):
+        minimum_dist_index = 0
+
+        for i in range(0, len(self.distance)):
+            if self.distance[i] < self.distance[minimum_dist_index]:
+                minimum_dist_index = i
+        return minimum_dist_index
+
+    def purge_gps_window(self):
+        self.gps_points.clear()
+        self.distance.clear()
+>>>>>>> f7f68ef464b431aefa526e13320c81f4ae688a05
 
 
 class Search:
     def __init__(self):
         global_frame = vehicle.location.global_frame
         global_location = LocationGlobal(new_lat, new_lon, original_location.alt)
+<<<<<<< HEAD
         distance = (2 * math.asin(math.sqrt(
             (math.sin((lat_a - lat_b) / 2)
              ) ** 2 + math.cos(lat_a) * math.cos(lat_b) *
@@ -33,6 +83,21 @@ class Search:
 
     @staticmethod
     def get_location(self, original_location, d_north, d_east):
+=======
+        distance = (
+            2 * math.asin(math.sqrt(
+            (math.sin((lat_a - lat_b) / 2)) ** 2
+            + math.cos(lat_a)
+            * math.cos(lat_b)
+            * (math.sin((lon_a - lon_b) / 2)) ** 2
+        )
+        ) * 1.113195e5
+        )
+
+    @staticmethod
+    def get_location(original_location, d_north, d_east, d_alt=0):
+
+>>>>>>> f7f68ef464b431aefa526e13320c81f4ae688a05
         earth_radius = 6378137.0  # Radius of "spherical" earth
         # Coordinate offsets in radians
         d_lat = d_north / earth_radius
@@ -44,6 +109,7 @@ class Search:
         new_lat = original_location.lat + (d_lat * 180 / math.pi)
         new_lon = original_location.lon + (d_lon * 180 / math.pi)
 
+<<<<<<< HEAD
         return global_location
 
     @staticmethod
@@ -59,6 +125,29 @@ class Search:
 
     @staticmethod
     def read_transceiver(self):
+=======
+        if original_location.alt:
+            return LocationGlobal(new_lat, new_lon, original_location.alt)
+        else:
+            return LocationGlobal(new_lat, new_lon, d_alt)
+
+    @staticmethod
+    def get_distance(location_a, location_b):
+        lat_a, lat_b = location_a.lat, location_b.lat
+        lon_a, lon_b = location_a.lat, location_b.lat
+
+        d_lat = lat_b - lat_a
+        d_lon = lon_b - lon_a
+
+        return math.sqrt(d_lat ** 2 + d_lon ** 2) * 1.113195e5
+
+    @staticmethod
+    def get_global_pos():
+        return global_frame
+
+    @staticmethod
+    def read_transceiver():
+>>>>>>> f7f68ef464b431aefa526e13320c81f4ae688a05
         uav_pos = [2, 2, 2]  # TODO replace this with actual positions
         beacon_pos = [1, 1, 1]  # TODO replace this with actual positions
         return util.mock_beacon(uav_pos, beacon_pos)
@@ -192,6 +281,131 @@ def condition_yaw(heading, relative=False):
     wobble_wait()
 
 
+<<<<<<< HEAD
+def Rotate_Cloud(Points, V1, V2):
+=======
+def rotate_cloud(Points, V1, V2):
+>>>>>>> f7f68ef464b431aefa526e13320c81f4ae688a05
+    # V1 is the current vector which the coordinate system is aligned to
+    # V2 is the vector we want the system aligned to
+    # Points is an (n,3) array of n points (x,y,z)
+    V1 = np.asarray(V1)
+    V2 = np.asarray(V2)
+
+    # Normalize V1 and V2 in case they aren't already
+    V1Len = (V1[0] ** 2 + V1[1] ** 2 + V1[2] ** 2) ** 0.5
+    V2Len = (V2[0] ** 2 + V2[1] ** 2 + V2[2] ** 2) ** 0.5
+    V1 = V1 / V1Len
+    V2 = V2 / V2Len
+
+    # Calculate the vector cross product
+    V1V2Cross = np.cross(V1, V2)
+    V1V2CrossNorm = (V1V2Cross[0] ** 2 + V1V2Cross[1] ** 2 + V1V2Cross[2] ** 2) ** 0.5
+    V1V2CrossNormalized = V1V2Cross / V1V2CrossNorm
+
+    # Dot product
+    V1V2Dot = np.dot(V1, V2)
+    V1Norm = (V1[0] ** 2 + V1[1] ** 2 + V1[2] ** 2) ** 0.5
+    V2Norm = (V2[0] ** 2 + V2[1] ** 2 + V2[2] ** 2) ** 0.5
+
+<<<<<<< HEAD
+    # Angle between the vectors
+    Theta = np.arccos(V1V2Dot / (V1Norm * V2Norm))
+    print(Theta)
+
+    # Using Rodrigues' rotation formula (wikipedia):
+=======
+    # angle between the vectors
+    Theta = np.arccos(V1V2Dot / (V1Norm * V2Norm))
+    print(Theta)
+
+    # Using Rodriguez' rotation formula (wikipedia):
+>>>>>>> f7f68ef464b431aefa526e13320c81f4ae688a05
+    e = V1V2CrossNormalized
+    pts_rotated = np.empty((len(Points), 3))
+    if np.size(Points) == 3:
+        p = Points
+        p_rotated = (
+<<<<<<< HEAD
+            np.cos(Theta) * p
+            + np.sin(Theta) * (np.cross(e, p))
+            + (1 - np.cos(Theta)) * np.dot(e, p) * e
+=======
+                np.cos(Theta) * p
+                + np.sin(Theta) * (np.cross(e, p))
+                + (1 - np.cos(Theta)) * np.dot(e, p) * e
+>>>>>>> f7f68ef464b431aefa526e13320c81f4ae688a05
+        )
+        pts_rotated = p_rotated
+    else:
+        for i, p in enumerate(Points):
+            p_rotated = (
+<<<<<<< HEAD
+                np.cos(Theta) * p
+                + np.sin(Theta) * (np.cross(e, p))
+                + (1 - np.cos(Theta)) * np.dot(e, p) * e
+=======
+                    np.cos(Theta) * p
+                    + np.sin(Theta) * (np.cross(e, p))
+                    + (1 - np.cos(Theta)) * np.dot(e, p) * e
+>>>>>>> f7f68ef464b431aefa526e13320c81f4ae688a05
+            )
+            pts_rotated[i] = p_rotated
+    return pts_rotated
+
+
+<<<<<<< HEAD
+def Rotate_Vector(Vector, Angle):
+    # Vector is the vector being rotated
+    # Angle is used to rotate Vector and is given in degrees
+
+    # Convert angle to radians
+    Angle_Rad = np.radians(Angle)
+=======
+def rotate_vector(vector, angle):
+    # vector is the vector being rotated
+    # angle is used to rotate vector and is given in degrees
+
+    # Convert angle to radians
+    Angle_Rad = np.radians(angle)
+>>>>>>> f7f68ef464b431aefa526e13320c81f4ae688a05
+
+    # rotation matrix
+    # See https://en.wikipedia.org/wiki/Rotation_matrix for more information
+    r = np.array(
+        (
+            (np.cos(Angle_Rad), -np.sin(Angle_Rad)),
+            (np.sin(Angle_Rad), np.cos(Angle_Rad)),
+        )
+    )
+
+    # we only care about x and y, not z
+<<<<<<< HEAD
+    a_vector = (Vector[0], Vector[1])
+=======
+    a_vector = (vector[0], vector[1])
+>>>>>>> f7f68ef464b431aefa526e13320c81f4ae688a05
+    a_vector = np.asarray(a_vector)
+
+    # vector after rotation
+    rotated = r.dot(a_vector)
+    # print(rotated)
+
+    # return 3D vector
+<<<<<<< HEAD
+    NewVector = (rotated[0], rotated[1], Vector[2])
+
+    return NewVector
+=======
+    NewVector = (rotated[0], rotated[1], vector[2])
+
+    return NewVector
+
+
+def get_range(totalLength, dLength):
+    return (totalLength / dLength) * 2
+
+
 def Rotate_Cloud(Points, V1, V2):
     # V1 is the current vector which the coordinate system is aligned to
     # V2 is the vector we want the system aligned to
@@ -215,7 +429,7 @@ def Rotate_Cloud(Points, V1, V2):
     V1Norm = (V1[0] ** 2 + V1[1] ** 2 + V1[2] ** 2) ** 0.5
     V2Norm = (V2[0] ** 2 + V2[1] ** 2 + V2[2] ** 2) ** 0.5
 
-    # Angle between the vectors
+    # angle between the vectors
     Theta = np.arccos(V1V2Dot / (V1Norm * V2Norm))
     print(Theta)
 
@@ -225,47 +439,18 @@ def Rotate_Cloud(Points, V1, V2):
     if np.size(Points) == 3:
         p = Points
         p_rotated = (
-            np.cos(Theta) * p
-            + np.sin(Theta) * (np.cross(e, p))
-            + (1 - np.cos(Theta)) * np.dot(e, p) * e
+                np.cos(Theta) * p
+                + np.sin(Theta) * (np.cross(e, p))
+                + (1 - np.cos(Theta)) * np.dot(e, p) * e
         )
         pts_rotated = p_rotated
     else:
         for i, p in enumerate(Points):
             p_rotated = (
-                np.cos(Theta) * p
-                + np.sin(Theta) * (np.cross(e, p))
-                + (1 - np.cos(Theta)) * np.dot(e, p) * e
+                    np.cos(Theta) * p
+                    + np.sin(Theta) * (np.cross(e, p))
+                    + (1 - np.cos(Theta)) * np.dot(e, p) * e
             )
             pts_rotated[i] = p_rotated
     return pts_rotated
-
-
-def Rotate_Vector(Vector, Angle):
-    # Vector is the vector being rotated
-    # Angle is used to rotate Vector and is given in degrees
-
-    # Convert angle to radians
-    Angle_Rad = np.radians(Angle)
-
-    # rotation matrix
-    # See https://en.wikipedia.org/wiki/Rotation_matrix for more information
-    r = np.array(
-        (
-            (np.cos(Angle_Rad), -np.sin(Angle_Rad)),
-            (np.sin(Angle_Rad), np.cos(Angle_Rad)),
-        )
-    )
-
-    # we only care about x and y, not z
-    a_vector = (Vector[0], Vector[1])
-    a_vector = np.asarray(a_vector)
-
-    # vector after rotation
-    rotated = r.dot(a_vector)
-    # print(rotated)
-
-    # return 3D vector
-    NewVector = (rotated[0], rotated[1], Vector[2])
-
-    return NewVector
+>>>>>>> f7f68ef464b431aefa526e13320c81f4ae688a05

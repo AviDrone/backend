@@ -49,7 +49,7 @@ vehicle = connect(connection_string, wait_ready=True)
 
 def get_location_metres(original_location, dNorth, dEast):
     """
-    Returns a LocationGlobal object containing the latitude/longitude `dNorth` and `dEast` metres from the
+    Returns a LocationGlobal object containing the latitude/longitude `d_north` and `d_east` metres from the
     specified `original_location`. The returned Location has the same `alt` value
     as `original_location`.
 
