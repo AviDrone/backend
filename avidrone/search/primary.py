@@ -67,10 +67,6 @@ if not connection_string:
     connection_string = sitl.connection_string()
 
 
-# Connect to the Vehicle
-print("Connecting to vehicle on: %s" % connection_string)
-vehicle = connect(connection_string, wait_ready=True)
-
 # Rectangular search taking angle and altitude into account
 def rectangular_primary_search_with_alt(
     a_location, width, dLength, totalLength, totalAlt, angle
