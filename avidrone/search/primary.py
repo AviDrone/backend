@@ -12,19 +12,10 @@ import logging as log
 import time
 
 import numpy as np
-from dronekit import (
-    Command,
-    LocationGlobal,
-    LocationGlobalRelative,
-    VehicleMode,
-    connect,
-)
-from primary_functions import (
-    get_distance_metres,
-    get_location_metres,
-    get_location_metres_with_alt,
-    get_range,
-)
+from dronekit import (Command, LocationGlobal, LocationGlobalRelative,
+                      VehicleMode, connect)
+from primary_functions import (get_distance_metres, get_location_metres,
+                               get_location_metres_with_alt, get_range)
 from pymavlink import mavutil
 from RotateVectorTools import Rotate_Cloud, Rotate_Vector
 

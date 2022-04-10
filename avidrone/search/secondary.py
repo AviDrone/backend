@@ -19,29 +19,10 @@ from transceiver import Transceiver
 
 def run():
     print("-- SECONDARY SEARCH --")
-    parser = argparse.ArgumentParser(
-        description="Demonstrates basic mission operations."
-    )
-    parser.add_argument(
-        "--connect",
-        help="vehicle connection target string. If not specified, SITL automatically started and used.",
-    )
-    args = parser.parse_args()
-
-    connection_string = args.connect
-
-    # Start SITL if no connection string specified
-    if not connection_string:
-        sitl = dronekit_sitl.start_default()
-        connection_string = sitl.connection_string()
-
-    # Connect to the vehicle
-    log.info("Connecting to vehicle on: %s", connection_string)
-    vehicle = connect(connection_string, wait_ready=True)
 
     signal_found = False
     Search.start()
-    gps_window = GPSData(default.WINDOW_SIZE)
+    gps_window = util.WINDOW_SIZE
     while vehicle.mode.name == "GUIDED":
         # TODO implement transceiver
         transceiver = Transceiver
