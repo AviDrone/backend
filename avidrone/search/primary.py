@@ -19,14 +19,16 @@ from dronekit import (
     VehicleMode,
     connect,
 )
-from primary_functions import (
+from util import (
     get_distance_metres,
     get_location_metres,
     get_location_metres_with_alt,
     get_range,
+    rotate_cloud,
+    rotate_vector,
 )
 from pymavlink import mavutil
-from RotateVectorTools import Rotate_Cloud, Rotate_Vector
+# from RotateVectorTools import 
 
 # Define variables
 
@@ -66,10 +68,6 @@ if not connection_string:
     sitl = dronekit_sitl.start_default()
     connection_string = sitl.connection_string()
 
-
-# Connect to the Vehicle
-print("Connecting to vehicle on: %s" % connection_string)
-vehicle = connect(connection_string, wait_ready=True)
 
 # Rectangular search taking angle and altitude into account
 def rectangular_primary_search_with_alt(
@@ -153,7 +151,7 @@ def rectangular_primary_search_with_alt(
     initArray = np.asarray(initArray)
     vector1 = (initArray[1][0], initArray[1][1], 0)
     vector1 = np.asarray(vector1)
-    vector2 = Rotate_Vector(vector1, angle)
+    vector2 = rotate_vector(vector1, angle)
 
     # avoid rare case where a divide by 0 occurs if vector1 = vector2
     if np.array_equal(vector2, vector1):
@@ -161,7 +159,7 @@ def rectangular_primary_search_with_alt(
         rotated = initArray
     else:
         # otherwise, rotate
-        rotated = Rotate_Cloud(initArray, vector1, vector2)
+        rotated = rotate_cloud(initArray, vector1, vector2)
 
     # rotate points
     for i in rotated:
@@ -273,8 +271,8 @@ def rectangular_primary_search_basic(a_location, width, dLength, totalLength, an
     initArray = np.asarray(initArray)
     vector1 = (initArray[1][0], initArray[1][1], 0)
     vector1 = np.asarray(vector1)
-    vector2 = Rotate_Vector(vector1, angle)
-    rotated = Rotate_Cloud(initArray, vector1, vector2)
+    vector2 = rotate_vector(vector1, angle)
+    rotated = rotate_cloud(initArray, vector1, vector2)
 
     # rotate points in array
     print("Rotating")
