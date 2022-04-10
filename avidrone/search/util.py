@@ -42,9 +42,9 @@ class GpsData:
 
     def add_point(self, new_gps_point, new_distance):
         self.gps_points.insert(0, new_gps_point)
-        del self.gps_points[self.window_size:]
+        del self.gps_points[self.window_size :]
         self.distance.insert(0, new_distance)
-        del self.distance[self.window_size:]
+        del self.distance[self.window_size :]
 
     def get_minimum_index(self):
         minimum_dist_index = 0
@@ -64,13 +64,16 @@ class Search:
         global_frame = vehicle.location.global_frame
         global_location = LocationGlobal(new_lat, new_lon, original_location.alt)
         distance = (
-            2 * math.asin(math.sqrt(
-            (math.sin((lat_a - lat_b) / 2)) ** 2
-            + math.cos(lat_a)
-            * math.cos(lat_b)
-            * (math.sin((lon_a - lon_b) / 2)) ** 2
-        )
-        ) * 1.113195e5
+            2
+            * math.asin(
+                math.sqrt(
+                    (math.sin((lat_a - lat_b) / 2)) ** 2
+                    + math.cos(lat_a)
+                    * math.cos(lat_b)
+                    * (math.sin((lon_a - lon_b) / 2)) ** 2
+                )
+            )
+            * 1.113195e5
         )
 
     @staticmethod
@@ -80,7 +83,7 @@ class Search:
         # Coordinate offsets in radians
         d_lat = d_north / earth_radius
         d_lon = d_east / (
-                earth_radius * math.cos(math.pi * original_location.lat / 180)
+            earth_radius * math.cos(math.pi * original_location.lat / 180)
         )
 
         # New position in decimal degrees
@@ -100,7 +103,7 @@ class Search:
         d_lat = lat_b - lat_a
         d_lon = lon_b - lon_a
 
-        return math.sqrt(d_lat ** 2 + d_lon ** 2) * 1.113195e5
+        return math.sqrt(d_lat**2 + d_lon**2) * 1.113195e5
 
     @staticmethod
     def get_global_pos():
@@ -200,8 +203,8 @@ def wobble_wait():
     target_yaw = original_yaw + cw * heading_rad
 
     while (
-            abs(target_yaw - vehicle.attitude.yaw) % math.pi
-            > 0.01745 * default.DEGREE_ERROR
+        abs(target_yaw - vehicle.attitude.yaw) % math.pi
+        > 0.01745 * default.DEGREE_ERROR
     ):
         error_degree = abs(target_yaw - vehicle.attitude.yaw) % math.pi
         print("Turn error: ", error_degree)  # 1 degree
@@ -274,17 +277,17 @@ def rotate_cloud(Points, V1, V2):
     if np.size(Points) == 3:
         p = Points
         p_rotated = (
-                np.cos(Theta) * p
-                + np.sin(Theta) * (np.cross(e, p))
-                + (1 - np.cos(Theta)) * np.dot(e, p) * e
+            np.cos(Theta) * p
+            + np.sin(Theta) * (np.cross(e, p))
+            + (1 - np.cos(Theta)) * np.dot(e, p) * e
         )
         pts_rotated = p_rotated
     else:
         for i, p in enumerate(Points):
             p_rotated = (
-                    np.cos(Theta) * p
-                    + np.sin(Theta) * (np.cross(e, p))
-                    + (1 - np.cos(Theta)) * np.dot(e, p) * e
+                np.cos(Theta) * p
+                + np.sin(Theta) * (np.cross(e, p))
+                + (1 - np.cos(Theta)) * np.dot(e, p) * e
             )
             pts_rotated[i] = p_rotated
     return pts_rotated
@@ -357,17 +360,17 @@ def Rotate_Cloud(Points, V1, V2):
     if np.size(Points) == 3:
         p = Points
         p_rotated = (
-                np.cos(Theta) * p
-                + np.sin(Theta) * (np.cross(e, p))
-                + (1 - np.cos(Theta)) * np.dot(e, p) * e
+            np.cos(Theta) * p
+            + np.sin(Theta) * (np.cross(e, p))
+            + (1 - np.cos(Theta)) * np.dot(e, p) * e
         )
         pts_rotated = p_rotated
     else:
         for i, p in enumerate(Points):
             p_rotated = (
-                    np.cos(Theta) * p
-                    + np.sin(Theta) * (np.cross(e, p))
-                    + (1 - np.cos(Theta)) * np.dot(e, p) * e
+                np.cos(Theta) * p
+                + np.sin(Theta) * (np.cross(e, p))
+                + (1 - np.cos(Theta)) * np.dot(e, p) * e
             )
             pts_rotated[i] = p_rotated
     return pts_rotated
