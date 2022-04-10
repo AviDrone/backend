@@ -7,11 +7,11 @@ import argparse
 import asyncio
 import datetime
 import math
-import numpy as np
 import time
 
-import transceiver.utils as util
 import default_parameters as default
+import numpy as np
+import transceiver.utils as util
 from dronekit import (
     Command,
     LocationGlobal,
@@ -19,31 +19,22 @@ from dronekit import (
     VehicleMode,
     connect,
 )
-from gps_data import GPSData
 
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
+IS_VERBOSE = False  # Verbose Output
+IS_TEST = False  # Testing
 
-
-# Default
-MAGNITUDE = 1  # Set the distance the vehicle goes
-ALTITUDE = 4  # Set the altitude of the flight path
-DEGREES = 10  # Set the amount to rotate in yaw
+# DEFAULT PARAMETERS
+MAGNITUDE = 1  # Distance the vehicle goes
+ALTITUDE = 4  # Altitude of the flight path
+DEGREES = 10  # Amount to rotate in yaw
 DEGREE_ERROR = 2  # Number of degrees error for rotation
 DISTANCE_ERROR = 0.35  # Error in distance before target reached
 LAND_THRESHOLD = 2  # Error in distance before target reached
-WINDOW_SIZE = 5  # Set the size of the gps window original: 5
-
-# Testing
-IS_TEST = False
-
-# Flight Mode
+WINDOW_SIZE = 5  # Size of the gps window original: 5
 FLIGHT_MODE = "GUIDED"
 
-# Verbose Output
-IS_VERBOSE = False
 
-class GPSData:
+class GpsData:
     def __init__(self, window_size):
         self.window_size = window_size
         self.gps_points = []
@@ -72,13 +63,19 @@ class Search:
     def __init__(self):
         global_frame = vehicle.location.global_frame
         global_location = LocationGlobal(new_lat, new_lon, original_location.alt)
-        distance = (2 * math.asin(math.sqrt(
-            (math.sin((lat_a - lat_b) / 2)
-             ) ** 2 + math.cos(lat_a) * math.cos(lat_b) *
-            (math.sin((lon_a - lon_b) / 2)) ** 2)) * 1.113195e5)
+        distance = (
+            2 * math.asin(math.sqrt(
+            (math.sin((lat_a - lat_b) / 2)) ** 2
+            + math.cos(lat_a)
+            * math.cos(lat_b)
+            * (math.sin((lon_a - lon_b) / 2)) ** 2
+        )
+        ) * 1.113195e5
+        )
 
     @staticmethod
-    def get_location(self, original_location, d_north, d_east):
+    def get_location(original_location, d_north, d_east, d_alt=0):
+
         earth_radius = 6378137.0  # Radius of "spherical" earth
         # Coordinate offsets in radians
         d_lat = d_north / earth_radius
@@ -90,21 +87,27 @@ class Search:
         new_lat = original_location.lat + (d_lat * 180 / math.pi)
         new_lon = original_location.lon + (d_lon * 180 / math.pi)
 
-        return global_location
+        if original_location.alt:
+            return LocationGlobal(new_lat, new_lon, original_location.alt)
+        else:
+            return LocationGlobal(new_lat, new_lon, d_alt)
 
     @staticmethod
-    def get_distance(self, location_a, location_b):
+    def get_distance(location_a, location_b):
         lat_a, lat_b = location_a.lat, location_b.lat
         lon_a, lon_b = location_a.lat, location_b.lat
 
-        return distance
+        d_lat = lat_b - lat_a
+        d_lon = lon_b - lon_a
+
+        return math.sqrt(d_lat ** 2 + d_lon ** 2) * 1.113195e5
 
     @staticmethod
-    def get_global_pos(self):
+    def get_global_pos():
         return global_frame
 
     @staticmethod
-    def read_transceiver(self):
+    def read_transceiver():
         uav_pos = [2, 2, 2]  # TODO replace this with actual positions
         beacon_pos = [1, 1, 1]  # TODO replace this with actual positions
         return util.mock_beacon(uav_pos, beacon_pos)
@@ -265,7 +268,7 @@ def rotate_cloud(Points, V1, V2):
     Theta = np.arccos(V1V2Dot / (V1Norm * V2Norm))
     print(Theta)
 
-    # Using Rodrigues' rotation formula (wikipedia):
+    # Using Rodriguez' rotation formula (wikipedia):
     e = V1V2CrossNormalized
     pts_rotated = np.empty((len(Points), 3))
     if np.size(Points) == 3:
@@ -316,68 +319,10 @@ def rotate_vector(vector, angle):
 
     return NewVector
 
-def get_location_metres(original_location, dNorth, dEast):
-    """
-    Returns a LocationGlobal object containing the latitude/longitude `dNorth` and `dEast` metres from the
-    specified `original_location`. The returned Location has the same `alt` value
-    as `original_location`.
-
-    The function is useful when you want to move the vehicle around specifying locations relative to
-    the current vehicle position.
-    The algorithm is relatively accurate over small distances (10m within 1km) except close to the poles.
-    For more information see:
-    http://gis.stackexchange.com/questions/2951/algorithm-for-offsetting-a-latitude-longitude-by-some-amount-of-meters
-    """
-    earth_radius = 6378137.0  # Radius of "spherical" earth
-    # Coordinate offsets in radians
-    dLat = dNorth / earth_radius
-    dLon = dEast / (earth_radius * math.cos(math.pi * original_location.lat / 180))
-
-    # New position in decimal degrees
-    newlat = original_location.lat + (dLat * 180 / math.pi)
-    newlon = original_location.lon + (dLon * 180 / math.pi)
-    return LocationGlobal(newlat, newlon, original_location.alt)
-
-
-def get_location_metres_with_alt(original_location, dNorth, dEast, newAlt):
-    """
-    Returns a LocationGlobal object containing the latitude/longitude `dNorth` and `dEast` metres from the
-    specified `original_location`. The returned Location has the same `alt` value
-    as `original_location`.
-
-    The function is useful when you want to move the vehicle around specifying locations relative to
-    the current vehicle position.
-    The algorithm is relatively accurate over small distances (10m within 1km) except close to the poles.
-    For more information see:
-    http://gis.stackexchange.com/questions/2951/algorithm-for-offsetting-a-latitude-longitude-by-some-amount-of-meters
-    """
-    earth_radius = 6378137.0  # Radius of "spherical" earth
-    # Coordinate offsets in radians
-    dLat = dNorth / earth_radius
-    dLon = dEast / (earth_radius * math.cos(math.pi * original_location.lat / 180))
-
-    # New position in decimal degrees
-    newlat = original_location.lat + (dLat * 180 / math.pi)
-    newlon = original_location.lon + (dLon * 180 / math.pi)
-
-    return LocationGlobal(newlat, newlon, newAlt)
-
-
-def get_distance_metres(a_location1, a_location2):
-    """
-    Returns the ground distance in metres between two LocationGlobal objects.
-
-    This method is an approximation, and will not be accurate over large distances and close to the
-    earth's poles. It comes from the ArduPilot test code:
-    https://github.com/diydrones/ardupilot/blob/master/Tools/autotest/common.py
-    """
-    dlat = a_location2.lat - a_location1.lat
-    dlong = a_location2.lon - a_location1.lon
-    return math.sqrt((dlat * dlat) + (dlong * dlong)) * 1.113195e5
-
 
 def get_range(totalLength, dLength):
     return (totalLength / dLength) * 2
+
 
 def Rotate_Cloud(Points, V1, V2):
     # V1 is the current vector which the coordinate system is aligned to
@@ -412,47 +357,17 @@ def Rotate_Cloud(Points, V1, V2):
     if np.size(Points) == 3:
         p = Points
         p_rotated = (
-            np.cos(Theta) * p
-            + np.sin(Theta) * (np.cross(e, p))
-            + (1 - np.cos(Theta)) * np.dot(e, p) * e
+                np.cos(Theta) * p
+                + np.sin(Theta) * (np.cross(e, p))
+                + (1 - np.cos(Theta)) * np.dot(e, p) * e
         )
         pts_rotated = p_rotated
     else:
         for i, p in enumerate(Points):
             p_rotated = (
-                np.cos(Theta) * p
-                + np.sin(Theta) * (np.cross(e, p))
-                + (1 - np.cos(Theta)) * np.dot(e, p) * e
+                    np.cos(Theta) * p
+                    + np.sin(Theta) * (np.cross(e, p))
+                    + (1 - np.cos(Theta)) * np.dot(e, p) * e
             )
             pts_rotated[i] = p_rotated
     return pts_rotated
-
-
-def Rotate_Vector(Vector, Angle):
-    # vector is the vector being rotated
-    # angle is used to rotate vector and is given in degrees
-
-    # Convert angle to radians
-    Angle_Rad = np.radians(Angle)
-
-    # rotation matrix
-    # See https://en.wikipedia.org/wiki/Rotation_matrix for more information
-    r = np.array(
-        (
-            (np.cos(Angle_Rad), -np.sin(Angle_Rad)),
-            (np.sin(Angle_Rad), np.cos(Angle_Rad)),
-        )
-    )
-
-    # we only care about x and y, not z
-    a_vector = (Vector[0], Vector[1])
-    a_vector = np.asarray(a_vector)
-
-    # vector after rotation
-    rotated = r.dot(a_vector)
-    # print(rotated)
-
-    # return 3D vector
-    NewVector = (rotated[0], rotated[1], Vector[2])
-
-    return NewVector
