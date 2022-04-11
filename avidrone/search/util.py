@@ -10,6 +10,7 @@ import math
 import time
 
 import numpy as np
+
 # import transceiver.utils as util
 from dronekit import (
     Command,
@@ -41,9 +42,9 @@ class GpsData:
 
     def add_point(self, new_gps_point, new_distance):
         self.gps_points.insert(0, new_gps_point)
-        del self.gps_points[self.window_size:]
+        del self.gps_points[self.window_size :]
         self.distance.insert(0, new_distance)
-        del self.distance[self.window_size:]
+        del self.distance[self.window_size :]
 
     def get_minimum_index(self):
         minimum_dist_index = 0
@@ -63,14 +64,16 @@ class Search:
         global_frame = vehicle.location.global_frame
         global_location = LocationGlobal(new_lat, new_lon, original_location.alt)
         distance = (
-                2
-                * math.asin(math.sqrt((math.sin((lat_a - lat_b) / 2)) ** 2
-                                      + math.cos(lat_a)
-                                      * math.cos(lat_b)
-                                      * (math.sin((lon_a - lon_b) / 2)) ** 2
-                                      )
-                            )
-                * 1.113195e5
+            2
+            * math.asin(
+                math.sqrt(
+                    (math.sin((lat_a - lat_b) / 2)) ** 2
+                    + math.cos(lat_a)
+                    * math.cos(lat_b)
+                    * (math.sin((lon_a - lon_b) / 2)) ** 2
+                )
+            )
+            * 1.113195e5
         )
 
     @staticmethod
@@ -80,7 +83,7 @@ class Search:
         # Coordinate offsets in radians
         d_lat = d_north / earth_radius
         d_lon = d_east / (
-                earth_radius * math.cos(math.pi * original_location.lat / 180)
+            earth_radius * math.cos(math.pi * original_location.lat / 180)
         )
 
         # New position in decimal degrees
@@ -100,7 +103,7 @@ class Search:
         d_lat = lat_b - lat_a
         d_lon = lon_b - lon_a
 
-        return math.sqrt(d_lat ** 2 + d_lon ** 2) * 1.113195e5
+        return math.sqrt(d_lat**2 + d_lon**2) * 1.113195e5
 
     @staticmethod
     def get_global_pos():
@@ -213,10 +216,7 @@ class Mission:
 
         target_yaw = self.original_yaw + cw * heading_rad
 
-        while (
-                abs(target_yaw - vehicle.attitude.yaw) % math.pi
-                > 0.01745 * DEGREE_ERROR
-        ):
+        while abs(target_yaw - vehicle.attitude.yaw) % math.pi > 0.01745 * DEGREE_ERROR:
             error_degree = abs(target_yaw - vehicle.attitude.yaw) % math.pi
             print("Turn error: ", error_degree)  # 1 degree
             time.sleep(0.25)
@@ -252,7 +252,7 @@ class Mission:
         wobble_wait()  # TODO apply condition to see if it needs to wait
 
 
-class Vector():
+class Vector:
     def __init__(self):
         V1 = np.asarray(V1)
         V2 = np.asarray(V2)
@@ -273,7 +273,9 @@ class Vector():
 
         # Calculate the vector cross product
         V1V2Cross = np.cross(V1, V2)
-        V1V2CrossNorm = (V1V2Cross[0] ** 2 + V1V2Cross[1] ** 2 + V1V2Cross[2] ** 2) ** 0.5
+        V1V2CrossNorm = (
+            V1V2Cross[0] ** 2 + V1V2Cross[1] ** 2 + V1V2Cross[2] ** 2
+        ) ** 0.5
         V1V2CrossNormalized = V1V2Cross / V1V2CrossNorm
 
         # Dot product
@@ -291,17 +293,17 @@ class Vector():
         if np.size(Points) == 3:
             p = Points
             p_rotated = (
-                    np.cos(Theta) * p
-                    + np.sin(Theta) * (np.cross(e, p))
-                    + (1 - np.cos(Theta)) * np.dot(e, p) * e
+                np.cos(Theta) * p
+                + np.sin(Theta) * (np.cross(e, p))
+                + (1 - np.cos(Theta)) * np.dot(e, p) * e
             )
             pts_rotated = p_rotated
         else:
             for i, p in enumerate(Points):
                 p_rotated = (
-                        np.cos(Theta) * p
-                        + np.sin(Theta) * (np.cross(e, p))
-                        + (1 - np.cos(Theta)) * np.dot(e, p) * e
+                    np.cos(Theta) * p
+                    + np.sin(Theta) * (np.cross(e, p))
+                    + (1 - np.cos(Theta)) * np.dot(e, p) * e
                 )
                 pts_rotated[i] = p_rotated
         return pts_rotated
@@ -353,7 +355,9 @@ class Vector():
 
         # Calculate the vector cross product
         V1V2Cross = np.cross(V1, V2)
-        V1V2CrossNorm = (V1V2Cross[0] ** 2 + V1V2Cross[1] ** 2 + V1V2Cross[2] ** 2) ** 0.5
+        V1V2CrossNorm = (
+            V1V2Cross[0] ** 2 + V1V2Cross[1] ** 2 + V1V2Cross[2] ** 2
+        ) ** 0.5
         V1V2CrossNormalized = V1V2Cross / V1V2CrossNorm
 
         # Dot product
@@ -371,69 +375,71 @@ class Vector():
         if np.size(Points) == 3:
             p = Points
             p_rotated = (
-                    np.cos(Theta) * p
-                    + np.sin(Theta) * (np.cross(e, p))
-                    + (1 - np.cos(Theta)) * np.dot(e, p) * e
+                np.cos(Theta) * p
+                + np.sin(Theta) * (np.cross(e, p))
+                + (1 - np.cos(Theta)) * np.dot(e, p) * e
             )
             pts_rotated[i] = p_rotated
+
     return pts_rotated
+
 
 def get_location_metres(original_location, dNorth, dEast):
     """
-    Returns a LocationGlobal object containing the latitude/longitude `dNorth` and `dEast` metres from the 
+    Returns a LocationGlobal object containing the latitude/longitude `dNorth` and `dEast` metres from the
     specified `original_location`. The returned Location has the same `alt` value
     as `original_location`.
-    The function is useful when you want to move the vehicle around specifying locations relative to 
+    The function is useful when you want to move the vehicle around specifying locations relative to
     the current vehicle position.
     The algorithm is relatively accurate over small distances (10m within 1km) except close to the poles.
     For more information see:
     http://gis.stackexchange.com/questions/2951/algorithm-for-offsetting-a-latitude-longitude-by-some-amount-of-meters
     """
-    earth_radius=6378137.0 #Radius of "spherical" earth
-    #Coordinate offsets in radians
-    dLat = dNorth/earth_radius
-    dLon = dEast/(earth_radius*math.cos(math.pi*original_location.lat/180))
+    earth_radius = 6378137.0  # Radius of "spherical" earth
+    # Coordinate offsets in radians
+    dLat = dNorth / earth_radius
+    dLon = dEast / (earth_radius * math.cos(math.pi * original_location.lat / 180))
 
-    #New position in decimal degrees
-    newlat = original_location.lat + (dLat * 180/math.pi)
-    newlon = original_location.lon + (dLon * 180/math.pi)
-    return LocationGlobal(newlat, newlon,original_location.alt)
+    # New position in decimal degrees
+    newlat = original_location.lat + (dLat * 180 / math.pi)
+    newlon = original_location.lon + (dLon * 180 / math.pi)
+    return LocationGlobal(newlat, newlon, original_location.alt)
+
 
 def get_location_metres_with_alt(original_location, dNorth, dEast, newAlt):
     """
-    Returns a LocationGlobal object containing the latitude/longitude `dNorth` and `dEast` metres from the 
+    Returns a LocationGlobal object containing the latitude/longitude `dNorth` and `dEast` metres from the
     specified `original_location`. The returned Location has the same `alt` value
     as `original_location`.
-    The function is useful when you want to move the vehicle around specifying locations relative to 
+    The function is useful when you want to move the vehicle around specifying locations relative to
     the current vehicle position.
     The algorithm is relatively accurate over small distances (10m within 1km) except close to the poles.
     For more information see:
     http://gis.stackexchange.com/questions/2951/algorithm-for-offsetting-a-latitude-longitude-by-some-amount-of-meters
     """
-    earth_radius=6378137.0 #Radius of "spherical" earth
-    #Coordinate offsets in radians
-    dLat = dNorth/earth_radius
-    dLon = dEast/(earth_radius*math.cos(math.pi*original_location.lat/180))
+    earth_radius = 6378137.0  # Radius of "spherical" earth
+    # Coordinate offsets in radians
+    dLat = dNorth / earth_radius
+    dLon = dEast / (earth_radius * math.cos(math.pi * original_location.lat / 180))
 
-    #New position in decimal degrees
-    newlat = original_location.lat + (dLat * 180/math.pi)
-    newlon = original_location.lon + (dLon * 180/math.pi)
+    # New position in decimal degrees
+    newlat = original_location.lat + (dLat * 180 / math.pi)
+    newlon = original_location.lon + (dLon * 180 / math.pi)
 
-    return LocationGlobal(newlat, newlon,newAlt)
+    return LocationGlobal(newlat, newlon, newAlt)
 
 
 def get_distance_metres(a_location1, a_location2):
     """
     Returns the ground distance in metres between two LocationGlobal objects.
-    This method is an approximation, and will not be accurate over large distances and close to the 
-    earth's poles. It comes from the ArduPilot test code: 
+    This method is an approximation, and will not be accurate over large distances and close to the
+    earth's poles. It comes from the ArduPilot test code:
     https://github.com/diydrones/ardupilot/blob/master/Tools/autotest/common.py
     """
     dlat = a_location2.lat - a_location1.lat
     dlong = a_location2.lon - a_location1.lon
-    return math.sqrt((dlat*dlat) + (dlong*dlong)) * 1.113195e5
+    return math.sqrt((dlat * dlat) + (dlong * dlong)) * 1.113195e5
 
 
 def get_range(totalLength, dLength):
-    return((totalLength/dLength) * 2)
-
+    return (totalLength / dLength) * 2

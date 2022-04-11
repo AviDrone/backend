@@ -69,7 +69,7 @@ if not connection_string:
 
 # Rectangular search taking angle and altitude into account
 def rectangular_primary_search_with_alt(
-        a_location, width, dLength, totalLength, totalAlt, angle
+    a_location, width, dLength, totalLength, totalAlt, angle
 ):
     """
     Primary search over a sloped plane in the direction of a specified angle,
@@ -378,7 +378,7 @@ def arm_and_takeoff(aTargetAltitude):
     while True:
         print(" Altitude: ", vehicle.location.global_relative_frame.alt)
         if (
-                vehicle.location.global_relative_frame.alt >= aTargetAltitude * 0.95
+            vehicle.location.global_relative_frame.alt >= aTargetAltitude * 0.95
         ):  # Trigger just below target alt.
             print("Reached target altitude")
             break
@@ -430,7 +430,7 @@ while True:
     )
 
     if nextwaypoint == get_range(
-            totalLength, dLength
+        totalLength, dLength
     ):  # Dummy waypoint - as soon as we reach last waypoint this is true and we exit.
         print(
             "Exit 'standard' mission when start heading to final waypoint (%s)"

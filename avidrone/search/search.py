@@ -9,8 +9,13 @@ import logging as log
 import math
 import time
 
-from dronekit import (Command, LocationGlobal, LocationGlobalRelative,
-                      VehicleMode, connect)
+from dronekit import (
+    Command,
+    LocationGlobal,
+    LocationGlobalRelative,
+    VehicleMode,
+    connect,
+)
 
 import primary
 import secondary
