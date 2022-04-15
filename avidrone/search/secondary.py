@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-
+"""
+    SECONDARY SEARCH
+"""
 from __future__ import print_function
 
 import argparse
@@ -9,39 +11,22 @@ import logging as log
 import math
 import time
 
-import default_parameters as default
+import avidrone
 import dronekit_sitl
+import util
 from dronekit import LocationGlobal, VehicleMode, connect
 from gps_data import GPSData
-from mission_methods import Search
 from transceiver import Transceiver
 
 
+def __init__(self):
+    self.singal_found = False
+
+
 def run():
-    print("-- SECONDARY SEARCH --")
-    parser = argparse.ArgumentParser(
-        description="Demonstrates basic mission operations."
-    )
-    parser.add_argument(
-        "--connect",
-        help="vehicle connection target string. If not specified, SITL automatically started and used.",
-    )
-    args = parser.parse_args()
-
-    connection_string = args.connect
-
-    # Start SITL if no connection string specified
-    if not connection_string:
-        sitl = dronekit_sitl.start_default()
-        connection_string = sitl.connection_string()
-
-    # Connect to the vehicle
-    log.info("Connecting to vehicle on: %s", connection_string)
-    vehicle = connect(connection_string, wait_ready=True)
-
-    signal_found = False
-    Search.start()
-    gps_window = GPSData(default.WINDOW_SIZE)
+    log.info("-- SECONDARY SEARCH --")
+    avidrone.util.Search.start()
+    gps_window = util.WINDOW_SIZE
     while vehicle.mode.name == "GUIDED":
         # TODO implement transceiver
         transceiver = Transceiver

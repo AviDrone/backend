@@ -19,6 +19,7 @@ from dronekit import (
     VehicleMode,
     connect,
 )
+from pymavlink import mavutil
 from util import (
     get_distance_metres,
     get_location_metres,
@@ -27,7 +28,8 @@ from util import (
     rotate_cloud,
     rotate_vector,
 )
-from pymavlink import mavutil
+
+# from RotateVectorTools import
 
 # Define variables
 
@@ -42,9 +44,6 @@ dLength = 20
 
 # height of the slope
 totalAlt = 0
-
-# Set up option parsing to get connection string
-import argparse
 
 parser = argparse.ArgumentParser(description="Demonstrates basic mission operations.")
 parser.add_argument(
@@ -403,7 +402,8 @@ else:
         vehicle.location.global_frame, width, dLength, totalLength, totalAlt, my_angle
     )
 
-# From Copter 3.3 you will be able to take off using a mission item. Plane must take off using a mission item (currently).
+# From Copter 3.3 you will be able to take off using a mission item. Plane must take off using a mission item (
+# currently).
 arm_and_takeoff(10 + totalAlt)
 
 print("Starting mission")
@@ -434,14 +434,13 @@ while True:
     ):  # Dummy waypoint - as soon as we reach last waypoint this is true and we exit.
         print(
             "Exit 'standard' mission when start heading to final waypoint (%s)"
-            % (nextwaypoint)
+            % nextwaypoint
         )
         break
     time.sleep(1)
 
 print("Return to launch")
 vehicle.mode = VehicleMode("RTL")
-
 
 # Close vehicle object before exiting script
 print("Close vehicle object")
