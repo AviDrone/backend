@@ -28,7 +28,6 @@ from util import (
     rotate_vector,
 )
 from pymavlink import mavutil
-# from RotateVectorTools import 
 
 # Define variables
 
@@ -321,7 +320,7 @@ def rectangular_primary_search_basic(a_location, width, dLength, totalLength, an
     cmds.upload()
 
 
-# dronekit functions
+# dronekit functions:
 
 
 def distance_to_current_waypoint():

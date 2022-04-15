@@ -245,6 +245,9 @@ def condition_yaw(heading, relative=False):
 
 
 def rotate_cloud(Points, V1, V2):
+    """
+    Rotate series of points based on V1, aligning to V2.
+    """
     # V1 is the current vector which the coordinate system is aligned to
     # V2 is the vector we want the system aligned to
     # Points is an (n,3) array of n points (x,y,z)
@@ -315,7 +318,6 @@ def rotate_vector(vector, angle):
 
     # vector after rotation
     rotated = r.dot(a_vector)
-    # print(rotated)
 
     # return 3D vector
     NewVector = (rotated[0], rotated[1], vector[2])
@@ -324,10 +326,14 @@ def rotate_vector(vector, angle):
 
 
 def get_range(totalLength, dLength):
-    return (totalLength / dLength) * 2
+    # number of waypoints needed for primary search
+    return (totalLength / dLength) * 2      
 
 
 def Rotate_Cloud(Points, V1, V2):
+    """
+    Rotate series of points based on V1, aligning to V2.
+    """
     # V1 is the current vector which the coordinate system is aligned to
     # V2 is the vector we want the system aligned to
     # Points is an (n,3) array of n points (x,y,z)
@@ -430,6 +436,3 @@ def get_distance_metres(a_location1, a_location2):
     dlong = a_location2.lon - a_location1.lon
     return math.sqrt((dlat*dlat) + (dlong*dlong)) * 1.113195e5
 
-
-def get_range(totalLength, dLength):
-    return((totalLength/dLength) * 2)
