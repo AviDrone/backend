@@ -22,7 +22,7 @@ def mock_beacon(uav_pos, beacon_pos):
     theta = vector_angle(disp_n)
     direction = calculate_direction(theta)
 
-    return direction, distance
+    return [direction, distance]
 
 
 def get_displacement(x_1, x_2, y_1, y_2, z_1=0, z_2=0):

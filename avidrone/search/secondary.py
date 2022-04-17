@@ -11,8 +11,8 @@ import logging as log
 import math
 import time
 
-from avidrone import transceiver as Transceiver
 import dronekit_sitl
+from avidrone import transceiver as Transceiver
 from dronekit import LocationGlobal, VehicleMode, connect
 
 import util
@@ -24,7 +24,8 @@ def start():
     )
     parser.add_argument(
         "--connect",
-        help="vehicle connection target string. If not specified, SITL automatically started and used.",
+        help="vehicle connection target string. "
+             "If not specified, SITL automatically started and used.",
     )
     args = parser.parse_args()
     connection_string = args.connect

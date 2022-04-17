@@ -12,13 +12,8 @@ import logging as log
 import time
 
 import numpy as np
-from dronekit import (
-    Command,
-    LocationGlobal,
-    LocationGlobalRelative,
-    VehicleMode,
-    connect,
-)
+from dronekit import (Command, LocationGlobal, LocationGlobalRelative,
+                      VehicleMode, connect)
 from pymavlink import mavutil
 
 import util

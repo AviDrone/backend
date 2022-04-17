@@ -1,10 +1,12 @@
-import util
 # For interfacing with the C code
 import ctypes
 import pathlib
 
+import util
+
+
 class Transceiver:
-    def __init__(self, uav_pos, beacon_pos, direction, distance):
+    def __init__(self, direction, distance):
 
         self.direction = direction
         self.distance = distance
@@ -14,12 +16,12 @@ class Transceiver:
         self.signal_status = False
         self.uav_pos = [-1,-1,-1]   # TODO change. Default
         self.beacon_pos = [0, 0, 0]  # TODO change. Default, transceiver signal not acquired
-        self.mock = asList(util.mock_beacon(uav_pos, beacon_pos))  # Mock transceiver object
+        self.mock = (util.mock_beacon(uav_pos, beacon_pos))  # Mock transceiver object
         self.read = [self.direction, self.distance] # Real transceiver object
 
 
-    def read_transceiver(self):
-        shared_ctypes_lib = pathlib.Path().absolute() / "read_transceiver.lib"
+    def read(self):
+        shared_ctypes_lib = pathlib.Path().absolute() / "read.lib"
         c_lib = ctypes.CDLL(shared_ctypes_lib)
 
         output_array = (ctypes.c_double * 2)()
