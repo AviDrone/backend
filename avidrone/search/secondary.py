@@ -11,7 +11,7 @@ import logging as log
 import math
 import time
 
-import avidrone.transceiver as Transceiver
+from avidrone import transceiver as Transceiver
 import dronekit_sitl
 from dronekit import LocationGlobal, VehicleMode, connect
 
@@ -143,4 +143,5 @@ def run():
 
 
 if __name__ == "__main__":
-    run()
+    start()
+    #   run()
