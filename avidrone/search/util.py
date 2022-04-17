@@ -18,6 +18,7 @@ from dronekit import (
     connect,
 )
 
+
 IS_VERBOSE = False  # for verbose command-line interface output
 IS_TEST = False  # for running simulations
 
@@ -59,20 +60,22 @@ class GpsData:
 
 class Search:
     def __init__(self):
-        global_frame = vehicle.location.global_frame
-        global_location = LocationGlobal(new_lat, new_lon, original_location.alt)
-        distance = (
-            2
-            * math.asin(
-                math.sqrt(
-                    (math.sin((lat_a - lat_b) / 2)) ** 2
-                    + math.cos(lat_a)
-                    * math.cos(lat_b)
-                    * (math.sin((lon_a - lon_b) / 2)) ** 2
-                )
-            )
-            * 1.113195e5
-        )
+        from drone import vehicle
+        aviDrone = vehicle
+        self.global_frame = aviDrone.location.global_frame
+        # self.global_location = LocationGlobal(new_lat, new_lon, original_location.alt)
+        # self.distance = (
+        #     2
+        #     * math.asin(
+        #         math.sqrt(
+        #             (math.sin((lat_a - lat_b) / 2)) ** 2
+        #             + math.cos(lat_a)
+        #             * math.cos(lat_b)
+        #             * (math.sin((lon_a - lon_b) / 2)) ** 2
+        #         )
+        #     )
+        #     * 1.113195e5
+        # )
 
     @staticmethod
     def get_location(original_location, d_north, d_east, d_alt=0):
@@ -116,25 +119,10 @@ class Search:
 
 class Mission:
     def __init__(self):
-        parser = argparse.ArgumentParser(
-            description="Demonstrates basic mission operations."
-        )
-        parser.add_argument(
-            "--connect",
-            help="vehicle connection target string. If not specified, SITL automatically started and used.",
-        )
-        args = parser.parse_args()
-
-        connection_string = args.connect
-
-        # Start SITL if no connection string specified
-        if not connection_string:
-            sitl = dronekit_sitl.start_default()
-            connection_string = sitl.connection_string()
-
-        log.info("Connecting to vehicle on: %s", connection_string)
-        self.vehicle = connect(connection_string, wait_ready=True)  # Connect to UAV
-        self.original_yaw = self.vehicle.attitude.yaw
+        import drone
+        aviDrone = drone.vehicle
+        self.vehicle = aviDrone
+        self.original_yaw = aviDrone.attitude.yaw
         self.heading = -1  # TODO get correct value
         self.relative = False
 
@@ -151,15 +139,15 @@ class Mission:
         while not self.vehicle.is_armable:
             time.sleep(1)
 
-        if vehicle.armed:
+        if self.vehicle.armed:
             print(f"-- Armed: {self.vehicle.armed}")
-            takeoff_to(ALTITUDE)
+            self.takeoff_to(ALTITUDE)
         start_gps()
 
         print("-- Setting GUIDED flight mode")
         print("-- Waiting for GUIDED mode...")
 
-        while vehicle.mode.name != "GUIDED":
+        while self.vehicle.mode.name != "GUIDED":
             time.sleep(1)
 
     def takeoff_to(self):
@@ -252,16 +240,18 @@ class Mission:
 
 class Vector:
     def __init__(self):
-        V1 = np.asarray(V1)
-        V2 = np.asarray(V2)
+        vect1 = []
+        vect2 = []
+        self.vect1 = np.asarray(vect1)
+        self.vect2 = np.asarray(vect2)
 
-    def rotate_cloud(self, Points):
+    def rotate_cloud_self(self, Points):
         # V1 is the current vector which the coordinate system is aligned to
         # V2 is the vector we want the system aligned to
         # Points is an (n,3) array of n points (x,y,z)
 
-        V1 = self.V1
-        V2 = self.V2
+        V1 = self.vect1
+        V2 = self.vect2
 
         # Normalize V1 and V2 in case they aren't already
         V1Len = (V1[0] ** 2 + V1[1] ** 2 + V1[2] ** 2) ** 0.5
@@ -283,7 +273,6 @@ class Vector:
 
         # angle between the vectors
         Theta = np.arccos(V1V2Dot / (V1Norm * V2Norm))
-        print(Theta)
 
         # Using Rodriguez' rotation formula (wikipedia):
         e = V1V2CrossNormalized
@@ -328,7 +317,6 @@ class Vector:
 
         # vector after rotation
         rotated = r.dot(a_vector)
-        # print(rotated)
 
         # return 3D vector
         NewVector = (rotated[0], rotated[1], vector[2])
@@ -365,7 +353,6 @@ class Vector:
 
         # angle between the vectors
         Theta = np.arccos(V1V2Dot / (V1Norm * V2Norm))
-        print(Theta)
 
         # Using Rodriguez's rotation formula (wikipedia):
         e = V1V2CrossNormalized
@@ -377,8 +364,15 @@ class Vector:
                 + np.sin(Theta) * (np.cross(e, p))
                 + (1 - np.cos(Theta)) * np.dot(e, p) * e
             )
-            pts_rotated[i] = p_rotated
-
+            pts_rotated = p_rotated
+        else:
+            for i, p in enumerate(Points):
+                p_rotated = (
+                    np.cos(Theta) * p
+                    + np.sin(Theta) * (np.cross(e, p))
+                    + (1 - np.cos(Theta)) * np.dot(e, p) * e
+                )
+                pts_rotated[i] = p_rotated
         return pts_rotated
 
 
