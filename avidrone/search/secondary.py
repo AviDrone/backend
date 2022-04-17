@@ -11,7 +11,7 @@ import logging as log
 import math
 import time
 
-import avidrone.transceiver as beacon
+import avidrone.transceiver as Transceiver
 import dronekit_sitl
 from dronekit import LocationGlobal, VehicleMode, connect
 
@@ -65,11 +65,20 @@ def start():
 
 
 def run():
-    signal_found = False
+
     log.info("-- SECONDARY SEARCH --")
     start()  # initialize vehicle for search
+    signal_found = False
     gps_window = util.WINDOW_SIZE
-    transceiver = simulate([9, 9, 9], [1, 1, 1])
+    # uav_pos = [1,1,1] # UAV position for testing.
+    # beacon_pos = [1,1,1]  # Beacon position for testing
+
+    if util.IS_TEST:
+        transceiver = Transceiver.mock(uav_pos, beacon_pos)
+
+    else:
+        transceiver = Transceiver.read(uav_pos, beacon_pos)
+
     while vehicle.mode.name == "GUIDED":
         # TODO get [x, y, z] coordinates from UAV's lat-long position
 
@@ -136,13 +145,6 @@ def run():
                 log.info("Climbing...")
                 Search.go_to_location(default.MAGNITUDE, vehicle.attitude.yaw, vehicle)
         time.sleep(2)
-
-
-def simulate(uav_pos, beacon_pos=None):
-    if beacon_pos is None:
-        beacon_pos = [1, 1, 1]
-    mock_beacon: object = beacon.mock(uav_pos, beacon_pos)
-    return mock_beacon
 
 
 if __name__ == "__main__":
