@@ -4,7 +4,6 @@
 from __future__ import print_function
 
 import argparse
-import asyncio
 import datetime
 import math
 import time
@@ -59,7 +58,7 @@ class GpsData:
 
 class Search:
     def __init__(self):
-        global_frame = vehicle.location.global_frame
+        global_frame = self.vehicle.location.global_frame
         global_location = LocationGlobal(new_lat, new_lon, original_location.alt)
         distance = (
             2
@@ -103,9 +102,8 @@ class Search:
 
         return math.sqrt(d_lat**2 + d_lon**2) * 1.113195e5
 
-    @staticmethod
-    def get_global_pos():
-        return global_frame
+    def get_global_pos(self):
+        return self.global_frame
 
     @staticmethod
     def read_transceiver():
@@ -132,31 +130,31 @@ class Mission:
             sitl = dronekit_sitl.start_default()
             connection_string = sitl.connection_string()
 
-        log.info("Connecting to vehicle on: %s", connection_string)
+        print("Connecting to vehicle on: %s", connection_string)
         self.vehicle = connect(connection_string, wait_ready=True)  # Connect to UAV
         self.original_yaw = self.vehicle.attitude.yaw
         self.heading = -1  # TODO get correct value
         self.relative = False
 
     def takeoff_to(self):
-        print(f"-- Taking off to altitude (m): {ALTITUDE} \n")
+        print("-- Taking off to altitude (m): ", ALTITUDE)
         self.vehicle.simple_takeoff(ALTITUDE)
 
         while True:
             current_alt = self.vehicle.location.global_relative_frame.alt
             if current_alt >= ALTITUDE * 0.95:
-                print(f"-- Reached {ALTITUDE}m")
+                print("-- Reached ", ALTITUDE, "m")
                 break
             time.sleep(1)
 
-    def go_to_location(self, distance, angle, vehicle):
+    def go_to_location(self, distance, angle):
         current_location = self.vehicle.location.global_frame
-        target_location = get_location(current_location, distance, angle)
+        target_location = Search.get_location(current_location, distance, angle)
         self.vehicle.simple_goto(target_location)
 
         loop_count = 0
         while self.vehicle.mode.name == "GUIDED":
-            remaining_distance = get_distance(
+            remaining_distance = Search.get_distance(
                 self.vehicle.location.global_frame, target_location
             )
             print("Distance to target: ", remaining_distance)
@@ -171,26 +169,26 @@ class Mission:
 
     def simple_goto_wait(self, go_to_checkpoint):
         self.vehicle.simple_goto(go_to_checkpoint)
-        distance = better_get_distance_meters(get_global_pos(), go_to_checkpoint)
+        distance = get_distance_metres(self.get_global_pos(), go_to_checkpoint)
 
         while distance >= DISTANCE_ERROR and self.vehicle.mode.name == "GUIDED":
             print(distance)
-            distance = better_get_distance_meters(get_global_pos(), go_to_checkpoint)
+            distance = get_distance_metres(self.get_global_pos(), go_to_checkpoint)
             time.sleep(1)
 
-        if vehicle.mode.name != "GUIDED":
-            vehicle.simple_goto(vehicle.location.global_frame)
+        if self.vehicle.mode.name != "GUIDED":
+            self.vehicle.simple_goto(self.vehicle.location.global_frame)
             print("Halting simple_go_to")
 
         print("Checkpoint reached")
 
     def wobble_wait(self):
         # make vehicle wait until the wobbling settles down before moving forward.
-        heading_rad = heading * math.pi / 180
+        heading_rad = self.heading * math.pi / 180
 
         target_yaw = self.original_yaw + cw * heading_rad
 
-        while abs(target_yaw - vehicle.attitude.yaw) % math.pi > 0.01745 * DEGREE_ERROR:
+        while abs(target_yaw - self.vehicle.attitude.yaw) % math.pi > 0.01745 * DEGREE_ERROR:
             error_degree = abs(target_yaw - vehicle.attitude.yaw) % math.pi
             print("Turn error: ", error_degree)  # 1 degree
             time.sleep(0.25)
@@ -223,7 +221,7 @@ class Mission:
             0,
         )  # param 5 ~ 7 not used
         self.vehicle.send_mavlink(msg)  # send command to vehicle
-        wobble_wait()  # TODO apply condition to see if it needs to wait
+        Mission.wobble_wait(self)  # TODO apply condition to see if it needs to wait
 
 
 class Vector:

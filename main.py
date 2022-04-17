@@ -5,7 +5,7 @@ import argparse
 import logging as log
 import os
 
-import avidrone.search.util as search_util
+import avidrone.transceiver.util as search_util
 
 if __name__ == "__main__":
     """
@@ -32,7 +32,7 @@ if __name__ == "__main__":
 
     print("\n********\nAvidrone Search\n********\n")
     if args.verbose:
-        log.info("--Verbose: True")
+        print("--Verbose: True")
         search_util.IS_VERBOSE = True
 
 

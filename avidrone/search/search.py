@@ -26,9 +26,9 @@ import util
 
 
 def search():
-    log.info(f"-- default size: {util.DEGREES}")
-    log.info(f"-- default altitude: {util.ALTITUDE}")
-    log.info(f"-- default land threshold: {util.LAND_THRESHOLD} \n")
+    print("-- default size: ", util.DEGREES)
+    print("-- default altitude: ", util.ALTITUDE)
+    print("-- default land threshold: ", util.LAND_THRESHOLD)
 
     """
     pseudocode
