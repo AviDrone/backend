@@ -11,25 +11,68 @@ import logging as log
 import math
 import time
 
-import avidrone
+import avidrone.transceiver as beacon
 import dronekit_sitl
-import util
 from dronekit import LocationGlobal, VehicleMode, connect
+
+import util
 from gps_data import GPSData
-from transceiver import Transceiver
 
 
-def __init__(self):
-    self.singal_found = False
+def start():
+    parser = argparse.ArgumentParser(
+        description="Demonstrates basic mission operations."
+    )
+    parser.add_argument(
+        "--connect",
+        help="vehicle connection target string. If not specified, SITL automatically started and used.",
+    )
+    args = parser.parse_args()
+
+    connection_string = args.connect
+    sitl = None
+
+    # Connect to the vehicle
+    log.info("Connecting to vehicle on: %s", connection_string)
+    vehicle = connect(connection_string, wait_ready=True)
+
+    # Start SITL if no connection string specified
+    if not connection_string:
+        sitl = dronekit_sitl.start_default()
+        connection_string = sitl.connection_string()
+
+    print("-- Waiting for vehicle to start...")
+    while not vehicle.is_armable:
+        time.sleep(1)
+
+    vehicle.mode = VehicleMode("GUIDED")
+    vehicle.armed = True
+
+    print("-- Arming...")
+    while not vehicle.is_armable:
+        time.sleep(1)
+
+    if vehicle.armed:
+        print(f"-- Armed: {vehicle.armed}")
+        takeoff_to(ALTITUDE)
+    start_gps()
+
+    print("-- Setting GUIDED flight mode")
+    print("-- Waiting for GUIDED mode...")
+
+    while vehicle.mode.name != "GUIDED":
+        time.sleep(1)
 
 
 def run():
+    signal_found = False
     log.info("-- SECONDARY SEARCH --")
-    avidrone.util.Search.start()
+    start()  # initialize vehicle for search
     gps_window = util.WINDOW_SIZE
+    transceiver = simulate([9, 9, 9], [1, 1, 1])
     while vehicle.mode.name == "GUIDED":
-        # TODO implement transceiver
-        transceiver = Transceiver
+        # TODO get [x, y, z] coordinates from UAV's lat-long position
+
         log.info(transceiver.direction, ", ", transceiver.distance)
 
         if transceiver.direction < 2:  # Turn left
@@ -63,6 +106,7 @@ def run():
                 if signal_found:
                     current_time = datetime.datetime.now()
                     print("--- SIGNAL FOUND --- ", f"-- time: {current_time}")
+                    log.info("--- SIGNAL FOUND --- ", f"-- time: {current_time}")
 
                 else:
                     log.info("Not close, continuing")
@@ -92,6 +136,13 @@ def run():
                 log.info("Climbing...")
                 Search.go_to_location(default.MAGNITUDE, vehicle.attitude.yaw, vehicle)
         time.sleep(2)
+
+
+def simulate(uav_pos, beacon_pos=None):
+    if beacon_pos is None:
+        beacon_pos = [1, 1, 1]
+    mock_beacon: object = beacon.mock(uav_pos, beacon_pos)
+    return mock_beacon
 
 
 if __name__ == "__main__":

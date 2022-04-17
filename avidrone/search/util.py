@@ -138,30 +138,6 @@ class Mission:
         self.heading = -1  # TODO get correct value
         self.relative = False
 
-    def start(self):
-
-        print("-- Waiting for vehicle to start...")
-        while not self.vehicle.is_armable:
-            time.sleep(1)
-
-        self.vehicle.mode = VehicleMode("GUIDED")
-        self.vehicle.armed = True
-
-        print("-- Arming...")
-        while not self.vehicle.is_armable:
-            time.sleep(1)
-
-        if vehicle.armed:
-            print(f"-- Armed: {self.vehicle.armed}")
-            takeoff_to(ALTITUDE)
-        start_gps()
-
-        print("-- Setting GUIDED flight mode")
-        print("-- Waiting for GUIDED mode...")
-
-        while vehicle.mode.name != "GUIDED":
-            time.sleep(1)
-
     def takeoff_to(self):
         print(f"-- Taking off to altitude (m): {ALTITUDE} \n")
         self.vehicle.simple_takeoff(ALTITUDE)
@@ -251,94 +227,12 @@ class Mission:
 
 
 class Vector:
-    def __init__(self):
-        V1 = np.asarray(V1)
-        V2 = np.asarray(V2)
+    def __init__(self, V1, V2):
+        self.V1 = np.asarray(V1)
+        self.V2 = np.asarray(V2)
 
-    def rotate_cloud(self, Points):
-        # V1 is the current vector which the coordinate system is aligned to
-        # V2 is the vector we want the system aligned to
-        # Points is an (n,3) array of n points (x,y,z)
-
-        V1 = self.V1
-        V2 = self.V2
-
-        # Normalize V1 and V2 in case they aren't already
-        V1Len = (V1[0] ** 2 + V1[1] ** 2 + V1[2] ** 2) ** 0.5
-        V2Len = (V2[0] ** 2 + V2[1] ** 2 + V2[2] ** 2) ** 0.5
-        V1 = V1 / V1Len
-        V2 = V2 / V2Len
-
-        # Calculate the vector cross product
-        V1V2Cross = np.cross(V1, V2)
-        V1V2CrossNorm = (
-            V1V2Cross[0] ** 2 + V1V2Cross[1] ** 2 + V1V2Cross[2] ** 2
-        ) ** 0.5
-        V1V2CrossNormalized = V1V2Cross / V1V2CrossNorm
-
-        # Dot product
-        V1V2Dot = np.dot(V1, V2)
-        V1Norm = (V1[0] ** 2 + V1[1] ** 2 + V1[2] ** 2) ** 0.5
-        V2Norm = (V2[0] ** 2 + V2[1] ** 2 + V2[2] ** 2) ** 0.5
-
-        # angle between the vectors
-        Theta = np.arccos(V1V2Dot / (V1Norm * V2Norm))
-        print(Theta)
-
-        # Using Rodriguez' rotation formula (wikipedia):
-        e = V1V2CrossNormalized
-        pts_rotated = np.empty((len(Points), 3))
-        if np.size(Points) == 3:
-            p = Points
-            p_rotated = (
-                np.cos(Theta) * p
-                + np.sin(Theta) * (np.cross(e, p))
-                + (1 - np.cos(Theta)) * np.dot(e, p) * e
-            )
-            pts_rotated = p_rotated
-        else:
-            for i, p in enumerate(Points):
-                p_rotated = (
-                    np.cos(Theta) * p
-                    + np.sin(Theta) * (np.cross(e, p))
-                    + (1 - np.cos(Theta)) * np.dot(e, p) * e
-                )
-                pts_rotated[i] = p_rotated
-        return pts_rotated
-
-    def rotate_vector(self, vector, angle):
-        # vector is the vector being rotated
-        # angle is used to rotate vector and is given in degrees
-
-        # Convert angle to radians
-        Angle_Rad = np.radians(angle)
-
-        # rotation matrix
-        # See https://en.wikipedia.org/wiki/Rotation_matrix for more information
-        r = np.array(
-            (
-                (np.cos(Angle_Rad), -np.sin(Angle_Rad)),
-                (np.sin(Angle_Rad), np.cos(Angle_Rad)),
-            )
-        )
-
-        # we only care about x and y, not z
-        a_vector = (vector[0], vector[1])
-        a_vector = np.asarray(a_vector)
-
-        # vector after rotation
-        rotated = r.dot(a_vector)
-        # print(rotated)
-
-        # return 3D vector
-        NewVector = (rotated[0], rotated[1], vector[2])
-
-        return NewVector
-
-    def get_range(self, totalLength, dLength):
-        return (totalLength / dLength) * 2
-
-    def Rotate_Cloud(self, Points, V1, V2):
+    @staticmethod
+    def rotate_cloud(Points, V1, V2):
         # V1 is the current vector which the coordinate system is aligned to
         # V2 is the vector we want the system aligned to
         # Points is an (n,3) array of n points (x,y,z)
@@ -381,6 +275,40 @@ class Vector:
 
         return pts_rotated
 
+    @staticmethod
+    def rotate_vector(vector, angle):
+        # vector is the vector being rotated
+        # angle is used to rotate vector and is given in degrees
+
+        # Convert angle to radians
+        Angle_Rad = np.radians(angle)
+
+        # rotation matrix
+        # See https://en.wikipedia.org/wiki/Rotation_matrix for more information
+        r = np.array(
+            (
+                (np.cos(Angle_Rad), -np.sin(Angle_Rad)),
+                (np.sin(Angle_Rad), np.cos(Angle_Rad)),
+            )
+        )
+
+        # we only care about x and y, not z
+        a_vector = (vector[0], vector[1])
+        a_vector = np.asarray(a_vector)
+
+        # vector after rotation
+        rotated = r.dot(a_vector)
+        # print(rotated)
+
+        # return 3D vector
+        NewVector = (rotated[0], rotated[1], vector[2])
+
+        return NewVector
+
+    @staticmethod
+    def get_range(totalLength, dLength):
+        return (totalLength / dLength) * 2
+
 
 def get_location_metres(original_location, dNorth, dEast):
     """
@@ -399,9 +327,9 @@ def get_location_metres(original_location, dNorth, dEast):
     dLon = dEast / (earth_radius * math.cos(math.pi * original_location.lat / 180))
 
     # New position in decimal degrees
-    newlat = original_location.lat + (dLat * 180 / math.pi)
-    newlon = original_location.lon + (dLon * 180 / math.pi)
-    return LocationGlobal(newlat, newlon, original_location.alt)
+    new_lat = original_location.lat + (dLat * 180 / math.pi)
+    new_lon = original_location.lon + (dLon * 180 / math.pi)
+    return LocationGlobal(new_lat, new_lon, original_location.alt)
 
 
 def get_location_metres_with_alt(original_location, dNorth, dEast, newAlt):
