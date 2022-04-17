@@ -16,7 +16,6 @@ import dronekit_sitl
 from dronekit import LocationGlobal, VehicleMode, connect
 
 import util
-from gps_data import GPSData
 
 
 def start():
@@ -28,7 +27,6 @@ def start():
         help="vehicle connection target string. If not specified, SITL automatically started and used.",
     )
     args = parser.parse_args()
-
     connection_string = args.connect
     sitl = None
 
@@ -53,9 +51,8 @@ def start():
         time.sleep(1)
 
     if vehicle.armed:
-        print(f"-- Armed: {vehicle.armed}")
-        takeoff_to(ALTITUDE)
-    start_gps()
+        print("-- Armed: ", vehicle.armed)
+        util.takeoff_to(altitude=util.ALTITUDE)
 
     print("-- Setting GUIDED flight mode")
     print("-- Waiting for GUIDED mode...")
@@ -65,11 +62,10 @@ def start():
 
 
 def run():
-
-    log.info("-- SECONDARY SEARCH --")
     start()  # initialize vehicle for search
+    print("-- SECONDARY SEARCH --")
     signal_found = False
-    gps_window = util.WINDOW_SIZE
+    gps_window = util.GpsData(util.WINDOW_SIZE)
     # uav_pos = [1,1,1] # UAV position for testing.
     # beacon_pos = [1,1,1]  # Beacon position for testing
 
@@ -107,7 +103,7 @@ def run():
                     gps_window.gps_points[int((gps_window.window_size - 1) / 2)]
                 )
 
-                if gps_window.distance[2] <= default.LAND_THRESHOLD:
+                if gps_window.distance[2] <= util.LAND_THRESHOLD:
                     log.info("-- Landing")
                     vehicle.mode = VehicleMode("LAND")
                     signal_found = True
@@ -115,7 +111,6 @@ def run():
                 if signal_found:
                     current_time = datetime.datetime.now()
                     print("--- SIGNAL FOUND --- ", f"-- time: {current_time}")
-                    log.info("--- SIGNAL FOUND --- ", f"-- time: {current_time}")
 
                 else:
                     log.info("Not close, continuing")
@@ -129,8 +124,8 @@ def run():
                 # If the minimum data point is the last one in the array,
                 log.info("too far in the wrong direction")
 
-                Search.condition_yaw(180, True)
-                Search.simple_goto_wait(
+                util.Search.condition_yaw(180, True)
+                util.Search.simple_goto_wait(
                     gps_window.gps_points[gps_window.window_size - 1]
                 )
                 gps_window.purge_gps_window()
@@ -138,12 +133,12 @@ def run():
             elif gps_window.get_minimum_index() == 0:
                 # If the minimum data point is in the first index,
                 log.info("continue forward")
-                Search.go_to_location(default.MAGNITUDE, vehicle.attitude.yaw, vehicle)
+                util.Search.go_to_location(util.MAGNITUDE, vehicle.attitude.yaw, vehicle)
 
             else:
-                log.info(f"Did not find signal at altitude: {default.ALTITUDE}")
+                log.info(f"Did not find signal at altitude: {util.ALTITUDE}")
                 log.info("Climbing...")
-                Search.go_to_location(default.MAGNITUDE, vehicle.attitude.yaw, vehicle)
+                Search.go_to_location(util.MAGNITUDE, vehicle.attitude.yaw, vehicle)
         time.sleep(2)
 
 

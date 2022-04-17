@@ -136,14 +136,14 @@ class Mission:
         self.heading = -1  # TODO get correct value
         self.relative = False
 
-    def takeoff_to(self):
-        print("-- Taking off to altitude (m): ", ALTITUDE)
-        self.vehicle.simple_takeoff(ALTITUDE)
+    def takeoff_to(self, altitude):
+        print("-- Taking off to altitude (m): ", altitude)
+        self.vehicle.simple_takeoff(altitude)
 
         while True:
             current_alt = self.vehicle.location.global_relative_frame.alt
-            if current_alt >= ALTITUDE * 0.95:
-                print("-- Reached ", ALTITUDE, "m")
+            if current_alt >= altitude * 0.95:
+                print("-- Reached ", altitude, "m")
                 break
             time.sleep(1)
 
