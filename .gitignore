@@ -176,7 +176,6 @@ rebase.sh
 revert.sh
 Utils
 
-avidrone/gui/build-qgroundcontrol-Desktop_x86_darwin_generic_mach_o_64bit-Debug
 time-log/README.md
 docs/time-log/README.md
 .gitignore
@@ -198,3 +197,4 @@ docs/time-log/w22/Week9.md
 docs/time-log/w22/Week10.md
 docs/time-log/s22/Week2.md
 docs/time-log/s22/Week3.md
+avidrone/gui/build-qgroundcontrol-Desktop_Qt_5_15_2_clang_64bit-Debug

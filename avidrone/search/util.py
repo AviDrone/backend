@@ -18,7 +18,6 @@ from dronekit import (
     connect,
 )
 
-
 IS_VERBOSE = False  # for verbose command-line interface output
 IS_TEST = False  # for running simulations
 
@@ -61,6 +60,7 @@ class GpsData:
 class Search:
     def __init__(self):
         from drone import vehicle
+
         aviDrone = vehicle
         self.global_frame = aviDrone.location.global_frame
         # self.global_location = LocationGlobal(new_lat, new_lon, original_location.alt)
@@ -120,6 +120,7 @@ class Search:
 class Mission:
     def __init__(self):
         import drone
+
         aviDrone = drone.vehicle
         self.vehicle = aviDrone
         self.original_yaw = aviDrone.attitude.yaw

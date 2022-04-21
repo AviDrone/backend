@@ -5,44 +5,42 @@
 """
 from __future__ import print_function
 
+# Set up option parsing to get connection string
 import argparse
 import datetime
 import logging as log
 import math
 import time
 
-import avidrone
 import dronekit_sitl
-import util
 from dronekit import LocationGlobal, VehicleMode, connect
-from gps_data import GPSData
 from transceiver import Transceiver
 
+import drone
+import util
 
-def __init__(self):
-    self.singal_found = False
-
-
+AviDrone = drone.vehicle
 def run():
+    signal_found = False
     log.info("-- SECONDARY SEARCH --")
-    avidrone.util.Search.start()
+    util.Search.start()
     gps_window = util.WINDOW_SIZE
-    while vehicle.mode.name == "GUIDED":
+    while AviDrone.mode.name == "GUIDED":
         # TODO implement transceiver
         transceiver = Transceiver
         log.info(transceiver.direction, ", ", transceiver.distance)
 
         if transceiver.direction < 2:  # Turn left
             log.info("-- Turning left")
-            Search.condition_yaw(-default.DEGREES, True)
+            util.Search.condition_yaw(-util.DEGREES, True)
 
         elif transceiver.direction > 2:  # Turn right
             log.info("-- Turning right")
-            Search.condition_yaw(default.DEGREES, True)
+            util.Search.condition_yaw(util.DEGREES, True)
 
         elif transceiver.direction == 2:  # Continue forward
             log.info("-- Continuing forward")
-            gps_window.add_point(Search.get_global_pos(), transceiver.distance)
+            gps_window.add_point(util.Search.get_global_pos(), transceiver.distance)
             if (
                 gps_window.get_minimum_index() == ((gps_window.window_size - 1) / 2)
                 and len(gps_window.gps_points) == gps_window.window_size
@@ -51,13 +49,13 @@ def run():
                 # If the minimum is the center point of the gps_window we need to go
                 # back to that location, Min index = middle
 
-                Search.simple_goto_wait(
+                util.Search.simple_goto_wait(
                     gps_window.gps_points[int((gps_window.window_size - 1) / 2)]
                 )
 
-                if gps_window.distance[2] <= default.LAND_THRESHOLD:
+                if gps_window.distance[2] <= util.LAND_THRESHOLD:
                     log.info("-- Landing")
-                    vehicle.mode = VehicleMode("LAND")
+                    AviDrone.mode = VehicleMode("LAND")
                     signal_found = True
 
                 if signal_found:
@@ -76,8 +74,8 @@ def run():
                 # If the minimum data point is the last one in the array,
                 log.info("too far in the wrong direction")
 
-                Search.condition_yaw(180, True)
-                Search.simple_goto_wait(
+                util.Search.condition_yaw(180, True)
+                util.Search.simple_goto_wait(
                     gps_window.gps_points[gps_window.window_size - 1]
                 )
                 gps_window.purge_gps_window()
@@ -85,12 +83,12 @@ def run():
             elif gps_window.get_minimum_index() == 0:
                 # If the minimum data point is in the first index,
                 log.info("continue forward")
-                Search.go_to_location(default.MAGNITUDE, vehicle.attitude.yaw, vehicle)
+                util.Search.go_to_location(util.MAGNITUDE, AviDrone.attitude.yaw, AviDrone)
 
             else:
-                log.info(f"Did not find signal at altitude: {default.ALTITUDE}")
+                log.info(f"Did not find signal at altitude: {util.ALTITUDE}")
                 log.info("Climbing...")
-                Search.go_to_location(default.MAGNITUDE, vehicle.attitude.yaw, vehicle)
+                util.Search.go_to_location(util.MAGNITUDE, AviDrone.attitude.yaw, AviDrone)
         time.sleep(2)
 
 
