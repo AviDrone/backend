@@ -119,8 +119,8 @@ class Search:
 
 class Mission:
     def __init__(self):
-        from pymavlink import mavutil
         from drone import vehicle
+        from pymavlink import mavutil
         
         aviDrone = vehicle
         self.mavutil = mavutil
@@ -187,13 +187,13 @@ class Mission:
 
     def simple_goto_wait(self, go_to_checkpoint):
         self.vehicle.simple_goto(go_to_checkpoint)
-        distance = Vector.get_distance_metres(
+        distance = get_distance_metres(
             Search.get_global_pos(), go_to_checkpoint
         )
 
         while distance >= DISTANCE_ERROR and self.vehicle.mode.name == "GUIDED":
             print(distance)
-            distance = Vector.get_distance_metres(
+            distance = get_distance_metres(
                 Search.get_global_pos(), go_to_checkpoint
             )
             time.sleep(1)
