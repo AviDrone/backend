@@ -4,9 +4,9 @@ import argparse
 import logging as log
 
 from dronekit import connect
-
 from pymavlink import mavutil
 from util import (
+    WINDOW_SIZE,
     GpsData,
     Mission,
     Search,
@@ -15,7 +15,6 @@ from util import (
     get_location_metres,
     get_location_metres_with_alt,
     get_range,
-    WINDOW_SIZE
 )
 
 # init vehicle
@@ -23,7 +22,7 @@ from util import (
 parser = argparse.ArgumentParser(description="Demonstrates basic mission operations.")
 parser.add_argument(
     "--connect",
-    help="vehicle connection target string. If not specified, SITL automatically started and used.",
+    help="vehicle connection target string.If not specified, SITL started and used.",
 )
 args = parser.parse_args()
 
@@ -41,11 +40,8 @@ if not connection_string:
     sitl = dronekit_sitl.start_default()
     connection_string = sitl.connection_string()
 
-# init 
+# init
 vector = Vector()
 mission = Mission()
 gps_data = GpsData(window_size=WINDOW_SIZE)
 search = Search()
-
-
-

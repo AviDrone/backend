@@ -18,6 +18,7 @@ from dronekit import (
     connect,
 )
 
+from ..transceiver import util as t_util
 
 IS_VERBOSE = False  # for verbose command-line interface output
 IS_TEST = False  # for running simulations
@@ -61,6 +62,7 @@ class GpsData:
 class Search:
     def __init__(self):
         from drone import vehicle
+
         aviDrone = vehicle
         self.global_frame = aviDrone.location.global_frame
         # self.global_location = LocationGlobal(new_lat, new_lon, original_location.alt)
@@ -106,25 +108,28 @@ class Search:
 
         return math.sqrt(d_lat**2 + d_lon**2) * 1.113195e5
 
-    @staticmethod
-    def get_global_pos():
-        return global_frame
+    def get_global_pos(self):
+        return self.global_frame
 
-    @staticmethod
-    def read_transceiver():
+    def read_transceiver(self):
         uav_pos = [2, 2, 2]  # TODO replace this with actual positions
         beacon_pos = [1, 1, 1]  # TODO replace this with actual positions
-        return util.mock_beacon(uav_pos, beacon_pos)
+        return t_util.mock_beacon(uav_pos, beacon_pos)
 
 
 class Mission:
     def __init__(self):
-        import drone
-        aviDrone = drone.vehicle
-        self.vehicle = aviDrone
-        self.original_yaw = aviDrone.attitude.yaw
+        from drone import vehicle
+        from pymavlink import mavutil
+
+        self.aviDrone = vehicle
+        self.mavutil = mavutil
+        self.global_frame = self.aviDrone.location.global_frame
+        self.vehicle = self.aviDrone
+        self.original_yaw = self.aviDrone.attitude.yaw
         self.heading = -1  # TODO get correct value
         self.relative = False
+        self.cw = -1  # TODO get correct value
 
     def start(self):
 
@@ -141,8 +146,7 @@ class Mission:
 
         if self.vehicle.armed:
             print(f"-- Armed: {self.vehicle.armed}")
-            self.takeoff_to(ALTITUDE)
-        start_gps()
+            self.takeoff_to_altitude()
 
         print("-- Setting GUIDED flight mode")
         print("-- Waiting for GUIDED mode...")
@@ -150,7 +154,7 @@ class Mission:
         while self.vehicle.mode.name != "GUIDED":
             time.sleep(1)
 
-    def takeoff_to(self):
+    def takeoff_to_altitude(self):
         print(f"-- Taking off to altitude (m): {ALTITUDE} \n")
         self.vehicle.simple_takeoff(ALTITUDE)
 
@@ -161,14 +165,14 @@ class Mission:
                 break
             time.sleep(1)
 
-    def go_to_location(self, distance, angle, vehicle):
+    def go_to_location(self, distance, angle):
         current_location = self.vehicle.location.global_frame
-        target_location = get_location(current_location, distance, angle)
+        target_location = Search.get_location(current_location, distance, angle)
         self.vehicle.simple_goto(target_location)
 
         loop_count = 0
         while self.vehicle.mode.name == "GUIDED":
-            remaining_distance = get_distance(
+            remaining_distance = Search.get_distance(
                 self.vehicle.location.global_frame, target_location
             )
             print("Distance to target: ", remaining_distance)
@@ -183,43 +187,48 @@ class Mission:
 
     def simple_goto_wait(self, go_to_checkpoint):
         self.vehicle.simple_goto(go_to_checkpoint)
-        distance = better_get_distance_meters(get_global_pos(), go_to_checkpoint)
+        global_frame = self.aviDrone.location.global_frame
+        distance = get_distance_metres(
+            Search.get_global_pos(global_frame), go_to_checkpoint
+        )
 
         while distance >= DISTANCE_ERROR and self.vehicle.mode.name == "GUIDED":
             print(distance)
-            distance = better_get_distance_meters(get_global_pos(), go_to_checkpoint)
+            distance = get_distance_metres(
+                Search.get_global_pos(global_frame), go_to_checkpoint
+            )
             time.sleep(1)
 
-        if vehicle.mode.name != "GUIDED":
-            vehicle.simple_goto(vehicle.location.global_frame)
+        if self.vehicle.mode.name != "GUIDED":
+            self.vehicle.simple_goto(self.vehicle.location.global_frame)
             print("Halting simple_go_to")
 
         print("Checkpoint reached")
 
-    def wobble_wait(self):
-        # make vehicle wait until the wobbling settles down before moving forward.
-        heading_rad = heading * math.pi / 180
+    # def wobble_wait(self):
+    # make vehicle wait until the wobbling settles down before moving forward.
+    #    heading_rad = self.heading * math.pi / 180
 
-        target_yaw = self.original_yaw + cw * heading_rad
+    #    target_yaw = self.original_yaw + cw * heading_rad
 
-        while abs(target_yaw - vehicle.attitude.yaw) % math.pi > 0.01745 * DEGREE_ERROR:
-            error_degree = abs(target_yaw - vehicle.attitude.yaw) % math.pi
-            print("Turn error: ", error_degree)  # 1 degree
-            time.sleep(0.25)
+    #   while abs(target_yaw - vehicle.attitude.yaw) % math.pi > 0.01745 * DEGREE_ERROR:
+    #        error_degree = abs(target_yaw - vehicle.attitude.yaw) % math.pi
+    #        print("Turn error: ", error_degree)  # 1 degree
+    #        time.sleep(0.25)
 
     def condition_yaw(self):
         heading = self.heading
         original_yaw = self.vehicle.attitude.yaw
-        if relative:
+        if self.relative:
             is_relative = 1  # yaw relative to direction of travel
         else:
             is_relative = 0  # yaw is an absolute angle
 
         if self.heading < 0:
             heading = abs(heading)
-            cw = -1
+            self.cw = -1
         else:
-            cw = 1
+            self.cw = 1
 
         msg = self.vehicle.message_factory.command_long_encode(
             0,  # target system
@@ -228,14 +237,13 @@ class Mission:
             0,  # confirmation
             heading,  # param 1, yaw in degrees
             0,  # param 2, yaw speed deg/s
-            cw,  # param 3, direction -1 ccw, 1 cw
+            self.cw,  # param 3, direction -1 ccw, 1 cw
             is_relative,  # param 4, relative offset 1, absolute angle 0
             0,
             0,
             0,
         )  # param 5 ~ 7 not used
         self.vehicle.send_mavlink(msg)  # send command to vehicle
-        wobble_wait()  # TODO apply condition to see if it needs to wait
 
 
 class Vector:
@@ -428,9 +436,9 @@ def get_distance_metres(a_location1, a_location2):
     earth's poles. It comes from the ArduPilot test code:
     https://github.com/diydrones/ardupilot/blob/master/Tools/autotest/common.py
     """
-    dlat = a_location2.lat - a_location1.lat
-    dlong = a_location2.lon - a_location1.lon
-    return math.sqrt((dlat * dlat) + (dlong * dlong)) * 1.113195e5
+    d_lat = a_location2.lat - a_location1.lat
+    d_long = a_location2.lon - a_location1.lon
+    return math.sqrt((d_lat * d_lat) + (d_long * d_long)) * 1.113195e5
 
 
 def get_range(totalLength, dLength):

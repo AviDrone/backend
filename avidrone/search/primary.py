@@ -11,6 +11,7 @@ import argparse
 import logging as log
 import time
 
+import drone
 import numpy as np
 from dronekit import (
     Command,
@@ -20,10 +21,16 @@ from dronekit import (
     connect,
 )
 from pymavlink import mavutil
+from util import (
+    get_distance_metres,
+    get_location_metres,
+    get_location_metres_with_alt,
+    get_range,
+)
 
-# from RotateVectorTools import
-
-# Define variables
+aviDrone = drone.vehicle
+sitl = drone.sitl
+vector = drone.vector
 
 # width of the search
 width = 100
@@ -36,18 +43,6 @@ dLength = 20
 
 # height of the slope
 totalAlt = 0
-
-import drone
-from util import (
-    get_distance_metres,
-    get_location_metres,
-    get_location_metres_with_alt,
-    get_range,
-)
-
-aviDrone = drone.vehicle
-sitl = drone.sitl
-vector = drone.vector
 
 # Rectangular search taking angle and altitude into account
 def rectangular_primary_search_with_alt(
