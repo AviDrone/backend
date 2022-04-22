@@ -9,7 +9,6 @@ import datetime
 import math
 import time
 
-from ..transceiver import util as t_util
 import numpy as np
 from dronekit import (
     Command,
@@ -18,6 +17,8 @@ from dronekit import (
     VehicleMode,
     connect,
 )
+
+from ..transceiver import util as t_util
 
 IS_VERBOSE = False  # for verbose command-line interface output
 IS_TEST = False  # for running simulations
@@ -105,7 +106,7 @@ class Search:
         d_lat = lat_b - lat_a
         d_lon = lon_b - lon_a
 
-        return math.sqrt(d_lat ** 2 + d_lon ** 2) * 1.113195e5
+        return math.sqrt(d_lat**2 + d_lon**2) * 1.113195e5
 
     def get_global_pos(self):
         return self.global_frame
@@ -141,7 +142,7 @@ class Mission:
             time.sleep(1)
 
         if self.vehicle.armed:
-            print(f"-- Armed: {self.vehicle.armed}")
+            print("-- Armed: ", self.vehicle.armed)
             self.takeoff_to(ALTITUDE)
 
         print("-- Setting GUIDED flight mode")
@@ -183,13 +184,13 @@ class Mission:
 
     def simple_goto_wait(self, go_to_checkpoint):
         self.vehicle.simple_goto(go_to_checkpoint)
-        distance = Search.better_get_distance_meters(
+        distance = Search.get_distance_meters(
             Search.get_global_pos(), go_to_checkpoint
         )
 
         while distance >= DISTANCE_ERROR and self.vehicle.mode.name == "GUIDED":
             print(distance)
-            distance = Search.better_get_distance_meters(
+            distance = Search.get_distance_meters(
                 Search.get_global_pos(), go_to_checkpoint
             )
             time.sleep(1)
@@ -431,9 +432,9 @@ def get_distance_metres(a_location1, a_location2):
     earth's poles. It comes from the ArduPilot test code:
     https://github.com/diydrones/ardupilot/blob/master/Tools/autotest/common.py
     """
-    dlat = a_location2.lat - a_location1.lat
-    dlong = a_location2.lon - a_location1.lon
-    return math.sqrt((dlat * dlat) + (dlong * dlong)) * 1.113195e5
+    d_lat = a_location2.lat - a_location1.lat
+    d_long = a_location2.lon - a_location1.lon
+    return math.sqrt((d_lat * d_lat) + (d_long * d_long)) * 1.113195e5
 
 
 def get_range(totalLength, dLength):

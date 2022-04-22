@@ -3,9 +3,8 @@ from __future__ import print_function
 import argparse
 import logging as log
 
-from dronekit import connects
-from pymavlink import mavutil
 from dronekit import connect
+from pymavlink import mavutil
 from util import (
     WINDOW_SIZE,
     GpsData,
@@ -21,9 +20,10 @@ from util import (
 # init vehicle
 
 parser = argparse.ArgumentParser(description="Demonstrates basic mission operations.")
-parser.add_argument("--connect",
-                    help="vehicle connection target string.If not specified, SITL started and used.",
-                    )
+parser.add_argument(
+    "--connect",
+    help="vehicle connection target string.If not specified, SITL started and used.",
+)
 args = parser.parse_args()
 
 connection_string = args.connect

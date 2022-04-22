@@ -11,14 +11,16 @@ import datetime
 import logging as log
 import math
 import time
+
 import drone
 import dronekit_sitl
 import util
 from dronekit import LocationGlobal, VehicleMode, connect
 from transceiver import Transceiver
 
-
 AviDrone = drone.vehicle
+
+
 def run():
     signal_found = False
     log.info("-- SECONDARY SEARCH --")
@@ -82,12 +84,16 @@ def run():
             elif gps_window.get_minimum_index() == 0:
                 # If the minimum data point is in the first index,
                 log.info("continue forward")
-                util.Search.go_to_location(util.MAGNITUDE, AviDrone.attitude.yaw, AviDrone)
+                util.Search.go_to_location(
+                    util.MAGNITUDE, AviDrone.attitude.yaw, AviDrone
+                )
 
             else:
                 log.info(f"Did not find signal at altitude: {util.ALTITUDE}")
                 log.info("Climbing...")
-                util.Search.go_to_location(util.MAGNITUDE, AviDrone.attitude.yaw, AviDrone)
+                util.Search.go_to_location(
+                    util.MAGNITUDE, AviDrone.attitude.yaw, AviDrone
+                )
         time.sleep(2)
 
 
