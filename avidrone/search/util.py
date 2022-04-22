@@ -119,9 +119,10 @@ class Search:
 
 class Mission:
     def __init__(self):
-        import drone
+        from drone import vehicle
 
-        aviDrone = drone.vehicle
+        aviDrone = vehicle
+        self.global_frame = aviDrone.location.global_frame
         self.vehicle = aviDrone
         self.original_yaw = aviDrone.attitude.yaw
         self.heading = -1  # TODO get correct value
@@ -142,7 +143,7 @@ class Mission:
             time.sleep(1)
 
         if self.vehicle.armed:
-            print("-- Armed: ", self.vehicle.armed)
+            print(f"-- Armed: {self.vehicle.armed}")
             self.takeoff_to(ALTITUDE)
 
         print("-- Setting GUIDED flight mode")
@@ -162,7 +163,7 @@ class Mission:
                 break
             time.sleep(1)
 
-    def go_to_location(self, distance, angle, vehicle):
+    def go_to_location(self, distance, angle):
         current_location = self.vehicle.location.global_frame
         target_location = Search.get_location(current_location, distance, angle)
         self.vehicle.simple_goto(target_location)
@@ -184,15 +185,13 @@ class Mission:
 
     def simple_goto_wait(self, go_to_checkpoint):
         self.vehicle.simple_goto(go_to_checkpoint)
-        distance = Search.get_distance_meters(
-            Search.get_global_pos(), go_to_checkpoint
+        distance = Search.get_distance_metres(
+            self.get_global_pos(), go_to_checkpoint
         )
 
         while distance >= DISTANCE_ERROR and self.vehicle.mode.name == "GUIDED":
             print(distance)
-            distance = Search.get_distance_meters(
-                Search.get_global_pos(), go_to_checkpoint
-            )
+            distance = Search.get_distance_metres(self.get_global_pos(), go_to_checkpoint)
             time.sleep(1)
 
         if self.vehicle.mode.name != "GUIDED":
