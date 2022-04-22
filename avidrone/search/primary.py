@@ -11,6 +11,7 @@ import argparse
 import logging as log
 import time
 
+import drone
 import numpy as np
 from dronekit import (
     Command,
@@ -20,8 +21,6 @@ from dronekit import (
     connect,
 )
 from pymavlink import mavutil
-
-import drone
 from util import (
     get_distance_metres,
     get_location_metres,

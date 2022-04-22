@@ -5,7 +5,7 @@ import logging as log
 
 from dronekit import connects
 from pymavlink import mavutil
-
+from dronekit import connect
 from util import (
     WINDOW_SIZE,
     GpsData,

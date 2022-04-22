@@ -11,13 +11,12 @@ import datetime
 import logging as log
 import math
 import time
-
+import drone
 import dronekit_sitl
+import util
 from dronekit import LocationGlobal, VehicleMode, connect
 from transceiver import Transceiver
 
-import drone
-import util
 
 AviDrone = drone.vehicle
 def run():
