@@ -122,11 +122,11 @@ class Mission:
         from drone import vehicle
         from pymavlink import mavutil
 
-        aviDrone = vehicle
+        self.aviDrone = vehicle
         self.mavutil = mavutil
-        self.global_frame = aviDrone.location.global_frame
-        self.vehicle = aviDrone
-        self.original_yaw = aviDrone.attitude.yaw
+        self.global_frame = self.aviDrone.location.global_frame
+        self.vehicle = self.aviDrone
+        self.original_yaw = self.aviDrone.attitude.yaw
         self.heading = -1  # TODO get correct value
         self.relative = False
         self.cw = -1  # TODO get correct value
