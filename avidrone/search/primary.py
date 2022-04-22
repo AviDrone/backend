@@ -327,6 +327,19 @@ def download_mission():
     cmds.wait_ready()  # wait until download is complete.
 
 
+def save_mission(aFileName):
+    """
+    Save a mission in the Waypoint file format (http://qgroundcontrol.org/mavlink/waypoint_protocol#waypoint_file_format).
+    """
+    missionlist = download_mission()
+    output='QGC WPL 110\n'
+    for cmd in missionlist:
+        commandline="%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n" % (cmd.seq,cmd.current,cmd.frame,cmd.command,cmd.param1,cmd.param2,cmd.param3,cmd.param4,cmd.x,cmd.y,cmd.z,cmd.autocontinue)
+        output+=commandline
+    with open(aFileName, 'w') as file_:
+        file_.write(output)
+
+
 def arm_and_takeoff(aTargetAltitude):
     """
     Arms vehicle and fly to aTargetAltitude.
@@ -418,6 +431,7 @@ while True:
 
 print("Return to launch")
 aviDrone.mode = VehicleMode("RTL")
+save_mission("mission.txt")
 
 # Close vehicle object before exiting script
 print("Close vehicle object")
@@ -426,3 +440,6 @@ aviDrone.close()
 # Shut down simulator if it was started.
 if sitl is not None:
     sitl.stop()
+
+
+
