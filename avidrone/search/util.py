@@ -17,6 +17,7 @@ from dronekit import (
     VehicleMode,
     connect,
 )
+from pymavlink import mavutil
 
 from ..transceiver import util as t_util
 
@@ -144,7 +145,7 @@ class Mission:
 
         if self.vehicle.armed:
             print(f"-- Armed: {self.vehicle.armed}")
-            self.takeoff_to(ALTITUDE)
+            self.takeoff_to_altitude()
 
         print("-- Setting GUIDED flight mode")
         print("-- Waiting for GUIDED mode...")
@@ -152,7 +153,7 @@ class Mission:
         while self.vehicle.mode.name != "GUIDED":
             time.sleep(1)
 
-    def takeoff_to(self):
+    def takeoff_to_altitude(self):
         print(f"-- Taking off to altitude (m): {ALTITUDE} \n")
         self.vehicle.simple_takeoff(ALTITUDE)
 
@@ -186,12 +187,12 @@ class Mission:
     def simple_goto_wait(self, go_to_checkpoint):
         self.vehicle.simple_goto(go_to_checkpoint)
         distance = Search.get_distance_metres(
-            self.get_global_pos(), go_to_checkpoint
+            Search.get_global_pos(), go_to_checkpoint
         )
 
         while distance >= DISTANCE_ERROR and self.vehicle.mode.name == "GUIDED":
             print(distance)
-            distance = Search.get_distance_metres(self.get_global_pos(), go_to_checkpoint)
+            distance = Search.get_distance_metres(Search.get_global_pos(), go_to_checkpoint)
             time.sleep(1)
 
         if self.vehicle.mode.name != "GUIDED":
