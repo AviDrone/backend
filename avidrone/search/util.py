@@ -17,7 +17,6 @@ from dronekit import (
     VehicleMode,
     connect,
 )
-from pymavlink import mavutil
 
 from ..transceiver import util as t_util
 
@@ -120,9 +119,11 @@ class Search:
 
 class Mission:
     def __init__(self):
+        from pymavlink import mavutil
         from drone import vehicle
-
+        
         aviDrone = vehicle
+        self.mavutil = mavutil
         self.global_frame = aviDrone.location.global_frame
         self.vehicle = aviDrone
         self.original_yaw = aviDrone.attitude.yaw
@@ -186,13 +187,15 @@ class Mission:
 
     def simple_goto_wait(self, go_to_checkpoint):
         self.vehicle.simple_goto(go_to_checkpoint)
-        distance = Search.get_distance_metres(
+        distance = Vector.get_distance_metres(
             Search.get_global_pos(), go_to_checkpoint
         )
 
         while distance >= DISTANCE_ERROR and self.vehicle.mode.name == "GUIDED":
             print(distance)
-            distance = Search.get_distance_metres(Search.get_global_pos(), go_to_checkpoint)
+            distance = Vector.get_distance_metres(
+                Search.get_global_pos(), go_to_checkpoint
+            )
             time.sleep(1)
 
         if self.vehicle.mode.name != "GUIDED":

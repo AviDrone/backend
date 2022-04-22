@@ -20,6 +20,7 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip setuptools wheel
+          pip install --upgrade setuptools
           pip install aioconsole
           pip install pyyaml==5.3.1
           pip install pytest
