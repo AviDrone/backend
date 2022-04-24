@@ -11,6 +11,7 @@ import argparse
 import logging as log
 import time
 
+import drone
 import numpy as np
 from dronekit import (
     Command,
@@ -20,10 +21,16 @@ from dronekit import (
     connect,
 )
 from pymavlink import mavutil
+from util import (
+    get_distance_metres,
+    get_location_metres,
+    get_location_metres_with_alt,
+    get_range,
+)
 
-# from RotateVectorTools import
-
-# Define variables
+aviDrone = drone.vehicle
+sitl = drone.sitl
+vector = drone.vector
 
 # width of the search
 width = 100
@@ -36,18 +43,6 @@ dLength = 20
 
 # height of the slope
 totalAlt = 0
-
-import drone
-from util import (
-    get_distance_metres,
-    get_location_metres,
-    get_location_metres_with_alt,
-    get_range,
-)
-
-aviDrone = drone.vehicle
-sitl = drone.sitl
-vector = drone.vector
 
 # Rectangular search taking angle and altitude into account
 def rectangular_primary_search_with_alt(
@@ -299,6 +294,7 @@ def rectangular_primary_search_basic(a_location, width, dLength, totalLength, an
 
     print(" Upload new commands to vehicle")
     cmds.upload()
+    save_mission("mission2.txt")
 
 
 # dronekit functions:
@@ -325,11 +321,30 @@ def distance_to_current_waypoint():
 
 def download_mission():
     """
-    Download the current mission from the vehicle.
+    Downloads the current mission and returns it in a list.
+    It is used in save_mission() to get the file information to save.
     """
+    missionlist=[]
     cmds = aviDrone.commands
     cmds.download()
-    cmds.wait_ready()  # wait until download is complete.
+    cmds.wait_ready()
+    for cmd in cmds:
+        missionlist.append(cmd)
+    return missionlist
+
+
+def save_mission(aFileName):
+    """
+    Save a mission in the Waypoint file format (http://qgroundcontrol.org/mavlink/waypoint_protocol#waypoint_file_format).
+    """
+    missionlist = download_mission()
+    output='QGC WPL 110\n'
+    for cmd in missionlist:
+        commandline="%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n" % (cmd.seq,cmd.current,cmd.frame,cmd.command,cmd.param1,cmd.param2,cmd.param3,cmd.param4,cmd.x,cmd.y,cmd.z,cmd.autocontinue)
+        print("x: ", cmd.x, " y: ", cmd.y, " z: ", cmd.z)
+        output+=commandline
+    with open(aFileName, 'w') as file_:
+        file_.write(output)
 
 
 def arm_and_takeoff(aTargetAltitude):
@@ -423,6 +438,7 @@ while True:
 
 print("Return to launch")
 aviDrone.mode = VehicleMode("RTL")
+save_mission("mission.txt")
 
 # Close vehicle object before exiting script
 print("Close vehicle object")
@@ -431,3 +447,6 @@ aviDrone.close()
 # Shut down simulator if it was started.
 if sitl is not None:
     sitl.stop()
+
+
+
