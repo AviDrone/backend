@@ -26,6 +26,7 @@ from util import (
     get_location_metres,
     get_location_metres_with_alt,
     get_range,
+    ALTITUDE
 )
 
 aviDrone = drone.vehicle
@@ -294,7 +295,7 @@ def rectangular_primary_search_basic(a_location, width, dLength, totalLength, an
 
     print(" Upload new commands to vehicle")
     cmds.upload()
-    save_mission("mission2.txt")
+
 
 
 # dronekit functions:
@@ -382,6 +383,68 @@ def arm_and_takeoff(aTargetAltitude):
         time.sleep(1)
 
 
+def return_to_launch():
+    aviDrone.commands.add(
+        Command(
+            0,
+            0,
+            0,
+            mavutil.mavlink.MAV_FRAME_GLOBAL_RELATIVE_ALT,
+            mavutil.mavlink.MAV_CMD_NAV_RETURN_TO_LAUNCH,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+        )
+    )
+
+
+def save_search_to_file(file):
+    # aviDrone.simple_takeoff(ALTITUDE)
+    print("adding takeoff to altitude ", ALTITUDE)
+    aviDrone.commands.add(
+        Command(
+            0,
+            0,
+            0,
+            mavutil.mavlink.MAV_FRAME_GLOBAL_RELATIVE_ALT,
+            mavutil.mavlink.MAV_CMD_NAV_TAKEOFF,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            ALTITUDE,
+        )
+    )
+    print("adding mission")
+    my_angle = 360 - np.degrees(aviDrone.attitude.yaw)
+    if totalAlt == 0:
+        rectangular_primary_search_basic(
+            aviDrone.location.global_frame, width, dLength, totalLength, my_angle
+        )
+    else:
+        rectangular_primary_search_with_alt(
+            aviDrone.location.global_frame, width, dLength, totalLength, totalAlt, my_angle
+        )
+    print("returning to launch")
+    # return_to_launch()
+    save_mission(file)
+    aviDrone.commands.clear()
+    print("Mission saved")
+
+mission_file = "r_mission3.txt"
+print("Saving to file", mission_file)
+save_search_to_file(mission_file)
+
 print("Set mode to GUIDED: ")
 aviDrone.mode = VehicleMode("GUIDED")
 
@@ -440,7 +503,7 @@ print("Return to launch")
 aviDrone.mode = VehicleMode("RTL")
 save_mission("mission.txt")
 
-# Close vehicle object before exiting script
+# # Close vehicle object before exiting script
 print("Close vehicle object")
 aviDrone.close()
 
