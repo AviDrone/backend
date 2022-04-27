@@ -10,6 +10,7 @@ import math
 import time
 
 import numpy as np
+from avidrone.transceiver import util as t_util
 from dronekit import (
     Command,
     LocationGlobal,
@@ -18,7 +19,6 @@ from dronekit import (
     connect,
 )
 
-from avidrone.transceiver import util as t_util
 
 IS_VERBOSE = False  # for verbose command-line interface output
 IS_TEST = False  # for running simulations

@@ -23,14 +23,15 @@ AviDrone = drone.vehicle
 
 def run(transceiver):
     if util.IS_TEST:
-        transceiver = util.Search.read_transceiver(self)  # mock transceiver
+        search = util.Search()
+        transceiver = search.read_transceiver()  # mock transceiver
 
     signal_found = False
     log.info("-- SECONDARY SEARCH --")
     util.Search.start()
     gps_window = util.WINDOW_SIZE
     while AviDrone.mode.name == "GUIDED":
-        if transceiver is not util.Search.read_transceiver(self):
+        if transceiver is not self.read_transceiver():
             transceiver = util.Search.read_transceiver(self)  # real transceiver
         log.info(transceiver.direction, ", ", transceiver.distance)
 
@@ -101,4 +102,5 @@ def run(transceiver):
 
 
 if __name__ == "__main__":
+    transceiver = util.Search.read_transceiver(self)
     run(transceiver)
