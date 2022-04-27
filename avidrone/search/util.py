@@ -18,7 +18,7 @@ from dronekit import (
     connect,
 )
 
-from ..transceiver import util as t_util
+from avidrone.transceiver import util as t_util
 
 IS_VERBOSE = False  # for verbose command-line interface output
 IS_TEST = False  # for running simulations
