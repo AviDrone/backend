@@ -22,8 +22,8 @@ AviDrone = drone.vehicle
 
 
 def run(transceiver):
+    search = util.Search()
     if util.IS_TEST:
-        search = util.Search()
         transceiver = search.read_transceiver()  # mock transceiver
 
     signal_found = False
@@ -31,8 +31,8 @@ def run(transceiver):
     util.Search.start()
     gps_window = util.WINDOW_SIZE
     while AviDrone.mode.name == "GUIDED":
-        if transceiver is not self.read_transceiver():
-            transceiver = util.Search.read_transceiver(self)  # real transceiver
+        if transceiver is not search.read_transceiver():
+            transceiver = search.read_transceiver()  # real transceiver
         log.info(transceiver.direction, ", ", transceiver.distance)
 
         if transceiver.direction < 2:  # Turn left
@@ -45,7 +45,7 @@ def run(transceiver):
 
         elif transceiver.direction == 2:  # Continue forward
             log.info("-- Continuing forward")
-            gps_window.add_point(util.Search.get_global_pos(self), transceiver.distance)
+            gps_window.add_point(search.get_global_pos(), transceiver.distance)
             if (
                     gps_window.get_minimum_index() == ((gps_window.window_size - 1) / 2)
                     and len(gps_window.gps_points) == gps_window.window_size
