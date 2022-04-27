@@ -47,8 +47,8 @@ def run(transceiver):
             log.info("-- Continuing forward")
             gps_window.add_point(search.get_global_pos(), transceiver.distance)
             if (
-                    gps_window.get_minimum_index() == ((gps_window.window_size - 1) / 2)
-                    and len(gps_window.gps_points) == gps_window.window_size
+                gps_window.get_minimum_index() == ((gps_window.window_size - 1) / 2)
+                and len(gps_window.gps_points) == gps_window.window_size
             ):
 
                 # If the minimum is the center point of the gps_window we need to go
@@ -72,8 +72,8 @@ def run(transceiver):
                     gps_window.purge_gps_window()
 
             elif (
-                    gps_window.get_minimum_index() == (gps_window.window_size - 1)
-                    and len(gps_window.gps_points) == gps_window.window_size
+                gps_window.get_minimum_index() == (gps_window.window_size - 1)
+                and len(gps_window.gps_points) == gps_window.window_size
             ):
 
                 # If the minimum data point is the last one in the array,
