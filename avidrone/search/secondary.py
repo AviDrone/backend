@@ -47,8 +47,8 @@ def run(transceiver):
             log.info("-- Continuing forward")
             gps_window.add_point(util.Search.get_global_pos(self), transceiver.distance)
             if (
-                gps_window.get_minimum_index() == ((gps_window.window_size - 1) / 2)
-                and len(gps_window.gps_points) == gps_window.window_size
+                    gps_window.get_minimum_index() == ((gps_window.window_size - 1) / 2)
+                    and len(gps_window.gps_points) == gps_window.window_size
             ):
 
                 # If the minimum is the center point of the gps_window we need to go
@@ -72,8 +72,8 @@ def run(transceiver):
                     gps_window.purge_gps_window()
 
             elif (
-                gps_window.get_minimum_index() == (gps_window.window_size - 1)
-                and len(gps_window.gps_points) == gps_window.window_size
+                    gps_window.get_minimum_index() == (gps_window.window_size - 1)
+                    and len(gps_window.gps_points) == gps_window.window_size
             ):
 
                 # If the minimum data point is the last one in the array,
@@ -102,5 +102,8 @@ def run(transceiver):
 
 
 if __name__ == "__main__":
-    transceiver = util.Search.read_transceiver(self)
+    uav_pos = [2, 2, 2]  # TODO replace this with actual positions
+    beacon_pos = [1, 1, 1]  # TODO replace this with actual positions
+    search = util.Search()
+    transceiver = search.read_transceiver(uav_pos, beacon_pos)
     run(transceiver)

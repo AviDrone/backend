@@ -19,7 +19,6 @@ from dronekit import (
     connect,
 )
 
-
 IS_VERBOSE = False  # for verbose command-line interface output
 IS_TEST = False  # for running simulations
 
@@ -111,9 +110,7 @@ class Search:
     def get_global_pos(self):
         return self.global_frame
 
-    def read_transceiver(self):
-        uav_pos = [2, 2, 2]  # TODO replace this with actual positions
-        beacon_pos = [1, 1, 1]  # TODO replace this with actual positions
+    def read_transceiver(self, uav_pos, beacon_pos):
         return t_util.mock_beacon(uav_pos, beacon_pos)
 
 
