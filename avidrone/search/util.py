@@ -10,7 +10,6 @@ import math
 import time
 
 import numpy as np
-from avidrone.transceiver import util as t_util
 from dronekit import (
     Command,
     LocationGlobal,
@@ -111,6 +110,7 @@ class Search:
         return self.global_frame
 
     def read_transceiver(self, uav_pos, beacon_pos):
+        from avidrone.transceiver import util as t_util
         return t_util.mock_beacon(uav_pos, beacon_pos)
 
 

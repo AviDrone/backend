@@ -10,11 +10,7 @@ from util import (
     GpsData,
     Mission,
     Search,
-    Vector,
-    get_distance_metres,
-    get_location_metres,
-    get_location_metres_with_alt,
-    get_range,
+    Vector
 )
 
 # init vehicle
