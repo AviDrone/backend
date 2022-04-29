@@ -1,0 +1,3 @@
+[submodule "avidrone/qui/qgroundcontrol"]
+	path = avidrone/qui/qgroundcontrol
+	url = https://github.com/AviDrone/Avidrone
