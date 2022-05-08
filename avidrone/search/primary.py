@@ -34,13 +34,13 @@ sitl = drone.sitl
 vector = drone.vector
 
 # width of the search
-width = 100
+width = 28
 
 # length of the search
-totalLength = 100
+totalLength = 75
 
 # search strip size
-dLength = 20
+dLength = 10
 
 # height of the slope
 totalAlt = 0
