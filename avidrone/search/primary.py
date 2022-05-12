@@ -32,15 +32,16 @@ from util import (
 aviDrone = drone.vehicle
 sitl = drone.sitl
 vector = drone.vector
+mission = drone.mission
 
 # width of the search
-width = 28
+width = 100
 
 # length of the search
-totalLength = 75
+totalLength = 200
 
 # search strip size
-dLength = 10
+dLength = 20
 
 # height of the slope
 totalAlt = 0
@@ -489,6 +490,12 @@ while True:
         "Distance to waypoint (%s): %s" % (nextwaypoint, distance_to_current_waypoint())
     )
 
+    if mission.break_condition():
+        aviDrone.commands.clear()
+        aviDrone.commands.upload()
+        time.sleep(1)
+        break
+
     if nextwaypoint == get_range(
         totalLength, dLength
     ):  # Dummy waypoint - as soon as we reach last waypoint this is true and we exit.
@@ -498,6 +505,20 @@ while True:
         )
         break
     time.sleep(1)
+
+print("Guided")
+aviDrone.mode = VehicleMode("ALT_HOLD")
+hold_count = 0
+while True:
+    if aviDrone.mode != "ALT_HOLD":
+        time.sleep(1)
+        print("Not")
+    if(hold_count == 10):
+        break
+    else:
+        time.sleep(1)
+    hold_count += 1
+
 
 print("Return to launch")
 aviDrone.mode = VehicleMode("RTL")
