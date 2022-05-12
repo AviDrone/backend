@@ -155,7 +155,8 @@ class Mission:
     # This will be called repeatedly and return true when the break condition is true.
     def break_condition(self):
         nextwaypoint = self.vehicle.commands.next
-        if nextwaypoint == 6:
+        if nextwaypoint == 2:
+            print("breaking...")
             return True
         return False
 

@@ -16,7 +16,7 @@ import drone
 import dronekit_sitl
 import util
 from dronekit import LocationGlobal, VehicleMode, connect
-from transceiver import Transceiver
+import transceiver
 
 AviDrone = drone.vehicle
 

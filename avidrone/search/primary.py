@@ -519,25 +519,30 @@ while True:
         break
     time.sleep(1)
 
-print("Guided")
+print("holding alt")
 aviDrone.mode = VehicleMode("ALT_HOLD")
 hold_count = 0
 while True:
     if aviDrone.mode != "ALT_HOLD":
         time.sleep(1)
-        print("Not")
-    if(hold_count == 10):
+        print("Not holding alt")
+    if(hold_count != 0):
+        time.sleep(2)
         break
-    else:
-        time.sleep(1)
     hold_count += 1
 
+# Switch to secondary search mode
+EN_SECONDARY_SWITCH = True
+print("Switch to secondary:")
+if EN_SECONDARY_SWITCH:
+    import secondary
+    # secondary.run()
 
 print("Return to launch")
 aviDrone.mode = VehicleMode("RTL")
 save_mission("mission.txt")
 
-# # Close vehicle object before exiting script
+# Close vehicle object before exiting script
 print("Close vehicle object")
 aviDrone.close()
 
