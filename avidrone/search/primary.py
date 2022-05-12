@@ -26,17 +26,19 @@ from util import (
     get_location_metres,
     get_location_metres_with_alt,
     get_range,
+    ALTITUDE
 )
 
 aviDrone = drone.vehicle
 sitl = drone.sitl
 vector = drone.vector
+mission = drone.mission
 
 # width of the search
 width = 100
 
 # length of the search
-totalLength = 100
+totalLength = 200
 
 # search strip size
 dLength = 20
@@ -296,6 +298,7 @@ def rectangular_primary_search_basic(a_location, width, dLength, totalLength, an
     cmds.upload()
 
 
+
 # dronekit functions:
 
 
@@ -320,11 +323,30 @@ def distance_to_current_waypoint():
 
 def download_mission():
     """
-    Download the current mission from the vehicle.
+    Downloads the current mission and returns it in a list.
+    It is used in save_mission() to get the file information to save.
     """
+    missionlist=[]
     cmds = aviDrone.commands
     cmds.download()
-    cmds.wait_ready()  # wait until download is complete.
+    cmds.wait_ready()
+    for cmd in cmds:
+        missionlist.append(cmd)
+    return missionlist
+
+
+def save_mission(aFileName):
+    """
+    Save a mission in the Waypoint file format (http://qgroundcontrol.org/mavlink/waypoint_protocol#waypoint_file_format).
+    """
+    missionlist = download_mission()
+    output='QGC WPL 110\n'
+    for cmd in missionlist:
+        commandline="%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n" % (cmd.seq,cmd.current,cmd.frame,cmd.command,cmd.param1,cmd.param2,cmd.param3,cmd.param4,cmd.x,cmd.y,cmd.z,cmd.autocontinue)
+        print("x: ", cmd.x, " y: ", cmd.y, " z: ", cmd.z)
+        output+=commandline
+    with open(aFileName, 'w') as file_:
+        file_.write(output)
 
 
 def save_mission(aFileName):
@@ -375,6 +397,68 @@ def arm_and_takeoff(aTargetAltitude):
         time.sleep(1)
 
 
+def return_to_launch():
+    aviDrone.commands.add(
+        Command(
+            0,
+            0,
+            0,
+            mavutil.mavlink.MAV_FRAME_GLOBAL_RELATIVE_ALT,
+            mavutil.mavlink.MAV_CMD_NAV_RETURN_TO_LAUNCH,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+        )
+    )
+
+
+def save_search_to_file(file):
+    # aviDrone.simple_takeoff(ALTITUDE)
+    print("adding takeoff to altitude ", ALTITUDE)
+    aviDrone.commands.add(
+        Command(
+            0,
+            0,
+            0,
+            mavutil.mavlink.MAV_FRAME_GLOBAL_RELATIVE_ALT,
+            mavutil.mavlink.MAV_CMD_NAV_TAKEOFF,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            ALTITUDE,
+        )
+    )
+    print("adding mission")
+    my_angle = 360 - np.degrees(aviDrone.attitude.yaw)
+    if totalAlt == 0:
+        rectangular_primary_search_basic(
+            aviDrone.location.global_frame, width, dLength, totalLength, my_angle
+        )
+    else:
+        rectangular_primary_search_with_alt(
+            aviDrone.location.global_frame, width, dLength, totalLength, totalAlt, my_angle
+        )
+    print("returning to launch")
+    # return_to_launch()
+    save_mission(file)
+    aviDrone.commands.clear()
+    print("Mission saved")
+
+mission_file = "r_mission3.txt"
+print("Saving to file", mission_file)
+save_search_to_file(mission_file)
+
 print("Set mode to GUIDED: ")
 aviDrone.mode = VehicleMode("GUIDED")
 
@@ -419,6 +503,12 @@ while True:
         "Distance to waypoint (%s): %s" % (nextwaypoint, distance_to_current_waypoint())
     )
 
+    if mission.break_condition():
+        aviDrone.commands.clear()
+        aviDrone.commands.upload()
+        time.sleep(1)
+        break
+
     if nextwaypoint == get_range(
         totalLength, dLength
     ):  # Dummy waypoint - as soon as we reach last waypoint this is true and we exit.
@@ -429,11 +519,25 @@ while True:
         break
     time.sleep(1)
 
+print("Guided")
+aviDrone.mode = VehicleMode("ALT_HOLD")
+hold_count = 0
+while True:
+    if aviDrone.mode != "ALT_HOLD":
+        time.sleep(1)
+        print("Not")
+    if(hold_count == 10):
+        break
+    else:
+        time.sleep(1)
+    hold_count += 1
+
+
 print("Return to launch")
 aviDrone.mode = VehicleMode("RTL")
 save_mission("mission.txt")
 
-# Close vehicle object before exiting script
+# # Close vehicle object before exiting script
 print("Close vehicle object")
 aviDrone.close()
 
