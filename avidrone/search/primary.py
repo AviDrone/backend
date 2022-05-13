@@ -492,7 +492,7 @@ aviDrone.mode = VehicleMode("AUTO")
 # Demonstrates getting and setting the command number
 # Uses distance_to_current_waypoint(), a convenience function for finding the
 #   distance to the next waypoint.
-
+reacheded_end = False;
 print("final waypoint: %s" % (get_range(totalLength, dLength)))
 while True:
     if aviDrone.mode != "AUTO":
