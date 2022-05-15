@@ -26,17 +26,19 @@ from util import (
     get_location_metres,
     get_location_metres_with_alt,
     get_range,
+    ALTITUDE
 )
 
 aviDrone = drone.vehicle
 sitl = drone.sitl
 vector = drone.vector
+mission = drone.mission
 
 # width of the search
 width = 100
 
 # length of the search
-totalLength = 100
+totalLength = 200
 
 # search strip size
 dLength = 20
@@ -181,7 +183,7 @@ def rectangular_primary_search_with_alt(
     print(" Upload new commands to vehicle")
     cmds.upload()
 
-
+aviDrone_commands_copy = []
 # Rectangular search over a flat plane taking angle into account
 def rectangular_primary_search_basic(a_location, width, dLength, totalLength, angle):
     """
@@ -208,8 +210,7 @@ def rectangular_primary_search_basic(a_location, width, dLength, totalLength, an
     # Add new commands. The meaning/order of the parameters is documented in the Command class.
 
     # Add MAV_CMD_NAV_TAKEOFF command. This is ignored if the vehicle is already in the air.
-    cmds.add(
-        Command(
+    start = Command(
             0,
             0,
             0,
@@ -225,7 +226,7 @@ def rectangular_primary_search_basic(a_location, width, dLength, totalLength, an
             0,
             10,
         )
-    )
+    cmds.add(start)
     maxrange = get_range(totalLength, dLength)
     v_dist = 0
     h_dist = 0
@@ -253,8 +254,7 @@ def rectangular_primary_search_basic(a_location, width, dLength, totalLength, an
     print("Rotating")
     for i in rotated:
         point = get_location_metres(a_location, i[1], i[0])
-        cmds.add(
-            Command(
+        myCommand = Command(
                 0,
                 0,
                 0,
@@ -270,11 +270,13 @@ def rectangular_primary_search_basic(a_location, width, dLength, totalLength, an
                 point.lon,
                 0,
             )
+        cmds.add(
+            myCommand
         )
+        aviDrone_commands_copy.append(myCommand)
 
     # add dummy waypoint at final point (lets us know when have reached destination)
-    cmds.add(
-        Command(
+    dummy = Command(
             0,
             0,
             0,
@@ -290,10 +292,11 @@ def rectangular_primary_search_basic(a_location, width, dLength, totalLength, an
             point.lon,
             0,
         )
-    )
-
+    cmds.add(dummy)
+    aviDrone_commands_copy.append(dummy)
     print(" Upload new commands to vehicle")
     cmds.upload()
+
 
 
 # dronekit functions:
@@ -320,11 +323,30 @@ def distance_to_current_waypoint():
 
 def download_mission():
     """
-    Download the current mission from the vehicle.
+    Downloads the current mission and returns it in a list.
+    It is used in save_mission() to get the file information to save.
     """
+    missionlist=[]
     cmds = aviDrone.commands
     cmds.download()
-    cmds.wait_ready()  # wait until download is complete.
+    cmds.wait_ready()
+    for cmd in cmds:
+        missionlist.append(cmd)
+    return missionlist
+
+
+def save_mission(aFileName):
+    """
+    Save a mission in the Waypoint file format (http://qgroundcontrol.org/mavlink/waypoint_protocol#waypoint_file_format).
+    """
+    missionlist = download_mission()
+    output='QGC WPL 110\n'
+    for cmd in missionlist:
+        commandline="%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n" % (cmd.seq,cmd.current,cmd.frame,cmd.command,cmd.param1,cmd.param2,cmd.param3,cmd.param4,cmd.x,cmd.y,cmd.z,cmd.autocontinue)
+        print("x: ", cmd.x, " y: ", cmd.y, " z: ", cmd.z)
+        output+=commandline
+    with open(aFileName, 'w') as file_:
+        file_.write(output)
 
 
 def save_mission(aFileName):
@@ -375,6 +397,68 @@ def arm_and_takeoff(aTargetAltitude):
         time.sleep(1)
 
 
+def return_to_launch():
+    aviDrone.commands.add(
+        Command(
+            0,
+            0,
+            0,
+            mavutil.mavlink.MAV_FRAME_GLOBAL_RELATIVE_ALT,
+            mavutil.mavlink.MAV_CMD_NAV_RETURN_TO_LAUNCH,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+        )
+    )
+
+
+def save_search_to_file(file):
+    # aviDrone.simple_takeoff(ALTITUDE)
+    print("adding takeoff to altitude ", ALTITUDE)
+    aviDrone.commands.add(
+        Command(
+            0,
+            0,
+            0,
+            mavutil.mavlink.MAV_FRAME_GLOBAL_RELATIVE_ALT,
+            mavutil.mavlink.MAV_CMD_NAV_TAKEOFF,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            ALTITUDE,
+        )
+    )
+    print("adding mission")
+    my_angle = 360 - np.degrees(aviDrone.attitude.yaw)
+    if totalAlt == 0:
+        rectangular_primary_search_basic(
+            aviDrone.location.global_frame, width, dLength, totalLength, my_angle
+        )
+    else:
+        rectangular_primary_search_with_alt(
+            aviDrone.location.global_frame, width, dLength, totalLength, totalAlt, my_angle
+        )
+    print("returning to launch")
+    # return_to_launch()
+    save_mission(file)
+    aviDrone.commands.clear()
+    print("Mission saved")
+
+mission_file = "r_mission3.txt"
+print("Saving to file", mission_file)
+save_search_to_file(mission_file)
+
 print("Set mode to GUIDED: ")
 aviDrone.mode = VehicleMode("GUIDED")
 
@@ -399,7 +483,7 @@ arm_and_takeoff(10 + totalAlt)
 print("Starting mission")
 
 aviDrone.commands.next = 0
-
+print("Size of commands start", len(aviDrone.commands))
 # Set mode to AUTO to start mission
 print("Set vehicle mode to AUTO")
 aviDrone.mode = VehicleMode("AUTO")
@@ -408,26 +492,78 @@ aviDrone.mode = VehicleMode("AUTO")
 # Demonstrates getting and setting the command number
 # Uses distance_to_current_waypoint(), a convenience function for finding the
 #   distance to the next waypoint.
-
+commands_copy = []
+print("aviDrone.commands",aviDrone.commands)
+# for command in aviDrone.commands:
+    # commands_copy.append(command)
 print("final waypoint: %s" % (get_range(totalLength, dLength)))
-while True:
-    if aviDrone.mode != "AUTO":
-        time.sleep(1)
+def follow_primary():
+    reached_end = False
+    stopping_point = 0
+    while True:
+        if aviDrone.mode != "AUTO":
+            time.sleep(1)
 
-    nextwaypoint = aviDrone.commands.next
-    print(
-        "Distance to waypoint (%s): %s" % (nextwaypoint, distance_to_current_waypoint())
-    )
-
-    if nextwaypoint == get_range(
-        totalLength, dLength
-    ):  # Dummy waypoint - as soon as we reach last waypoint this is true and we exit.
+        nextwaypoint = aviDrone.commands.next
         print(
-            "Exit 'standard' mission when start heading to final waypoint (%s)"
-            % nextwaypoint
+            "Distance to waypoint (%s): %s" % (nextwaypoint, distance_to_current_waypoint())
         )
+
+        if mission.break_condition():
+            # print("Size of commands break", len(aviDrone.commands))
+            aviDrone.commands.clear()
+            aviDrone.commands.upload()
+            time.sleep(1)
+            stopping_point = nextwaypoint
+            break
+
+        if nextwaypoint == get_range(
+            totalLength, dLength
+        ):  # Dummy waypoint - as soon as we reach last waypoint this is true and we exit.
+            print(
+                "Exit 'standard' mission when start heading to final waypoint (%s)"
+                % nextwaypoint
+            )
+            reached_end = True
+            stopping_point = nextwaypoint
+            break
+        time.sleep(1)
+    return reached_end, stopping_point
+
+reached_end, stopping_point = follow_primary()
+
+print("holding alt")
+aviDrone.mode = VehicleMode("ALT_HOLD")
+hold_count = 0
+hold_sec = 1
+while True:
+    if aviDrone.mode != "ALT_HOLD":
+        print("Not holding alt")
+        time.sleep(1)
+    if(hold_count != 0):
+        time.sleep(hold_sec)
         break
-    time.sleep(1)
+    hold_count += 1
+
+def reupload_commands(index):
+    cmds = aviDrone.commands
+    for command in aviDrone_commands_copy:
+        cmds.add(command)
+    cmds.next = index
+    cmds.upload()
+
+reupload_commands(stopping_point)
+print("Reuploaded size", aviDrone.commands.count)
+time.sleep(1)
+
+reached_end2, stopping_point2 = follow_primary()
+
+# Switch to secondary search mode
+EN_SECONDARY_SWITCH = True
+print("Switch to secondary:")
+if EN_SECONDARY_SWITCH and not reached_end:
+    import secondary
+    # secondary.run()
 
 print("Return to launch")
 aviDrone.mode = VehicleMode("RTL")

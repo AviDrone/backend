@@ -24,7 +24,7 @@ IS_TEST = False  # for running simulations
 
 # DEFAULT PARAMETERS
 MAGNITUDE = 1  # Distance the vehicle goes
-ALTITUDE = 4  # Altitude of the flight path
+ALTITUDE = 15  # Altitude of the flight path
 DEGREES = 10  # Amount to rotate in yaw
 DEGREE_ERROR = 2  # Number of degrees error for rotation
 DISTANCE_ERROR = 0.35  # Error in distance before target reached
@@ -149,6 +149,16 @@ class Mission:
         log.info("-- Waiting for GUIDED mode...")
         while self.vehicle.mode.name != "GUIDED":
             time.sleep(1)
+
+    # Any condition we want to break the primary search can be done in this command. 
+    # This will be called repeatedly and return true when the break condition is true.
+    def break_condition(self):
+        nextwaypoint = self.vehicle.commands.next
+        if nextwaypoint == 6:
+            print("breaking...")
+            return True
+        return False
+
 
     def takeoff_to_altitude(self):
         self.vehicle.simple_takeoff(ALTITUDE)
