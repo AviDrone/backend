@@ -18,21 +18,21 @@ import util
 from dronekit import LocationGlobal, VehicleMode, connect
 from transceiver import Transceiver
 
-AviDrone = drone.vehicle
-
+Avidrone = drone.vehicle
+search = util.Search()
 
 def run(transceiver):
-    search = util.Search()
-    if util.IS_TEST:
-        transceiver = search.read_transceiver()  # mock transceiver
-
-    signal_found = False
     log.info("-- SECONDARY SEARCH --")
-    util.Search.start()
+    signal_found = False
+    uav_pos = [0,0,0]
+    beacon_pos = [0,0,0]
+    if util.IS_TEST:
+        mock_transceiver = search.read_transceiver(uav_pos,beacon_pos)  # mock transceiver
+    else:
+        transceiver = Transceiver()
+    search.start()
     gps_window = util.WINDOW_SIZE
-    while AviDrone.mode.name == "GUIDED":
-        if transceiver is not search.read_transceiver():
-            transceiver = search.read_transceiver()  # real transceiver
+    while Avidrone.mode.name == "GUIDED":
         log.info(transceiver.direction, ", ", transceiver.distance)
 
         if transceiver.direction < 2:  # Turn left
@@ -60,9 +60,9 @@ def run(transceiver):
 
                 if gps_window.distance[2] <= util.LAND_THRESHOLD:
                     log.info("-- Landing")
-                    AviDrone.mode = VehicleMode("LAND")
+                    Avidrone.mode = VehicleMode("LAND")
                     signal_found = True
-
+ 
                 if signal_found:
                     current_time = datetime.datetime.now()
                     print("--- SIGNAL FOUND --- ", f"-- time: {current_time}")
@@ -89,14 +89,14 @@ def run(transceiver):
                 # If the minimum data point is in the first index,
                 log.info("continue forward")
                 util.Search.go_to_location(
-                    util.MAGNITUDE, AviDrone.attitude.yaw, AviDrone
+                    util.MAGNITUDE, Avidrone.attitude.yaw, Avidrone
                 )
 
             else:
                 log.info(f"Did not find signal at altitude: {util.ALTITUDE}")
                 log.info("Climbing...")
                 util.Search.go_to_location(
-                    util.MAGNITUDE, AviDrone.attitude.yaw, AviDrone
+                    util.MAGNITUDE, Avidrone.attitude.yaw, Avidrone
                 )
         time.sleep(2)
 

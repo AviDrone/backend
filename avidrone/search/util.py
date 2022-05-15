@@ -6,6 +6,7 @@ from __future__ import print_function
 import argparse
 import asyncio
 import datetime
+import logging as log
 import math
 import time
 
@@ -111,7 +112,8 @@ class Search:
 
     def read_transceiver(self, uav_pos, beacon_pos):
         from avidrone.transceiver import util as t_util
-        return t_util.mock_beacon(uav_pos, beacon_pos)
+        mock_beacon = t_util.mock_beacon(uav_pos, beacon_pos)
+        return mock_beacon
 
 
 class Mission:
@@ -129,36 +131,33 @@ class Mission:
         self.cw = -1  # TODO get correct value
 
     def start(self):
-
-        print("-- Waiting for vehicle to start...")
+        log.info("-- Waiting for vehicle to start...")
         while not self.vehicle.is_armable:
             time.sleep(1)
 
         self.vehicle.mode = VehicleMode("GUIDED")
         self.vehicle.armed = True
 
-        print("-- Arming...")
+        log.info("-- Arming...")
         while not self.vehicle.is_armable:
             time.sleep(1)
 
         if self.vehicle.armed:
-            print(f"-- Armed: {self.vehicle.armed}")
+            log.info(f"-- Is armed: {self.vehicle.armed}")
             self.takeoff_to_altitude()
 
-        print("-- Setting GUIDED flight mode")
-        print("-- Waiting for GUIDED mode...")
-
+        log.info("-- Waiting for GUIDED mode...")
         while self.vehicle.mode.name != "GUIDED":
             time.sleep(1)
 
     def takeoff_to_altitude(self):
-        print(f"-- Taking off to altitude (m): {ALTITUDE} \n")
         self.vehicle.simple_takeoff(ALTITUDE)
+        log.info(f"-- Taking off to altitude (m): {ALTITUDE} \n")
 
         while True:
             current_alt = self.vehicle.location.global_relative_frame.alt
             if current_alt >= ALTITUDE * 0.95:
-                print(f"-- Reached {ALTITUDE}m")
+                log.info(f"-- Reached {ALTITUDE}m")
                 break
             time.sleep(1)
 
