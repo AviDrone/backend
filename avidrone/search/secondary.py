@@ -39,11 +39,11 @@ def run(transceiver):
 
         if transceiver.direction < 2:  # Turn left
             log.info("-- Turning left")
-            util.Search.condition_yaw(-util.DEGREES, True)
+            util.Mission.condition_yaw(-util.DEGREES, True)
 
         elif transceiver.direction > 2:  # Turn right
             log.info("-- Turning right")
-            util.Search.condition_yaw(util.DEGREES, True)
+            util.Mission.condition_yaw(util.DEGREES, True)
 
         elif transceiver.direction == 2:  # Continue forward
             log.info("-- Continuing forward")
@@ -56,7 +56,7 @@ def run(transceiver):
                 # If the minimum is the center point of the gps_window we need to go
                 # back to that location, Min index = middle
 
-                util.Search.simple_goto_wait(
+                util.Mission.simple_goto_wait(
                     gps_window.gps_points[int((gps_window.window_size - 1) / 2)]
                 )
 
@@ -81,8 +81,8 @@ def run(transceiver):
                 # If the minimum data point is the last one in the array,
                 log.info("too far in the wrong direction")
 
-                util.Search.condition_yaw(180, True)
-                util.Search.simple_goto_wait(
+                util.Mission.condition_yaw(180, True)
+                util.Mission.simple_goto_wait(
                     gps_window.gps_points[gps_window.window_size - 1]
                 )
                 gps_window.purge_gps_window()
@@ -90,22 +90,22 @@ def run(transceiver):
             elif gps_window.get_minimum_index() == 0:
                 # If the minimum data point is in the first index,
                 log.info("continue forward")
-                util.Search.go_to_location(
+                util.Mission.go_to_location(
                     util.MAGNITUDE, Avidrone.attitude.yaw, Avidrone
                 )
 
             else:
                 log.info(f"Did not find signal at altitude: {util.ALTITUDE}")
                 log.info("Climbing...")
-                util.Search.go_to_location(
+                util.Mission.go_to_location(
                     util.MAGNITUDE, Avidrone.attitude.yaw, Avidrone
                 )
         time.sleep(2)
 
 
 if __name__ == "__main__":
-    uav_pos = [2, 2, 2]  # TODO replace this with actual positions
-    beacon_pos = [1, 1, 1]  # TODO replace this with actual positions
+    uav_pos = [20, 20, 2]  # Example
+    beacon_pos = [1, 1, 1]  # Example
     search = util.Search()
     transceiver = search.read_transceiver(uav_pos, beacon_pos)
     run(transceiver)
