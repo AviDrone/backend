@@ -21,31 +21,32 @@ import transceiver
 Avidrone = drone.vehicle
 search = util.Search()
 
-IS_TEST = True
+IS_TEST = True  # set to False for real flight
 
 
-def run(transceiver):
+def run(beacon):
     log.info("-- SECONDARY SEARCH --")
     signal_found = False
     uav_pos = [0, 0, 0]
     beacon_pos = [0, 0, 0]
     if IS_TEST:
-        transceiver = search.read_transceiver( uav_pos, beacon_pos)  # mock transceiver
-
+        beacon = search.read_transceiver( uav_pos, beacon_pos)  # mock transceiver
+    else:
+        beacon = transceiver.Transceiver()
     search.start()
     gps_window = util.WINDOW_SIZE
     while Avidrone.mode.name == "GUIDED":
         log.info(transceiver.direction, ", ", transceiver.distance)
 
-        if transceiver.direction < 2:  # Turn left
+        if beacon.direction < 2:  # Turn left
             log.info("-- Turning left")
             util.Mission.condition_yaw(-util.DEGREES, True)
 
-        elif transceiver.direction > 2:  # Turn right
+        elif beacon.direction > 2:  # Turn right
             log.info("-- Turning right")
             util.Mission.condition_yaw(util.DEGREES, True)
 
-        elif transceiver.direction == 2:  # Continue forward
+        elif beacon.direction == 2:  # Continue forward
             log.info("-- Continuing forward")
             gps_window.add_point(search.get_global_pos(), transceiver.distance)
             if (
