@@ -59,7 +59,7 @@ if __name__ == "__main__":
         )  # py -3.8 main.py --primary --v38 --sim
 
     elif args.secondary and not args.primary:
-        os.system("python3 avidrone/search/secondary.py")  # python3 main.py --secondary
+        os.system("python3 avidrone/search/secondary.py --connect udp:127.0.0.1:14551")  # python3 main.py --secondary
 
     else:
-        os.system("python3 avidrone/search/search.py")  # python3 main.py
+        os.system("python3 avidrone/search/search.py --connect udp:127.0.0.1:14551")  # python3 main.py

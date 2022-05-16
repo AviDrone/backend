@@ -55,7 +55,7 @@ def get_angle(disp):
     # between -15 and 15. That makes it likely that the beacon gets the
     # wrong direction roughly a third of the time.
 
-    print(theta + random.uniform(-15, 15))
+    # print(theta + random.uniform(-15, 15))
 
     return theta + random.uniform(-15, 15)
 

@@ -18,6 +18,10 @@ from dronekit import (
     VehicleMode,
     connect,
 )
+from search.transceiver.util import mock_beacon
+from transceiver import transceiver
+
+Beacon = transceiver.Transceiver()
 
 IS_VERBOSE = False  # for verbose command-line interface output
 IS_TEST = False  # for running simulations
@@ -110,10 +114,10 @@ class Search:
     def get_global_pos(self):
         return self.global_frame
 
-    def read_transceiver(self, uav_pos, beacon_pos):
-        from avidrone.transceiver import util as t_util
-
-        mock_beacon = t_util.mock_beacon(uav_pos, beacon_pos)
+    def mock_transceiver(self, uav_pos, beacon_pos):
+        mock_beacon = transceiver.mock_beacon(uav_pos, beacon_pos)
+        mock_beacon.distance = Beacon.distance
+        mock_beacon.direction = Beacon.direction
         return mock_beacon
 
 
@@ -155,7 +159,7 @@ class Mission:
     # This will be called repeatedly and return true when the break condition is true.
     def break_condition(self):
         nextwaypoint = self.vehicle.commands.next
-        if nextwaypoint == 6:
+        if nextwaypoint == 4:
             print("breaking...")
             return True
         return False

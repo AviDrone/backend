@@ -35,7 +35,7 @@ vector = drone.vector
 mission = drone.mission
 
 # width of the search
-width = 100
+width = 200
 
 # length of the search
 totalLength = 200
@@ -43,7 +43,7 @@ totalLength = 200
 # search strip size
 dLength = 20
 
-# height of the slope
+# height 
 totalAlt = 0
 
 # Rectangular search taking angle and altitude into account
@@ -584,15 +584,43 @@ def reupload_commands(index):
     cmds = aviDrone.commands
     for command in aviDrone_commands_copy:
         cmds.add(command)
-    cmds.next = index
+    print("nxt1:", cmds.next)
     cmds.upload()
+    time.sleep(1)
+    # go back one when we check again. Further testing required to see if this. is helpful
+    cmds.next = index - 1
+    print("nxt2:", cmds.next)
 
 
 reupload_commands(stopping_point)
 print("Reuploaded size", aviDrone.commands.count)
 time.sleep(1)
 
-reached_end2, stopping_point2 = follow_primary()
+reached_end_again = False
+if not reached_end:
+    while not reached_end_again:
+        reupload_commands(stopping_point)
+        print("Reuploaded size", aviDrone.commands.count)
+        print("Set vehicle mode to AUTO")
+        aviDrone.mode = VehicleMode("AUTO")
+        time.sleep(1)
+
+        reached_end_again, stopping_point2 = follow_primary()
+
+        print("holding alt again")
+        aviDrone.mode = VehicleMode("ALT_HOLD")
+        hold_count = 0
+        hold_sec = 1
+        while True:
+            if aviDrone.mode != "ALT_HOLD":
+                print("Not holding alt again")
+                time.sleep(1)
+            if(hold_count != 0):
+                time.sleep(hold_sec)
+                break
+            hold_count += 1
+        
+        # if aviDrone.
 
 # Switch to secondary search mode
 EN_SECONDARY_SWITCH = True
