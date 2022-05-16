@@ -6,6 +6,7 @@ import numpy as np
 random.seed(492)
 # distances are euclidean
 
+
 def mock_beacon(uav_pos, beacon_pos):
     # UAV position
     x_1 = uav_pos[0]
@@ -55,7 +56,7 @@ def get_angle(disp):
     # wrong direction roughly a third of the time.
 
     print(theta + random.uniform(-15, 15))
-    
+
     return theta + random.uniform(-15, 15)
 
 
@@ -69,7 +70,7 @@ def get_direction(theta):
 
     """
 
-    direction = -1    # direction not acquired
+    direction = -1  # direction not acquired
 
     if -90 <= theta < -30:
         direction = 0

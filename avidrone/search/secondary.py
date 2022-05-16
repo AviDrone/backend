@@ -21,13 +21,16 @@ import transceiver
 Avidrone = drone.vehicle
 search = util.Search()
 
+
 def run(transceiver):
     log.info("-- SECONDARY SEARCH --")
     signal_found = False
-    uav_pos = [0,0,0]
-    beacon_pos = [0,0,0]
+    uav_pos = [0, 0, 0]
+    beacon_pos = [0, 0, 0]
     if util.IS_TEST:
-        mock_transceiver = search.read_transceiver(uav_pos,beacon_pos)  # mock transceiver
+        mock_transceiver = search.read_transceiver(
+            uav_pos, beacon_pos
+        )  # mock transceiver
     else:
         transceiver = Transceiver()
     search.start()
@@ -62,7 +65,7 @@ def run(transceiver):
                     log.info("-- Landing")
                     Avidrone.mode = VehicleMode("LAND")
                     signal_found = True
- 
+
                 if signal_found:
                     current_time = datetime.datetime.now()
                     print("--- SIGNAL FOUND --- ", f"-- time: {current_time}")

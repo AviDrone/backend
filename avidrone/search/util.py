@@ -105,13 +105,14 @@ class Search:
         d_lat = lat_b - lat_a
         d_lon = lon_b - lon_a
 
-        return math.sqrt(d_lat**2 + d_lon**2) * 1.113195e5
+        return math.sqrt(d_lat ** 2 + d_lon ** 2) * 1.113195e5
 
     def get_global_pos(self):
         return self.global_frame
 
     def read_transceiver(self, uav_pos, beacon_pos):
         from avidrone.transceiver import util as t_util
+
         mock_beacon = t_util.mock_beacon(uav_pos, beacon_pos)
         return mock_beacon
 
@@ -150,7 +151,7 @@ class Mission:
         while self.vehicle.mode.name != "GUIDED":
             time.sleep(1)
 
-    # Any condition we want to break the primary search can be done in this command. 
+    # Any condition we want to break the primary search can be done in this command.
     # This will be called repeatedly and return true when the break condition is true.
     def break_condition(self):
         nextwaypoint = self.vehicle.commands.next
@@ -158,7 +159,6 @@ class Mission:
             print("breaking...")
             return True
         return False
-
 
     def takeoff_to_altitude(self):
         self.vehicle.simple_takeoff(ALTITUDE)
