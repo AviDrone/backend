@@ -68,7 +68,10 @@ def run(beacon):
 
                 if signal_found:
                     current_time = datetime.datetime.now()
-                    print("--- SIGNAL FOUND --- ", f"-- time: {current_time}")
+                    print(f"\n-------- VICTIM FOUND: {transceiver.signal_detected} -------- ")
+                    print(f"-- Time: {current_time}")
+                    print(f"-- Location: {Avidrone.location.global_frame}\n")
+            
 
                 else:
                     log.info("Not close, continuing")
