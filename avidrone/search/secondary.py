@@ -21,6 +21,7 @@ import transceiver
 Avidrone = drone.vehicle
 search = util.Search()
 
+# If test, use the following command to run
 IS_TEST = True  # set to False for real flight
 
 
@@ -30,7 +31,7 @@ def run(beacon):
     uav_pos = [0, 0, 0]
     beacon_pos = [0, 0, 0]
     if IS_TEST:
-        beacon = search.read_transceiver( uav_pos, beacon_pos)  # mock transceiver
+        beacon = search.read_transceiver(uav_pos, beacon_pos)  # mock transceiver
     else:
         beacon = transceiver.Transceiver()
     search.start()
@@ -68,10 +69,11 @@ def run(beacon):
 
                 if signal_found:
                     current_time = datetime.datetime.now()
-                    print(f"\n-------- VICTIM FOUND: {transceiver.signal_detected} -------- ")
+                    print(
+                        f"\n-------- VICTIM FOUND: {transceiver.signal_detected} -------- "
+                    )
                     print(f"-- Time: {current_time}")
                     print(f"-- Location: {Avidrone.location.global_frame}\n")
-            
 
                 else:
                     log.info("Not close, continuing")

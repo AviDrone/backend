@@ -11,17 +11,16 @@ import math
 import time
 
 import numpy as np
+from drone import vehicle
 from dronekit import (
     Command,
     LocationGlobal,
     LocationGlobalRelative,
     VehicleMode,
-    connect,
 )
-from search.transceiver.util import mock_beacon
 from transceiver import transceiver
 
-Beacon = transceiver.Transceiver()
+Beacon = transceiver.transceiver()
 
 IS_VERBOSE = False  # for verbose command-line interface output
 IS_TEST = False  # for running simulations
@@ -123,7 +122,6 @@ class Search:
 
 class Mission:
     def __init__(self):
-        from drone import vehicle
         from pymavlink import mavutil
 
         self.aviDrone = vehicle

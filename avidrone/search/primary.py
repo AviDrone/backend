@@ -43,7 +43,7 @@ totalLength = 200
 # search strip size
 dLength = 20
 
-# height 
+# height
 totalAlt = 0
 
 # Rectangular search taking angle and altitude into account
@@ -615,11 +615,11 @@ if not reached_end:
             if aviDrone.mode != "ALT_HOLD":
                 print("Not holding alt again")
                 time.sleep(1)
-            if(hold_count != 0):
+            if hold_count != 0:
                 time.sleep(hold_sec)
                 break
             hold_count += 1
-        
+
         # if aviDrone.
 
 # Switch to secondary search mode

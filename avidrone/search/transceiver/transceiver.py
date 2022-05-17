@@ -7,8 +7,8 @@ class Transceiver:
     def __init__(self):
         self.max_range = 20  # meters
         self.signal_detected = False  # not detected
-        self.direction = -1     # default
-        self.distance = -1   # default
+        self.direction = -1  # default
+        self.distance = -1  # default
 
 
 transceiver = Transceiver()
@@ -21,7 +21,7 @@ beacon_pos = [35.363862, 149.165337, 0.0]  # Example
 
 while True:
     timeout_count += 1
-    
+
     if timeout_count == 999:
         timeout = True
 
@@ -38,7 +38,7 @@ while True:
             print(f"-- Time: {current_time}")
             print(f"-- Location: {beacon_pos[0], beacon_pos[1], beacon_pos[2]}\n")
         break
-    
+
     if uav_pos[0] < beacon_pos[0]:  # x
         uav_pos[0] += 0.000001
         print("x_uav < x_beacon")
@@ -46,7 +46,7 @@ while True:
     elif uav_pos[0] > beacon_pos[0]:  # x
         uav_pos[0] -= 0.000001
         print("x_uav > x_beacon")
-        
+
     if uav_pos[1] < beacon_pos[1]:  # y
         uav_pos[1] += 0.000001
         print("y_uav < y_beacon")
@@ -56,7 +56,7 @@ while True:
         print("y_uav > y_beacon")
 
     else:
-        print("searching...")        
+        print("searching...")
         if timeout:
             print("\n reached timeout \n")
             current_time = datetime.datetime.now()

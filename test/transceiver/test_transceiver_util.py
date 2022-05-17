@@ -6,7 +6,7 @@ from unittest import TestCase
 
 import numpy as np
 
-from avidrone.transceiver import util
+from avidrone.search.transceiver import util
 
 
 class TestTransceiver(TestCase):
