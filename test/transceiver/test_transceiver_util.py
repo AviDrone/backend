@@ -11,8 +11,8 @@ from avidrone.search.transceiver import util
 
 class TestTransceiver(TestCase):
     random.seed(492)
-    uav = [12, 120, 25]
-    beacon = [60, 60, 1]
+    uav = [136, 145, 50]  # Example
+    beacon = [35, 120, 2]  # Example
 
     displacement = util.get_displacement(uav[0], beacon[0], uav[1], beacon[1], uav[2], beacon[2])
     theta = util.get_angle(displacement)
