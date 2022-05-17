@@ -101,4 +101,4 @@ if __name__ == "__main__":
     uav_position = [136, 145, 50]  # Example
     beacon_position = [35, 120, 2]  # Example
     mock_beacon_ = mock_beacon(uav_position, beacon_position)
-    log.info("Direction, Distance: ", mock_beacon_)
+    log.info(f"Direction, Distance: {mock_beacon_}")

@@ -12,6 +12,9 @@ import logging as log
 import math
 import time
 
+import primary
+import secondary
+import util
 from dronekit import (
     Command,
     LocationGlobal,
@@ -19,10 +22,6 @@ from dronekit import (
     VehicleMode,
     connect,
 )
-
-import primary
-import secondary
-import util
 
 
 def search():

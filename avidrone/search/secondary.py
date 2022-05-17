@@ -12,11 +12,11 @@ import logging as log
 import math
 import time
 
+import drone
 import dronekit_sitl
+import transceiver
 from dronekit import LocationGlobal, VehicleMode, connect
 
-import drone
-import transceiver
 from util import (
     ALTITUDE,
     DEGREES,
