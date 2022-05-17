@@ -24,18 +24,18 @@ class TestTransceiver(TestCase):
         assert TestTransceiver.displacement[2] == -24  # dz
 
     def test_get_distance_xy(self):
-        test_displacement = (
+        test_displacement = math.sqrt((
             TestTransceiver.displacement[0] ** 2 +
             TestTransceiver.displacement[1] ** 2
-        ) ** -2
+        ))
         assert test_displacement == util.get_distance_xy(TestTransceiver.displacement)
 
     def test_get_distance_xyz(self):
-        test_displacement = (
+        test_displacement = math.sqrt((
             TestTransceiver.displacement[0] ** 2 +
             TestTransceiver.displacement[1] ** 2 +
             TestTransceiver.displacement[2] ** 2
-        ) ** -2
+        ))
         assert test_displacement == util.get_distance_xyz(TestTransceiver.displacement)
 
     def test_normalize(self):
