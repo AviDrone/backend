@@ -58,8 +58,11 @@ if __name__ == "__main__":
             "py -3.8 avidrone/search/primary.py --connect udp:127.0.0.1:14551"
         )  # py -3.8 main.py --primary --v38 --sim
 
+    if args.secondary and args.sim and not args.primary and not args.v38:
+        os.system("python3 avidrone/search/transceiver/transceiver.py --connect udp:127.0.0.1:14551")
+        
     elif args.secondary and not args.primary:
         os.system("python3 avidrone/search/secondary.py --connect udp:127.0.0.1:14551")  # python3 main.py --secondary
-
+    
     else:
         os.system("python3 avidrone/search/search.py --connect udp:127.0.0.1:14551")  # python3 main.py
