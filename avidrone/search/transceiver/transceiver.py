@@ -1,6 +1,7 @@
-from time import sleep
+import time
 import datetime
 import util
+import logging as log
 
 
 class Transceiver:
@@ -14,52 +15,59 @@ class Transceiver:
 transceiver = Transceiver()
 timeout_count = 0
 timeout = False
-# --- scratch ----
-uav_pos = [35.363262, 149.165237, 25.0]  # Example
-beacon_pos = [35.363862, 149.165337, 0.0]  # Example
+
+uav_pos = [136, 145, 50]  # Example
+beacon_pos = [35, 120, 2]  # Example
 
 
 while True:
     timeout_count += 1
 
-    if timeout_count == 999:
+    if timeout_count == 9999:
         timeout = True
 
     mock_beacon = util.mock_beacon(uav_pos, beacon_pos)
     transceiver.direction = mock_beacon[0]
     transceiver.distance = mock_beacon[1]
     print(f"direction, distance: {transceiver.direction, transceiver.distance}")
+    mission_begin_time = datetime.datetime.now()
 
     if uav_pos[0] == beacon_pos[0] and uav_pos[1] == beacon_pos[1]:
         transceiver.signal_detected = True
         if transceiver.signal_detected:
             current_time = datetime.datetime.now()
+            mission_end_time = datetime.datetime.now()
+            mission_time = mission_end_time - mission_begin_time
             print(f"\n-------- VICTIM FOUND: {transceiver.signal_detected} -------- ")
-            print(f"-- Time: {current_time}")
-            print(f"-- Location: {beacon_pos[0], beacon_pos[1], beacon_pos[2]}\n")
+            print(f"-- Current ime: {current_time}")
+            print("-- Mission time: ",mission_time)
+            print(f"-- Location: {uav_pos[0], uav_pos[1], uav_pos[2]}\n")
         break
 
     if uav_pos[0] < beacon_pos[0]:  # x
-        uav_pos[0] += 0.000001
-        print("x_uav < x_beacon")
+        uav_pos[0] += 1
+        log.info("x_uav < x_beacon")
 
     elif uav_pos[0] > beacon_pos[0]:  # x
-        uav_pos[0] -= 0.000001
-        print("x_uav > x_beacon")
+        uav_pos[0] -= 1
+        log.info("x_uav > x_beacon")
 
     if uav_pos[1] < beacon_pos[1]:  # y
-        uav_pos[1] += 0.000001
-        print("y_uav < y_beacon")
+        uav_pos[1] += 1
+        log.info("y_uav < y_beacon")
 
     elif uav_pos[1] > beacon_pos[1]:  # y
-        uav_pos[1] -= 0.000001
-        print("y_uav > y_beacon")
+        uav_pos[1] -= 1
+        log.info("y_uav > y_beacon")
 
     else:
         print("searching...")
+        time.sleep(0.20) # change back
         if timeout:
             print("\n reached timeout \n")
             current_time = datetime.datetime.now()
-            print(f"\n-------- VICTIM FOUND: {transceiver.signal_detected} -------- ")
-            print(f"-- Time: {current_time}")
+            mission_end_time = datetime.datetime.now()
+            mission_time = mission_end_time - mission_begin_time
+            print(f"\n-------- VICTIM NOT FOUND: {transceiver.signal_detected} -------- ")
+            print("-- Mission time: ",mission_time)
             break

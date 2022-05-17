@@ -2,7 +2,7 @@ import math
 import random
 
 import numpy as np
-
+import logging as log
 random.seed(492)
 # distances are euclidean
 
@@ -32,11 +32,11 @@ def get_displacement(x_1, x_2, y_1, y_2, z_1=0, z_2=0):
 
 
 def get_distance_xy(disp):
-    return (disp[0] ** 2 + disp[1] ** 2) ** -2
+    return math.sqrt( (disp[0] ** 2 + disp[1] ** 2) )
 
 
 def get_distance_xyz(disp):
-    return (disp[0] ** 2 + disp[1] ** 2 + disp[2] ** 2) ** -2
+    return math.sqrt( (disp[0] ** 2 + disp[1] ** 2 + disp[2] ** 2) )
 
 
 def normalize(disp):
@@ -49,8 +49,13 @@ def get_angle(disp):
     fwd = [1, 0]  # UAV's forward vector.
     v_d = [disp[0], disp[1]]
     d_xy = get_distance_xy(disp)
-    theta = np.arccos(np.dot(v_d, fwd) / d_xy)
+    
+    if d_xy != 0:
+        theta = np.arccos(np.dot(v_d, fwd) / d_xy)
 
+    else:
+        d_xy = 0.01
+        theta = theta = np.arccos(np.dot(v_d, fwd) / d_xy)
     # To account for measurement inconsistencies. We use a random value
     # between -15 and 15. That makes it likely that the beacon gets the
     # wrong direction roughly a third of the time.
@@ -94,4 +99,4 @@ if __name__ == "__main__":
     uav_position = [12, 120, 25]  # Example
     beacon_position = [60, 60, 1]  # Example
     mock_beacon_ = mock_beacon(uav_position, beacon_position)
-    print("Direction, Distance: ", mock_beacon_)
+    log.info("Direction, Distance: ", mock_beacon_)
