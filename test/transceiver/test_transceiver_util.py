@@ -19,9 +19,9 @@ class TestTransceiver(TestCase):
     print(theta)
 
     def test_get_displacement(self):
-        assert TestTransceiver.displacement[0] == 48  # dx
-        assert TestTransceiver.displacement[1] == -60  # dy
-        assert TestTransceiver.displacement[2] == -24  # dz
+        assert TestTransceiver.displacement[0] == -101  # dx
+        assert TestTransceiver.displacement[1] == -25  # dy
+        assert TestTransceiver.displacement[2] == -48  # dz
 
     def test_get_distance_xy(self):
         test_displacement = math.sqrt((

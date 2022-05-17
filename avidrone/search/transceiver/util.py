@@ -28,6 +28,7 @@ def mock_beacon(uav_pos, beacon_pos):
 
 
 def get_displacement(x_1, x_2, y_1, y_2, z_1=0, z_2=0):
+    print([x_2 - x_1, y_2 - y_1, z_2 - z_1])
     return [x_2 - x_1, y_2 - y_1, z_2 - z_1]
 
 
@@ -96,7 +97,9 @@ def get_direction(theta):
 
 
 if __name__ == "__main__":
-    uav_position = [12, 120, 25]  # Example
-    beacon_position = [60, 60, 1]  # Example
+    uav_position = [136, 145, 50]  # Example
+    beacon_position = [35, 120, 2]  # Example
     mock_beacon_ = mock_beacon(uav_position, beacon_position)
     log.info("Direction, Distance: ", mock_beacon_)
+
+
