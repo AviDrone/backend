@@ -12,14 +12,29 @@ import logging as log
 import math
 import time
 
-import drone
 import dronekit_sitl
-import util
 from dronekit import LocationGlobal, VehicleMode, connect
+
+import drone
 import transceiver
+from util import (
+    ALTITUDE,
+    DEGREES,
+    LAND_THRESHOLD,
+    MAGNITUDE,
+    WINDOW_SIZE,
+    Mission,
+    get_distance_metres,
+    get_location_metres,
+    get_location_metres_with_alt,
+    get_range,
+)
 
 Avidrone = drone.vehicle
-search = util.Search()
+sitl = drone.sitl
+vector = drone.vector
+mission = drone.mission
+search = drone.search
 
 # If test, use the following command to run
 IS_TEST = True  # set to False for real flight
@@ -35,17 +50,17 @@ def run(beacon):
     else:
         beacon = transceiver.Transceiver()
     search.start()
-    gps_window = util.WINDOW_SIZE
+    gps_window = WINDOW_SIZE
     while Avidrone.mode.name == "GUIDED":
         log.info(transceiver.direction, ", ", transceiver.distance)
 
         if beacon.direction < 2:  # Turn left
             log.info("-- Turning left")
-            util.Mission.condition_yaw(-util.DEGREES, True)
+            Mission.condition_yaw(-DEGREES, True)
 
         elif beacon.direction > 2:  # Turn right
             log.info("-- Turning right")
-            util.Mission.condition_yaw(util.DEGREES, True)
+            Mission.condition_yaw(DEGREES, True)
 
         elif beacon.direction == 2:  # Continue forward
             log.info("-- Continuing forward")
@@ -58,11 +73,11 @@ def run(beacon):
                 # If the minimum is the center point of the gps_window we need to go
                 # back to that location, Min index = middle
 
-                util.Mission.simple_goto_wait(
+                Mission.simple_goto_wait(
                     gps_window.gps_points[int((gps_window.window_size - 1) / 2)]
                 )
 
-                if gps_window.distance[2] <= util.LAND_THRESHOLD:
+                if gps_window.distance[2] <= LAND_THRESHOLD:
                     log.info("-- Landing")
                     Avidrone.mode = VehicleMode("LAND")
                     signal_found = True
@@ -87,8 +102,8 @@ def run(beacon):
                 # If the minimum data point is the last one in the array,
                 log.info("too far in the wrong direction")
 
-                util.Mission.condition_yaw(180, True)
-                util.Mission.simple_goto_wait(
+                Mission.condition_yaw(180, True)
+                Mission.simple_goto_wait(
                     gps_window.gps_points[gps_window.window_size - 1]
                 )
                 gps_window.purge_gps_window()
@@ -96,22 +111,18 @@ def run(beacon):
             elif gps_window.get_minimum_index() == 0:
                 # If the minimum data point is in the first index,
                 log.info("continue forward")
-                util.Mission.go_to_location(
-                    util.MAGNITUDE, Avidrone.attitude.yaw, Avidrone
-                )
+                Mission.go_to_location(MAGNITUDE, Avidrone.attitude.yaw, Avidrone)
 
             else:
-                log.info(f"Did not find signal at altitude: {util.ALTITUDE}")
+                log.info(f"Did not find signal at altitude: {ALTITUDE}")
                 log.info("Climbing...")
-                util.Mission.go_to_location(
-                    util.MAGNITUDE, Avidrone.attitude.yaw, Avidrone
-                )
+                Mission.go_to_location(MAGNITUDE, Avidrone.attitude.yaw, Avidrone)
         time.sleep(2)
 
 
 if __name__ == "__main__":
     uav_pos = [20, 20, 2]  # Example
     beacon_pos = [1, 1, 1]  # Example
-    search = util.Search()
+    search = drone.search
     transceiver = search.read_transceiver(uav_pos, beacon_pos)
     run(transceiver)

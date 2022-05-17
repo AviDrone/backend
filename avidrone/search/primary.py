@@ -11,7 +11,6 @@ import argparse
 import logging as log
 import time
 
-import drone
 import numpy as np
 from dronekit import (
     Command,
@@ -21,12 +20,14 @@ from dronekit import (
     connect,
 )
 from pymavlink import mavutil
+
+import drone
 from util import (
+    ALTITUDE,
     get_distance_metres,
     get_location_metres,
     get_location_metres_with_alt,
     get_range,
-    ALTITUDE,
 )
 
 aviDrone = drone.vehicle

@@ -1,8 +1,9 @@
+import logging as log
 import math
 import random
 
 import numpy as np
-import logging as log
+
 random.seed(492)
 # distances are euclidean
 
@@ -33,11 +34,11 @@ def get_displacement(x_1, x_2, y_1, y_2, z_1=0, z_2=0):
 
 
 def get_distance_xy(disp):
-    return math.sqrt( (disp[0] ** 2 + disp[1] ** 2) )
+    return math.sqrt((disp[0] ** 2 + disp[1] ** 2))
 
 
 def get_distance_xyz(disp):
-    return math.sqrt( (disp[0] ** 2 + disp[1] ** 2 + disp[2] ** 2) )
+    return math.sqrt((disp[0] ** 2 + disp[1] ** 2 + disp[2] ** 2))
 
 
 def normalize(disp):
@@ -50,7 +51,7 @@ def get_angle(disp):
     fwd = [1, 0]  # UAV's forward vector.
     v_d = [disp[0], disp[1]]
     d_xy = get_distance_xy(disp)
-    
+
     if d_xy != 0:
         theta = np.arccos(np.dot(v_d, fwd) / d_xy)
 
@@ -101,5 +102,3 @@ if __name__ == "__main__":
     beacon_position = [35, 120, 2]  # Example
     mock_beacon_ = mock_beacon(uav_position, beacon_position)
     log.info("Direction, Distance: ", mock_beacon_)
-
-

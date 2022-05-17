@@ -1,7 +1,8 @@
-import time
 import datetime
-import util
 import logging as log
+import time
+
+import util
 
 
 class Transceiver:
@@ -40,7 +41,7 @@ while True:
             mission_time = mission_end_time - mission_begin_time
             print(f"\n-------- VICTIM FOUND: {transceiver.signal_detected} -------- ")
             print(f"-- Current ime: {current_time}")
-            print("-- Mission time: ",mission_time)
+            print("-- Mission time: ", mission_time)
             print(f"-- Location: {uav_pos[0], uav_pos[1], uav_pos[2]}\n")
         break
 
@@ -62,12 +63,14 @@ while True:
 
     else:
         print("searching...")
-        time.sleep(0.20) # change back
+        time.sleep(0.20)  # change back
         if timeout:
             print("\n reached timeout \n")
             current_time = datetime.datetime.now()
             mission_end_time = datetime.datetime.now()
             mission_time = mission_end_time - mission_begin_time
-            print(f"\n-------- VICTIM NOT FOUND: {transceiver.signal_detected} -------- ")
-            print("-- Mission time: ",mission_time)
+            print(
+                f"\n-------- VICTIM NOT FOUND: {transceiver.signal_detected} -------- "
+            )
+            print("-- Mission time: ", mission_time)
             break
