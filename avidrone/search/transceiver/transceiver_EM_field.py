@@ -1,6 +1,7 @@
 import magpylib as magpy
 import matplotlib.pyplot as plt
 import numpy as np
+import math
 
 # reference: https://magpylib.readthedocs.io/en/latest/examples/examples_30_coil_field_lines.html
 
@@ -76,6 +77,17 @@ sp_2 = ax2.streamplot(
     density=3,
     color=B_amp,
     linewidth=np.sqrt(B_amp) * 2,
+)
+
+
+# tan^-1 ( B_z / B_x) -> theta (radians) -> transceiver direction
+
+B_x = B[:, :, 0]
+B_z = B[:, :, 2]
+
+theta_grid = np.arctan2(B_z, B_x)
+
+# print(B_zx)
 
 # figure styling
 ax1.set(
@@ -96,4 +108,4 @@ plt.colorbar(sp_1.lines, ax=ax1, label="[mT]")
 plt.colorbar(sp_2.lines, ax=ax2, label="[mT]")
 
 plt.tight_layout()
-plt.show()
+# plt.show()
