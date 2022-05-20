@@ -9,6 +9,7 @@ random.seed(492)
 
 # distances are euclidean
 
+
 def mock_beacon(uav_pos, beacon_pos):
     # UAV position
     x_1 = uav_pos[0]
