@@ -11,14 +11,13 @@ import math
 import time
 
 import numpy as np
+from drone import vehicle
 from dronekit import (
-    Command, 
+    Command,
     LocationGlobal,
     LocationGlobalRelative,
     VehicleMode,
 )
-
-from drone import vehicle
 from transceiver import transceiver
 
 Beacon = transceiver.transceiver()
@@ -109,7 +108,7 @@ class Search:
         d_lat = lat_b - lat_a
         d_lon = lon_b - lon_a
 
-        return math.sqrt(d_lat ** 2 + d_lon ** 2) * 1.113195e5
+        return math.sqrt(d_lat**2 + d_lon**2) * 1.113195e5
 
     def get_global_pos(self):
         return self.global_frame

@@ -21,7 +21,6 @@ from dronekit import (
     connect,
 )
 from pymavlink import mavutil
-
 from util import (
     ALTITUDE,
     get_distance_metres,
@@ -496,7 +495,7 @@ aviDrone.mode = VehicleMode("AUTO")
 # Demonstrates getting and setting the command number
 # Uses distance_to_current_waypoint(), a convenience function for finding the
 #   distance to the next waypoint.
-commands_copy = []
+# commands_copy = []
 print("aviDrone.commands", aviDrone.commands)
 # for command in aviDrone.commands:
 # commands_copy.append(command)

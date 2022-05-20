@@ -16,7 +16,6 @@ import drone
 import dronekit_sitl
 import transceiver
 from dronekit import LocationGlobal, VehicleMode, connect
-
 from util import (
     ALTITUDE,
     DEGREES,
