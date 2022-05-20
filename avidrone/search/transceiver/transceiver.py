@@ -106,7 +106,7 @@ while True:
     mock_beacon = util.mock_beacon(uav_pos, beacon_pos)
     transceiver.direction = mock_beacon[0]
     transceiver.distance = mock_beacon[1]
-    log.info("direction, distance: ", (transceiver.direction, transceiver.distance))
+    print("direction, distance: ", (transceiver.direction, transceiver.distance))
     mission_begin_time = datetime.datetime.now()
 
     if uav_pos[0] == beacon_pos[0] and uav_pos[1] == beacon_pos[1]:
