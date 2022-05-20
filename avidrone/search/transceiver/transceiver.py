@@ -137,7 +137,7 @@ while True:
         log.info("y_uav > y_beacon")
 
     else:
-        time.sleep(0.5)  # Transceiver receives reading every half seconds
+        # time.sleep(0.5)  # Transceiver receives reading every half seconds
         if timeout:
             print("\n reached timeout \n")
             current_time = datetime.datetime.now()
