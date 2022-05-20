@@ -33,7 +33,7 @@ Bamp_2 = np.linalg.norm(B_2, axis=2)
 Bamp_2 /= np.amax(Bamp_2)
 # coil_2.show()
 
-# Plot 
+# Plot
 fig, [ax1, ax2] = plt.subplots(1, 2, figsize=(9, 4))
 
 sp_1 = ax1.streamplot(

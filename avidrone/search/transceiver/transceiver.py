@@ -20,7 +20,7 @@ class Transceiver:
         self.signal_detected = False  # not detected
 
         # settings
-        self.mode = 'transmit'
+        self.mode = "transmit"
         self.model_number = 0  # default: Avidrone
 
         # Only models with measured range were selected
@@ -39,23 +39,25 @@ class Transceiver:
         ]
 
         self.search_strip_width = [
-            {'Avidrone': 6},
-            {'Tracker DTS': 34},
-            {'Orthovox Zoom+': 31},
-            {'Orthovox 3+': 36},
-            {'Tracker2': 38},
-            {'Tracker3': 39},
-            {'Pieps DSP Sport': 41},
-            {'Pieps DSP Pro': 42},
-            {'Mammut Pulse': 54},
-            {'Orthovox S1': 50},
+            {"Avidrone": 6},
+            {"Tracker DTS": 34},
+            {"Orthovox Zoom+": 31},
+            {"Orthovox 3+": 36},
+            {"Tracker2": 38},
+            {"Tracker3": 39},
+            {"Pieps DSP Sport": 41},
+            {"Pieps DSP Pro": 42},
+            {"Mammut Pulse": 54},
+            {"Orthovox S1": 50},
         ]
 
         # simulation parameters
         self.frequency = 457  # kHz
 
         # Battery life from: https://www.backcountry.com/backcountry-access-tracker-dts-beacon#
-        self.battery = 720000 if self.mode == 'transmit' else 180000  # seconds in battery at 100%
+        self.battery = (
+            720000 if self.mode == "transmit" else 180000
+        )  # seconds in battery at 100%
 
     def switch_mode(self):
         if self.mode == "transmit":
@@ -75,7 +77,10 @@ class Transceiver:
         print("\n--- settings ---")
         print(f"transceiver.mode: {transceiver.mode}")
         print(f"transceiver.model: {model}")
-        print("transceiver.search_strip_width: ", transceiver.search_strip_width[transceiver.model_number][model])
+        print(
+            "transceiver.search_strip_width: ",
+            transceiver.search_strip_width[transceiver.model_number][model],
+        )
         print("\n--- simulation parameters ---")
         print(f"transceiver.frequency: {transceiver.frequency}")
 
@@ -115,7 +120,7 @@ while True:
             print("-- Mission time: ", mission_time)
             transceiver.position = uav_pos
             print(f"-- Location: {transceiver.position}\n")
-            
+
             transceiver.show_settings()
 
         break
