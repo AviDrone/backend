@@ -21,7 +21,6 @@ from dronekit import (
     connect,
 )
 from pymavlink import mavutil
-
 from util import (
     ALTITUDE,
     get_distance_metres,

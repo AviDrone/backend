@@ -11,6 +11,7 @@ import math
 import time
 
 import numpy as np
+from drone import vehicle
 from dronekit import (
     Command, 
     LocationGlobal,
@@ -18,7 +19,6 @@ from dronekit import (
     VehicleMode,
 )
 
-from drone import vehicle
 from transceiver import transceiver
 
 Beacon = transceiver.transceiver()

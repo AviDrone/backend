@@ -20,14 +20,11 @@ class TestTransceiver(TestCase):
 
     def test_coil_1(self):
 
-
         assert True
-
 
     def test_coil_2(self):
 
         assert True
-
 
     def test_figure_styling(self):
 
