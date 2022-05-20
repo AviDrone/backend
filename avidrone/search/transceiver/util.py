@@ -29,7 +29,6 @@ def mock_beacon(uav_pos, beacon_pos):
 
 
 def get_displacement(x_1, x_2, y_1, y_2, z_1=0, z_2=0):
-    print([x_2 - x_1, y_2 - y_1, z_2 - z_1])
     return [x_2 - x_1, y_2 - y_1, z_2 - z_1]
 
 
@@ -56,7 +55,7 @@ def get_angle(disp):
         theta = np.arccos(np.dot(v_d, fwd) / d_xy)
 
     else:
-        d_xy = 0.01
+        d_xy = 0.001
         theta = theta = np.arccos(np.dot(v_d, fwd) / d_xy)
     # To account for measurement inconsistencies. We use a random value
     # between -15 and 15. That makes it likely that the beacon gets the
@@ -101,4 +100,3 @@ if __name__ == "__main__":
     uav_position = [136, 145, 50]  # Example
     beacon_position = [35, 120, 2]  # Example
     mock_beacon_ = mock_beacon(uav_position, beacon_position)
-    log.info(f"Direction, Distance: {mock_beacon_}")
