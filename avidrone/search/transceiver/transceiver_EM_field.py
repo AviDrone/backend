@@ -1,7 +1,6 @@
 import magpylib as magpy
 import matplotlib.pyplot as plt
 import numpy as np
-import math
 
 # reference: https://magpylib.readthedocs.io/en/latest/examples/examples_30_coil_field_lines.html
 
@@ -98,7 +97,6 @@ ax1.set(
 )
 ax2.set(
     title="Combined magnetic field of coil 1 and coil 2",
-
     xlabel="x-position [mm]",
     ylabel="z-position [mm]",
     aspect=1,
