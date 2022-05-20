@@ -5,8 +5,9 @@ import random
 import numpy as np
 
 random.seed(492)
-# distances are euclidean
 
+
+# distances are euclidean
 
 def mock_beacon(uav_pos, beacon_pos):
     # UAV position
@@ -56,12 +57,12 @@ def get_angle(disp):
 
     else:
         d_xy = 0.001
-        theta = theta = np.arccos(np.dot(v_d, fwd) / d_xy)
+        theta = np.arccos(np.dot(v_d, fwd) / d_xy)
     # To account for measurement inconsistencies. We use a random value
     # between -15 and 15. That makes it likely that the beacon gets the
     # wrong direction roughly a third of the time.
 
-    # print(theta + random.uniform(-15, 15))
+    print(theta + random.uniform(-15, 15))
 
     return theta + random.uniform(-15, 15)
 

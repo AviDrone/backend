@@ -79,14 +79,14 @@ sp_2 = ax2.streamplot(
 )
 
 
-# tan^-1 ( B_z / B_x) -> theta (radians) -> transceiver direction
+# tan^-1 ( B_z / B_x) -> theta (radians to degrees)
 
 B_x = B[:, :, 0]
 B_z = B[:, :, 2]
 
-theta_grid = np.arctan2(B_z, B_x)
+theta_grid = np.rad2deg(np.arctan2(B_z, B_x))
 
-# print(B_zx)
+print(theta_grid)
 
 # figure styling
 ax1.set(
