@@ -9,7 +9,8 @@ class Transceiver:
     """
     # For more info about avalanche beacons:
     # https://avalanche.org/avalanche-encyclopedia/avalanche-transceiver-beacon/
-
+    # patent for transceiver used in avidrone search
+    # https://patft.uspto.gov/netacgi/nph-Parser?Sect2=PTO1&Sect2=HITOFF&p=1&u=%2Fnetahtml%2FPTO%2Fsearch-bool.html&r=1&f=G&l=50&d=PALL&RefSrch=yes&Query=PN%2F6484021
     """
 
     def __init__(self):
