@@ -104,7 +104,9 @@ class Transceiver:
         print(settings_msg)
 
 
+
 IS_TEST = False  # set to true to use mock transceiver simulation
+
 
 # initialize transceiver parameters
 transceiver = Transceiver()
@@ -116,10 +118,12 @@ transceiver.curr_search_strip_width = transceiver.search_strip_width[
 
 uav_pos = [140, 145, 980]  # Example
 beacon_pos = [31, 16, 51]  # Example
+
 # beacon_pos = [35, 120, 2]  # Example
 
 timeout_count = 0
 timeout = False
+
 
 mock_transceiver = util.mock_transceiver(uav_pos, beacon_pos)
 
@@ -135,6 +139,10 @@ while True:
         timeout_count += 1
     if timeout_count == transceiver.battery:
         timeout = True
+<<<<<<< HEAD
+=======
+        
+>>>>>>> 4439c8188f615fbedf030a7212875a413f5338f6
 
     log.info(f"-- direction, distance: {(transceiver.direction, transceiver.distance)}")
     mission_begin_time = datetime.datetime.now()
