@@ -7,8 +7,6 @@ from unittest import TestCase
 import magpylib as magpy
 import matplotlib.pyplot as plt
 import numpy as np
-from avidrone.search.transceiver import transceiver_EM_field
-
 
 class TestTransceiver(TestCase):
     def test_grid(self):
@@ -16,7 +14,7 @@ class TestTransceiver(TestCase):
         test_ts = np.linspace(-100, 100, 100)
         test_grid = np.array([[(x, 0, z) for x in test_ts] for z in test_ts])
 
-        assert True
+        assert test_grid
 
     def test_coil_1(self):
 
