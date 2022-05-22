@@ -29,12 +29,12 @@ from dronekit import (
 # log
 log = logging.getLogger(__name__)
 log.setLevel(logging.INFO)
-formatter = logging.Formatter("%(asctime)s:%(levelname)s:%(message)s")
+formatter = logging.Formatter("%(asctime)s [%(levelname)s] %(message)s")
 file_handler = logging.FileHandler("search.log")
 file_handler.setFormatter(formatter)
 log.addHandler(file_handler)
 
-
+print("main test")  # TODO remove after testing
 def search():
     log.info("--- BEGIN SEARCH ---")
 

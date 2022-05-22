@@ -114,4 +114,4 @@ plt.colorbar(sp_1.lines, ax=ax1, label="[mT]")
 plt.colorbar(sp_2.lines, ax=ax2, label="[mT]")
 
 plt.tight_layout()
-# plt.show()
+plt.show()
