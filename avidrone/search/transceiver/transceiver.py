@@ -1,31 +1,36 @@
 import datetime
-import logging as log
+import logging
 import time
 
 import util
 
+# log
+log = logging.getLogger(__name__)
+log.setLevel(logging.INFO)
+
+formatter = logging.Formatter('%(asctime)s:%(levelname)s:%(message)s')
+
+file_handler = logging.FileHandler('transceiver.log')
+file_handler.setFormatter(formatter)
+
+log.addHandler(file_handler)
 
 class Transceiver:
-    """
-    # For more info about avalanche beacons:
-    # https://avalanche.org/avalanche-encyclopedia/avalanche-transceiver-beacon/
-    # patent for transceiver used in avidrone search
-    # https://patft.uspto.gov/netacgi/nph-Parser?Sect2=PTO1&Sect2=HITOFF&p=1&u=%2Fnetahtml%2FPTO%2Fsearch-bool.html&r=1&f=G&l=50&d=PALL&RefSrch=yes&Query=PN%2F6484021
-    """
-
     def __init__(self):
-        # sensor outputs
         self.direction = -1  # not detected
         self.distance = -1  # not detected
-        self.position = [-1, -1, -1]  # not detected
         self.signal_detected = False  # not detected
+        self.position = [None, None, None]  # not detected
 
         # settings
-        self.mode = "transmit"
-        self.model_number = 0  # default: Avidrone
+        self.mode = "transmit"  # or detect
+        self.model_number = 0  # Avidrone (default)
+        
+        
+        self.battery = (
+            720000 if self.mode == "transmit" else 180000   # seconds in battery at 100%
+        )   # Battery life from: https://www.backcountry.com/backcountry-access-tracker-dts-beacon#
 
-        # Only models with measured range were selected
-        # Model reference: https://beaconreviews.com/search_strip_widths.php
         self.model = [
             "Avidrone",
             "Tracker DTS",
@@ -37,7 +42,7 @@ class Transceiver:
             "Pieps DSP Pro",
             "Mammut Pulse",
             "Orthovox S1",
-        ]
+        ]   # Model reference: https://beaconreviews.com/search_strip_widths.php
 
         self.search_strip_width = [
             {"Avidrone": 6},
@@ -52,29 +57,40 @@ class Transceiver:
             {"Orthovox S1": 50},
         ]
 
-        # simulation parameters
-        self.frequency = 457  # kHz
-
-        # Battery life from: https://www.backcountry.com/backcountry-access-tracker-dts-beacon#
-        self.battery = (
-            720000 if self.mode == "transmit" else 180000
-        )  # seconds in battery at 100%
-
+    
+    def get_model(self, model_number):
+        return transceiver.model[model_number]
+        
     def switch_mode(self):
         if self.mode == "transmit":
             self.mode = "receive"
         elif self.mode == "receive":
             self.mode = "transmit"
         else:
-            log.error("Unknown mode")
+            log.warning("Unknown mode")
 
+    def victim_found_msg(self):
+        print(f"\n-------- VICTIM FOUND: {transceiver.signal_detected} -------- ")
+        print(f"-- Current ime: {current_time}")
+        print("-- Mission time: ", mission_time)
+        print(f"-- Location: {transceiver.position}\n")
+        
+    def victim_not_found_msg(self):
+        print(f"\n-------- VICTIM FOUND: {transceiver.signal_detected} -------- ")
+        print(f"-- Current ime: {current_time}")
+        print(f"-- Mission time: {mission_time}")
+
+        
     @staticmethod
-    def show_settings():
-        print("------ TRANSCEIVER ------")
-        print("--- data ---")
+    def show_data():
+        print("\n--- transceiver data ---")
+        print(f"transceiver.mode: {transceiver.mode}")
         print(f"transceiver.direction: {transceiver.direction}")
         print(f"transceiver.distance: {transceiver.distance}")
         print(f"transceiver.signal_detected: {transceiver.signal_detected}")
+    
+    @staticmethod
+    def show_settings():
         print("\n--- settings ---")
         print(f"transceiver.mode: {transceiver.mode}")
         print(f"transceiver.model: {model}")
@@ -82,75 +98,72 @@ class Transceiver:
             "transceiver.search_strip_width: ",
             transceiver.search_strip_width[transceiver.model_number][model],
         )
-        print("\n--- simulation parameters ---")
-        print(f"transceiver.frequency: {transceiver.frequency}")
 
+
+IS_TEST = True  # set to true for simulation
 
 transceiver = Transceiver()
 transceiver.model_number = 0  # Avidrone
-model = transceiver.model[transceiver.model_number]
+model = transceiver.get_model(transceiver.model_number)
 
 timeout_count = 0
 timeout = False
 
-uav_pos = [136, 145, 50]  # Example
-beacon_pos = [35, 120, 2]  # Example
-
-transceiver.show_settings()
+uav_pos = [36, 145, 50]  # Example
+beacon_pos = [31, 146, 51]  # Example
+# beacon_pos = [35, 120, 2]  # Example
 
 while True:
     timeout_count += 1
+    if timeout_count == transceiver.battery: timeout = True
 
-    if timeout_count == transceiver.battery:
-        timeout = True
-
-    mock_beacon = util.mock_beacon(uav_pos, beacon_pos)
-    transceiver.direction = mock_beacon[0]
-    transceiver.distance = mock_beacon[1]
-    print("direction, distance: ", (transceiver.direction, transceiver.distance))
+    if IS_TEST:
+        mock_transceiver = util.mock_transceiver(uav_pos, beacon_pos)
+        transceiver.direction = mock_transceiver[0]
+        transceiver.distance = mock_transceiver[1]
+    
+    else:
+        transceiver.direction = -1  # TODO real vals
+        transceiver.distance = -1   # TODO real vals
+    
+    print(f"-- direction, distance: {(transceiver.direction, transceiver.distance)}")
     mission_begin_time = datetime.datetime.now()
 
     if uav_pos[0] == beacon_pos[0] and uav_pos[1] == beacon_pos[1]:
         transceiver.signal_detected = True
+        
         if transceiver.signal_detected:
             current_time = datetime.datetime.now()
             mission_end_time = datetime.datetime.now()
             mission_time = mission_end_time - mission_begin_time
-            print(f"\n-------- VICTIM FOUND: {transceiver.signal_detected} -------- ")
-            print(f"-- Current ime: {current_time}")
-            print("-- Mission time: ", mission_time)
             transceiver.position = uav_pos
-            print(f"-- Location: {transceiver.position}\n")
-
+            transceiver.victim_found_msg()
             transceiver.show_settings()
-
         break
 
+    
     if uav_pos[0] < beacon_pos[0]:  # x
         uav_pos[0] += 1
-        log.info("x_uav < x_beacon")
+        # log.debug("x_uav < x_beacon")
 
     elif uav_pos[0] > beacon_pos[0]:  # x
         uav_pos[0] -= 1
-        log.info("x_uav > x_beacon")
+        # log.debug("x_uav > x_beacon")
 
     if uav_pos[1] < beacon_pos[1]:  # y
         uav_pos[1] += 1
-        log.info("y_uav < y_beacon")
+        # log.debug("y_uav < y_beacon")
 
     elif uav_pos[1] > beacon_pos[1]:  # y
         uav_pos[1] -= 1
-        log.info("y_uav > y_beacon")
+        # log.debug("y_uav > y_beacon")
 
     else:
         # time.sleep(0.5)  # Transceiver receives reading every half seconds
         if timeout:
-            print("\n reached timeout \n")
+            log.warning("\n reached timeout \n")
             current_time = datetime.datetime.now()
             mission_end_time = datetime.datetime.now()
             mission_time = mission_end_time - mission_begin_time
-            print(
-                f"\n-------- VICTIM NOT FOUND: {transceiver.signal_detected} -------- "
-            )
-            print("-- Mission time: ", mission_time)
+            transceiver.victim_not_found_msg()
             break

@@ -114,7 +114,7 @@ class Search:
         return self.global_frame
 
     def mock_transceiver(self, uav_pos, beacon_pos):
-        mock_beacon = transceiver.mock_beacon(uav_pos, beacon_pos)
+        mock_beacon = transceiver.mock_transceiver(uav_pos, beacon_pos)
         mock_beacon.distance = Beacon.distance
         mock_beacon.direction = Beacon.direction
         return mock_beacon

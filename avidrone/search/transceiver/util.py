@@ -14,7 +14,7 @@ theta_val = type(theta_grid[0][0])
 # print(theta_val)
 
 
-def mock_beacon(uav_pos, beacon_pos):
+def mock_transceiver(uav_pos, beacon_pos):
     # UAV position
     x_1 = uav_pos[0]
     y_1 = uav_pos[1]
@@ -63,11 +63,10 @@ def get_angle(disp):
     else:
         d_xy = 0.001
         theta = np.arccos(np.dot(v_d, fwd) / d_xy)
+        
     # To account for measurement inconsistencies. We use a random value
     # between -15 and 15. That makes it likely that the beacon gets the
     # wrong direction roughly a third of the time.
-
-    print(theta + random.uniform(-15, 15))
 
     return theta + random.uniform(-15, 15)
 
@@ -105,4 +104,4 @@ def get_direction(theta):
 if __name__ == "__main__":
     uav_position = [136, 145, 50]  # Example
     beacon_position = [35, 120, 2]  # Example
-    mock_beacon_ = mock_beacon(uav_position, beacon_position)
+    mock_beacon_ = mock_transceiver(uav_position, beacon_position)
