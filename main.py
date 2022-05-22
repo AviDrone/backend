@@ -2,19 +2,18 @@
 # -*- coding: utf-8 -*-
 
 import argparse
-import logging as log
 import os
 
 import avidrone.search.util as search_util
 
 if __name__ == "__main__":
     """
-    Run searches as simple command line arguments.
+    Run search as command line arguments.
     """
     parser = argparse.ArgumentParser()
     group = parser.add_argument_group()
 
-    # define command line arguments
+    # Define command line arguments
     group.add_argument("--primary", action="store_true", help="primary search only")
     group.add_argument("--v38", action="store_true", help="ensure python 3.8 runs")
     group.add_argument("--sim", action="store_true", help="run in simulated mode")
@@ -27,11 +26,6 @@ if __name__ == "__main__":
         "-search", action="store_true", help="start avidrone search mission"
     )
     args = parser.parse_args()
-
-    print("\n****************\nAvidrone Search\n****************\n")
-    if args.verbose:
-        log.info("--Verbose: True")
-        search_util.IS_VERBOSE = True
 
     # Arguments are not mutually exclusive so they are very explicit
     # Example commands are shown in comments below. May need to be modified

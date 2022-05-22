@@ -3,11 +3,15 @@ import math
 import random
 
 import numpy as np
-
-random.seed(492)
-
+import transceiver_EM_field
 
 # distances are euclidean
+
+
+theta_grid = transceiver_EM_field.get_theta_grid()
+
+theta_val = type(theta_grid[0][0])
+# print(theta_val)
 
 
 def mock_beacon(uav_pos, beacon_pos):
