@@ -9,9 +9,8 @@ import transceiver_EM_field
 # distances are euclidean
 
 
-theta_grid = transceiver_EM_field.get_theta_grid()
-
-theta_val = type(theta_grid[0][0])
+# theta_grid = transceiver_EM_field.get_theta_grid()
+# theta_val = type(theta_grid[0][0])
 # print(theta_val)
 
 
@@ -105,4 +104,5 @@ def get_direction(theta):
 if __name__ == "__main__":
     uav_position = [136, 145, 50]  # Example
     beacon_position = [35, 120, 2]  # Example
-    mock_beacon_ = mock_transceiver(uav_position, beacon_position)
+    mock_beacon = mock_transceiver(uav_position, beacon_position)
+    print(mock_beacon)
