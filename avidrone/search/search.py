@@ -8,13 +8,10 @@ from __future__ import print_function
 import argparse
 import asyncio
 import datetime
-import logging as log
+import logging
 import math
 import time
 
-import primary
-import secondary
-import util
 from dronekit import (
     Command,
     LocationGlobal,
@@ -23,11 +20,23 @@ from dronekit import (
     connect,
 )
 
+# import primary
+# import secondary
+
+# import util
+
+
+# log
+log = logging.getLogger(__name__)
+log.setLevel(logging.INFO)
+formatter = logging.Formatter("%(asctime)s:%(levelname)s:%(message)s")
+file_handler = logging.FileHandler("search.log")
+file_handler.setFormatter(formatter)
+log.addHandler(file_handler)
+
 
 def search():
-    log.info(f"-- default size: {util.DEGREES}")
-    log.info(f"-- default altitude: {util.ALTITUDE}")
-    log.info(f"-- default land threshold: {util.LAND_THRESHOLD}")
+    log.info("--- BEGIN SEARCH ---")
 
 
 if __name__ == "__main__":

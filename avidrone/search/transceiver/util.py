@@ -4,13 +4,15 @@ import random
 
 import numpy as np
 
-random.seed(492)
-
-
 # distances are euclidean
 
 
-def mock_beacon(uav_pos, beacon_pos):
+# theta_grid = transceiver_EM_field.get_theta_grid()
+# theta_val = type(theta_grid[0][0])
+# print(theta_val)
+
+
+def mock_transceiver(uav_pos, beacon_pos):
     # UAV position
     x_1 = uav_pos[0]
     y_1 = uav_pos[1]
@@ -35,11 +37,11 @@ def get_displacement(x_1, x_2, y_1, y_2, z_1=0, z_2=0):
 
 
 def get_distance_xy(disp):
-    return math.sqrt((disp[0] ** 2 + disp[1] ** 2))
+    return math.sqrt((disp[0]**2 + disp[1]**2))
 
 
 def get_distance_xyz(disp):
-    return math.sqrt((disp[0] ** 2 + disp[1] ** 2 + disp[2] ** 2))
+    return math.sqrt((disp[0]**2 + disp[1]**2 + disp[2] ** 2))
 
 
 def normalize(disp):
@@ -59,11 +61,10 @@ def get_angle(disp):
     else:
         d_xy = 0.001
         theta = np.arccos(np.dot(v_d, fwd) / d_xy)
+
     # To account for measurement inconsistencies. We use a random value
     # between -15 and 15. That makes it likely that the beacon gets the
     # wrong direction roughly a third of the time.
-
-    print(theta + random.uniform(-15, 15))
 
     return theta + random.uniform(-15, 15)
 
@@ -101,4 +102,5 @@ def get_direction(theta):
 if __name__ == "__main__":
     uav_position = [136, 145, 50]  # Example
     beacon_position = [35, 120, 2]  # Example
-    mock_beacon_ = mock_beacon(uav_position, beacon_position)
+    mock_beacon = mock_transceiver(uav_position, beacon_position)
+    # print(mock_beacon)

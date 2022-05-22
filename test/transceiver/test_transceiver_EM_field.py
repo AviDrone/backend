@@ -7,7 +7,6 @@ from unittest import TestCase
 import magpylib as magpy
 import matplotlib.pyplot as plt
 import numpy as np
-from avidrone.search.transceiver import transceiver_EM_field
 
 
 class TestTransceiver(TestCase):

@@ -79,14 +79,17 @@ sp_2 = ax2.streamplot(
 )
 
 
-# tan^-1 ( B_z / B_x) -> theta (radians to degrees)
+def get_theta_grid():
+    # tan^-1 ( B_z / B_x) -> theta (radians to degrees)
 
-B_x = B[:, :, 0]
-B_z = B[:, :, 2]
+    B_x = B[:, :, 0]
+    B_z = B[:, :, 2]
 
-theta_grid = np.rad2deg(np.arctan2(B_z, B_x))
+    theta_grid = np.rad2deg(np.arctan2(B_z, B_x))
+    print(theta_grid)
+    # return theta_grid
 
-print(theta_grid)
+get_theta_grid()
 
 # figure styling
 ax1.set(
