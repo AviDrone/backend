@@ -4,7 +4,6 @@ import random
 
 import numpy as np
 
-import transceiver_EM_field
 
 # distances are euclidean
 
