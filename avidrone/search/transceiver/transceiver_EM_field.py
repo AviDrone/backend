@@ -95,6 +95,7 @@ def get_theta_grid():
     
     return test
 
+
 # figure styling
 ax1.set(
     title="Magnetic field of coil 1",
