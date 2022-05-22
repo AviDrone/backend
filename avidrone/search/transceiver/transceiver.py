@@ -144,7 +144,6 @@ while True:
             mission_time = mission_end_time - mission_begin_time
             transceiver.position = uav_pos
             transceiver.victim_found_msg()
-            transceiver.show_settings()
         break
 
     # Navigation algorithm
