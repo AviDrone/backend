@@ -104,7 +104,6 @@ class Transceiver:
         print(settings_msg)
 
 
-
 IS_TEST = False  # set to true to use mock transceiver simulation
 
 
