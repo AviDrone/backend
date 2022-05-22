@@ -3,8 +3,8 @@ import logging
 import time
 
 import util
-
 from transceiver_EM_field import get_theta_grid
+
 # log
 log = logging.getLogger(__name__)
 log.setLevel(logging.INFO)
@@ -17,6 +17,7 @@ file_handler.setFormatter(formatter)
 log.addHandler(file_handler)
 
 theta = get_theta_grid()
+
 
 class Transceiver:
     def __init__(self):
@@ -134,7 +135,7 @@ while True:
         timeout_count += 1
     if timeout_count == transceiver.battery:
         timeout = True
-        
+
     log.info(f"-- direction, distance: {(transceiver.direction, transceiver.distance)}")
     mission_begin_time = datetime.datetime.now()
 

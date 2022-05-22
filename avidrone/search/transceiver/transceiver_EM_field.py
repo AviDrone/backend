@@ -84,16 +84,17 @@ def get_theta_grid():
 
     B_x = B[:, :, 0]
     B_y = B[:, :, 1]
-    B_z = B[:, :, 2]    # currently not used for 2D model
+    B_z = B[:, :, 2]  # currently not used for 2D model
 
     test = []
-    theta_grid = (np.arctan2(B_y, B_x))
-    
+    theta_grid = np.arctan2(B_y, B_x)
+
     for i in range(len(theta_grid)):
         for j in range(len(theta_grid[i])):
             test.append(theta_grid[i][j])
-    
+
     return test
+
 
 # figure styling
 ax1.set(

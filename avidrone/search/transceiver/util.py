@@ -37,11 +37,11 @@ def get_displacement(x_1, x_2, y_1, y_2, z_1=0, z_2=0):
 
 
 def get_distance_xy(disp):
-    return math.sqrt((disp[0]**2 + disp[1]**2))
+    return math.sqrt((disp[0] ** 2 + disp[1] ** 2))
 
 
 def get_distance_xyz(disp):
-    return math.sqrt((disp[0]**2 + disp[1]**2 + disp[2] ** 2))
+    return math.sqrt((disp[0] ** 2 + disp[1] ** 2 + disp[2] ** 2))
 
 
 def normalize(disp):
