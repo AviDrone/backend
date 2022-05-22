@@ -31,8 +31,8 @@ from util import (
 
 log = logging.getLogger(__name__)
 log.setLevel(logging.INFO)
-formatter = logging.Formatter('%(asctime)s:%(levelname)s:%(message)s')
-file_handler = logging.FileHandler('secondary.log')
+formatter = logging.Formatter("%(asctime)s:%(levelname)s:%(message)s")
+file_handler = logging.FileHandler("secondary.log")
 file_handler.setFormatter(formatter)
 log.addHandler(file_handler)
 

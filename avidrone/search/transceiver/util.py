@@ -4,7 +4,6 @@ import random
 
 import numpy as np
 
-
 # distances are euclidean
 
 
