@@ -10,17 +10,15 @@ import logging as log
 import math
 import time
 
+import drone
 import numpy as np
-from drone import vehicle
 from dronekit import (
     Command,
     LocationGlobal,
     LocationGlobalRelative,
     VehicleMode,
 )
-from transceiver import transceiver
-
-Beacon = transceiver.transceiver()
+from transceiver.transceiver import Transceiver
 
 IS_VERBOSE = False  # for verbose command-line interface output
 IS_TEST = False  # for running simulations
@@ -63,7 +61,7 @@ class GpsData:
 
 class Search:
     def __init__(self):
-        aviDrone = vehicle
+        aviDrone = drone.vehicle
         self.global_frame = aviDrone.location.global_frame
         # self.global_location = LocationGlobal(new_lat, new_lon, original_location.alt)
         # self.distance = (
@@ -106,15 +104,14 @@ class Search:
         d_lat = lat_b - lat_a
         d_lon = lon_b - lon_a
 
-        return math.sqrt(d_lat**2 + d_lon**2) * 1.113195e5
+        return math.sqrt(math.pow(d_lat, 2) + math.pow(d_lon, 2)) * 1.113195e5
 
     def get_global_pos(self):
         return self.global_frame
 
-    def mock_transceiver(self, uav_pos, beacon_pos):
-        mock_beacon = transceiver.mock_transceiver(uav_pos, beacon_pos)
-        mock_beacon.distance = Beacon.distance
-        mock_beacon.direction = Beacon.direction
+    @staticmethod
+    def mock_transceiver(uav_pos, beacon_pos):
+        mock_beacon = Transceiver.mock_transceiver(uav_pos, beacon_pos)
         return mock_beacon
 
 
@@ -122,10 +119,9 @@ class Mission:
     def __init__(self):
         from pymavlink import mavutil
 
-        self.aviDrone = vehicle
+        self.aviDrone = drone.vehicle
         self.mavutil = mavutil
         self.global_frame = self.aviDrone.location.global_frame
-        self.vehicle = self.aviDrone
         self.original_yaw = self.aviDrone.attitude.yaw
         self.heading = -1  # TODO get correct value
         self.relative = False
@@ -133,53 +129,53 @@ class Mission:
 
     def start(self):
         log.info("-- Waiting for vehicle to start...")
-        while not self.vehicle.is_armable:
+        while not self.aviDrone.is_armable:
             time.sleep(1)
 
-        self.vehicle.mode = VehicleMode("GUIDED")
-        self.vehicle.armed = True
+        self.aviDrone.mode = VehicleMode("GUIDED")
+        self.aviDrone.armed = True
 
         log.info("-- Arming...")
-        while not self.vehicle.is_armable:
+        while not self.aviDrone.is_armable:
             time.sleep(1)
 
-        if self.vehicle.armed:
-            log.info(f"-- Is armed: {self.vehicle.armed}")
+        if self.aviDrone.armed:
+            log.info(f"-- Is armed: {self.aviDrone.armed}")
             self.takeoff_to_altitude()
 
         log.info("-- Waiting for GUIDED mode...")
-        while self.vehicle.mode.name != "GUIDED":
+        while self.aviDrone.mode.name != "GUIDED":
             time.sleep(1)
 
     # Any condition we want to break the primary search can be done in this command.
     # This will be called repeatedly and return true when the break condition is true.
     def break_condition(self):
-        nextwaypoint = self.vehicle.commands.next
+        nextwaypoint = self.aviDrone.commands.next
         if nextwaypoint == 4:
             print("breaking...")
             return True
         return False
 
     def takeoff_to_altitude(self):
-        self.vehicle.simple_takeoff(ALTITUDE)
+        self.aviDrone.simple_takeoff(ALTITUDE)
         log.info(f"-- Taking off to altitude (m): {ALTITUDE} \n")
 
         while True:
-            current_alt = self.vehicle.location.global_relative_frame.alt
+            current_alt = self.aviDrone.location.global_relative_frame.alt
             if current_alt >= ALTITUDE * 0.95:
                 log.info(f"-- Reached {ALTITUDE}m")
                 break
             time.sleep(1)
 
     def go_to_location(self, distance, angle):
-        current_location = self.vehicle.location.global_frame
+        current_location = self.aviDrone.location.global_frame
         target_location = Search.get_location(current_location, distance, angle)
-        self.vehicle.simple_goto(target_location)
+        self.aviDrone.simple_goto(target_location)
 
         loop_count = 0
-        while self.vehicle.mode.name == "GUIDED":
+        while self.aviDrone.mode.name == "GUIDED":
             remaining_distance = Search.get_distance(
-                self.vehicle.location.global_frame, target_location
+                self.aviDrone.location.global_frame, target_location
             )
             print("Distance to target: ", remaining_distance)
             loop_count += 1
@@ -192,21 +188,21 @@ class Mission:
             time.sleep(2)
 
     def simple_goto_wait(self, go_to_checkpoint):
-        self.vehicle.simple_goto(go_to_checkpoint)
+        self.aviDrone.simple_goto(go_to_checkpoint)
         global_frame = self.aviDrone.location.global_frame
         distance = get_distance_metres(
             Search.get_global_pos(global_frame), go_to_checkpoint
         )
 
-        while distance >= DISTANCE_ERROR and self.vehicle.mode.name == "GUIDED":
+        while distance >= DISTANCE_ERROR and self.aviDrone.mode.name == "GUIDED":
             print(distance)
             distance = get_distance_metres(
                 Search.get_global_pos(global_frame), go_to_checkpoint
             )
             time.sleep(1)
 
-        if self.vehicle.mode.name != "GUIDED":
-            self.vehicle.simple_goto(self.vehicle.location.global_frame)
+        if self.aviDrone.mode.name != "GUIDED":
+            self.aviDrone.simple_goto(self.aviDrone.location.global_frame)
             print("Halting simple_go_to")
 
         print("Checkpoint reached")
@@ -224,7 +220,7 @@ class Mission:
 
     def condition_yaw(self):
         heading = self.heading
-        original_yaw = self.vehicle.attitude.yaw
+        original_yaw = self.aviDrone.attitude.yaw
         if self.relative:
             is_relative = 1  # yaw relative to direction of travel
         else:
@@ -236,7 +232,7 @@ class Mission:
         else:
             self.cw = 1
 
-        msg = self.vehicle.message_factory.command_long_encode(
+        msg = self.aviDrone.message_factory.command_long_encode(
             0,  # target system
             0,  # target component
             self.mavutil.mavlink.MAV_CMD_CONDITION_YAW,  # command
@@ -249,7 +245,7 @@ class Mission:
             0,
             0,
         )  # param 5 ~ 7 not used
-        self.vehicle.send_mavlink(msg)  # send command to vehicle
+        self.aviDrone.send_mavlink(msg)  # send command to vehicle
 
 
 class Vector:

@@ -15,6 +15,7 @@ import time
 import drone
 import dronekit_sitl
 import transceiver
+import transceiver.util
 from dronekit import LocationGlobal, VehicleMode, connect
 from util import (
     ALTITUDE,
@@ -23,6 +24,7 @@ from util import (
     MAGNITUDE,
     WINDOW_SIZE,
     Mission,
+    Search,
     get_distance_metres,
     get_location_metres,
     get_location_metres_with_alt,
@@ -47,13 +49,13 @@ search = drone.search
 IS_TEST = True  # set to False for real flight
 
 
-def run(beacon):
+def run(transceiver):
     log.info("-- SECONDARY SEARCH --")
     signal_found = False
     uav_pos = [0, 0, 0]
     beacon_pos = [0, 0, 0]
     if IS_TEST:
-        beacon = search.read_transceiver(uav_pos, beacon_pos)  # mock transceiver
+        beacon = search.mock_transceiver(uav_pos, beacon_pos)  # mock transceiver
     else:
         beacon = transceiver.Transceiver()
     search.start()
@@ -131,5 +133,5 @@ if __name__ == "__main__":
     uav_pos = [20, 20, 2]  # Example
     beacon_pos = [1, 1, 1]  # Example
     search = drone.search
-    transceiver = search.read_transceiver(uav_pos, beacon_pos)
-    run(transceiver)
+    mock_transceiver = Search.mock_transceiver(uav_pos, beacon_pos)
+    run(mock_transceiver)

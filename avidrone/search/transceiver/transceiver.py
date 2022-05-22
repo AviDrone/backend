@@ -2,21 +2,28 @@ import datetime
 import logging
 import time
 
-import util
-from transceiver_EM_field import get_theta_grid
+import transceiver.transceiver_EM_field
+import transceiver.util
+from transceiver.util import (
+    get_direction,
+    get_displacement,
+    get_distance_xy,
+    get_unique_theta,
+    normalize,
+)
 
 # log
 log = logging.getLogger(__name__)
 log.setLevel(logging.INFO)
 
-formatter = logging.Formatter("%(asctime)s:%(levelname)s:%(message)s")
+formatter = logging.Formatter("%(asctime)s : [%(levelname)s] : %(message)s")
 
 file_handler = logging.FileHandler("transceiver.log")
 file_handler.setFormatter(formatter)
 
 log.addHandler(file_handler)
 
-theta = get_theta_grid()
+theta = transceiver.transceiver_EM_field.get_theta_grid()
 
 
 class Transceiver:
@@ -60,7 +67,7 @@ class Transceiver:
             {"Orthovox S1": 50},
         ]
 
-        self.curr_search_strip_width = 6  # Aivdrone (default)
+        self.curr_search_strip_width = 6  # Avidrone (default)
 
     def get_model(self):
         return transceiver.model[self.model_number]
@@ -90,8 +97,7 @@ class Transceiver:
         transceiver.mode: {transceiver.mode} \n \
         transceiver.direction: {transceiver.direction} \n \
         transceiver.distance: {transceiver.distance} \n \
-        transceiver.signal_detected: {transceiver.signal_detected} \n \
-        "
+        transceiver.signal_detected: {transceiver.signal_detected} \n"
         print(data_msg)
         log.info(data_msg)
 
@@ -102,6 +108,26 @@ class Transceiver:
             transceiver.model: {model} \n \
             transceiver.search_strip_width: {transceiver.curr_search_strip_width}"
         print(settings_msg)
+        log.info(settings_msg)
+
+    @staticmethod
+    def mock_transceiver(uav_pos, beacon_pos):
+        # UAV position
+        x_1 = uav_pos[0]
+        y_1 = uav_pos[1]
+        z_1 = uav_pos[2]
+
+        # Beacon position
+        x_2 = beacon_pos[0]
+        y_2 = beacon_pos[1]
+        z_2 = beacon_pos[2]
+
+        displacement = get_displacement(x_1, x_2, y_1, y_2, z_1, z_2)
+        disp_n = normalize(displacement)
+        dist = get_distance_xy(displacement)
+        theta = get_unique_theta(disp_n)
+        direction = get_direction(theta)
+        return direction, dist
 
 
 IS_TEST = False  # set to true to use mock transceiver simulation
@@ -124,7 +150,7 @@ timeout_count = 0
 timeout = False
 
 
-mock_transceiver = util.mock_transceiver(uav_pos, beacon_pos)
+mock_transceiver = transceiver.mock_transceiver(uav_pos, beacon_pos)
 
 while True:
     if IS_TEST:
