@@ -139,10 +139,6 @@ while True:
         timeout_count += 1
     if timeout_count == transceiver.battery:
         timeout = True
-<<<<<<< HEAD
-=======
-        
->>>>>>> 4439c8188f615fbedf030a7212875a413f5338f6
 
     log.info(f"-- direction, distance: {(transceiver.direction, transceiver.distance)}")
     mission_begin_time = datetime.datetime.now()
