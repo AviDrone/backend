@@ -2,7 +2,11 @@ import magpylib as magpy
 import matplotlib.pyplot as plt
 import numpy as np
 
-# reference: https://magpylib.readthedocs.io/en/latest/examples/examples_30_coil_field_lines.html
+"""
+# Simulation of electromagnetic field of transceiver coils
+# For mor information about the coils, see: 
+# https://magpylib.readthedocs.io/en/latest/examples/examples_30_coil_field_lines.html
+"""
 
 # create grid
 ts = np.linspace(-100, 100, 100)
@@ -33,9 +37,6 @@ Bamp_2 = np.linalg.norm(B_2, axis=2)
 Bamp_2 /= np.amax(Bamp_2)
 # # coil_2.show()
 
-# superposition principle of magnetic field
-# Reference: http://www.physicsbootcamp.org/Superposition-of-Magnetic-Fields.html
-
 # plotting magnetic fields of coil 1 and coil 2
 B = np.add(B_1, B_2)
 B_amp = np.linalg.norm(B, axis=2)
@@ -56,19 +57,19 @@ sp_1 = ax1.streamplot(
 )
 
 # coil 2 plot
-# sp_2 = ax2.streamplot(
-#     grid[:, :, 0],
-#     grid[:, :, 2],
-#     B_2[:, :, 0],
-#     B_2[:, :, 2],
-#     density=3,
-#     color=Bamp_2,
-#     linewidth=np.sqrt(Bamp_2) * 2,
-#     cmap="coolwarm",
-# )
+sp_2 = ax2.streamplot(
+    grid[:, :, 0],
+    grid[:, :, 2],
+    B_2[:, :, 0],
+    B_2[:, :, 2],
+    density=3,
+    color=Bamp_2,
+    linewidth=np.sqrt(Bamp_2) * 2,
+    cmap="coolwarm",
+)
 
 # combined coils plot
-sp_2 = ax2.streamplot(
+sp_combined = ax2.streamplot(
     grid[:, :, 0],
     grid[:, :, 2],
     B[:, :, 0],
@@ -80,8 +81,6 @@ sp_2 = ax2.streamplot(
 
 
 def get_theta_grid():
-    # tan^-1 ( B_y / B_x) -> theta (radians)
-
     B_x = B[:, :, 0]
     B_y = B[:, :, 1]
     B_z = B[:, :, 2]  # currently not used for 2D model
@@ -111,7 +110,8 @@ ax2.set(
 )
 
 plt.colorbar(sp_1.lines, ax=ax1, label="[mT]")
-plt.colorbar(sp_2.lines, ax=ax2, label="[mT]")
+# plt.colorbar(sp_2, ax=ax2, label="[mT]")
+plt.colorbar(sp_combined.lines, ax=ax2, label="[mT]")
 
 plt.tight_layout()
-plt.show()
+# plt.show()

@@ -23,8 +23,6 @@ from dronekit import (
 # import primary
 # import secondary
 
-# import util
-
 
 # log
 log = logging.getLogger(__name__)
@@ -34,9 +32,10 @@ file_handler = logging.FileHandler("search.log")
 file_handler.setFormatter(formatter)
 log.addHandler(file_handler)
 
-print("main test")  # TODO remove after testing
+
 def search():
     log.info("--- BEGIN SEARCH ---")
+    print("main test_2")  # TODO remove after testing
 
 
 if __name__ == "__main__":
