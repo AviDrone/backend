@@ -4,7 +4,7 @@ import numpy as np
 
 """
 # Simulation of electromagnetic field of transceiver coils
-# For mor information about the coils, see: 
+# For more information about the coils, see: 
 # https://magpylib.readthedocs.io/en/latest/examples/examples_30_coil_field_lines.html
 """
 
