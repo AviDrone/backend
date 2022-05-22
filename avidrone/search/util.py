@@ -63,8 +63,6 @@ class GpsData:
 
 class Search:
     def __init__(self):
-        from drone import vehicle
-
         aviDrone = vehicle
         self.global_frame = aviDrone.location.global_frame
         # self.global_location = LocationGlobal(new_lat, new_lon, original_location.alt)
