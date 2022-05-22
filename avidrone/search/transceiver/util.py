@@ -3,6 +3,7 @@ import math
 import random
 
 import numpy as np
+
 import transceiver_EM_field
 
 # distances are euclidean
@@ -63,7 +64,7 @@ def get_angle(disp):
     else:
         d_xy = 0.001
         theta = np.arccos(np.dot(v_d, fwd) / d_xy)
-        
+
     # To account for measurement inconsistencies. We use a random value
     # between -15 and 15. That makes it likely that the beacon gets the
     # wrong direction roughly a third of the time.
