@@ -3,6 +3,7 @@ import logging
 import time
 
 import util
+from transceiver_EM_field import get_theta_grid
 
 # log
 log = logging.getLogger(__name__)
@@ -14,6 +15,8 @@ file_handler = logging.FileHandler("transceiver.log")
 file_handler.setFormatter(formatter)
 
 log.addHandler(file_handler)
+
+theta = get_theta_grid()
 
 
 class Transceiver:
@@ -101,7 +104,8 @@ class Transceiver:
         print(settings_msg)
 
 
-IS_TEST = True  # set to true to use mock transceiver simulation
+IS_TEST = False  # set to true to use mock transceiver simulation
+
 
 # initialize transceiver parameters
 transceiver = Transceiver()
@@ -111,26 +115,29 @@ transceiver.curr_search_strip_width = transceiver.search_strip_width[
     transceiver.model_number
 ][model]
 
-uav_pos = [36, 145, 50]  # Example
-beacon_pos = [31, 146, 51]  # Example
+uav_pos = [140, 145, 980]  # Example
+beacon_pos = [31, 16, 51]  # Example
+
 # beacon_pos = [35, 120, 2]  # Example
 
 timeout_count = 0
 timeout = False
 
-while True:
-    timeout_count += 1
-    if timeout_count == transceiver.battery:
-        timeout = True
 
+mock_transceiver = util.mock_transceiver(uav_pos, beacon_pos)
+
+while True:
     if IS_TEST:
-        mock_transceiver = util.mock_transceiver(uav_pos, beacon_pos)
         transceiver.direction = mock_transceiver[0]
         transceiver.distance = mock_transceiver[1]
 
     else:
-        transceiver.direction = -1  # TODO real vals
-        transceiver.distance = -1  # TODO real vals
+        transceiver.direction = int(theta[timeout_count])
+        transceiver.distance = mock_transceiver[1]  # TODO real vals
+
+        timeout_count += 1
+    if timeout_count == transceiver.battery:
+        timeout = True
 
     log.info(f"-- direction, distance: {(transceiver.direction, transceiver.distance)}")
     mission_begin_time = datetime.datetime.now()
