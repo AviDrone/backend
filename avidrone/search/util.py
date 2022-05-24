@@ -18,7 +18,10 @@ from dronekit import (
     LocationGlobalRelative,
     VehicleMode,
 )
-from transceiver.transceiver import Transceiver
+
+WITH_TRANSCEIVER = False    # set to false for quicker primary search only operation
+if WITH_TRANSCEIVER:
+    from transceiver.transceiver import Transceiver
 
 IS_VERBOSE = False  # for verbose command-line interface output
 IS_TEST = False  # for running simulations
@@ -152,6 +155,7 @@ class Mission:
     def break_condition(self):
         nextwaypoint = self.aviDrone.commands.next
         if nextwaypoint == 4:
+            self.aviDrone.mode = VehicleMode("GUIDED")
             print("breaking...")
             return True
         return False

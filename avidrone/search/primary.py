@@ -517,6 +517,7 @@ def follow_primary():
 
         if mission.break_condition():
             # print("Size of commands break", len(aviDrone.commands))
+            time.sleep(1)
             aviDrone.commands.clear()
             aviDrone.commands.upload()
             time.sleep(1)
@@ -540,13 +541,17 @@ def follow_primary():
 reached_end, stopping_point = follow_primary()
 
 print("holding alt")
-aviDrone.mode = VehicleMode("ALT_HOLD")
+aviDrone.mode = VehicleMode("GUIDED")
 hold_count = 0
-hold_sec = 1
+hold_sec = 3
+
 while True:
-    if aviDrone.mode != "ALT_HOLD":
+    if aviDrone.mode != "GUIDED":
         print("Not holding alt")
         time.sleep(1)
+    if(aviDrone.location.global_frame.alt < 10):
+        a_location = LocationGlobalRelative(aviDrone.location.global_frame.lat, aviDrone.location.global_frame.lon, 10)
+        aviDrone.simple_goto(a_location)
     if hold_count != 0:
         time.sleep(hold_sec)
         break
@@ -564,7 +569,8 @@ def reupload_commands(index):
     cmds.next = index - 1
     print("nxt2:", cmds.next)
 
-
+aviDrone.mode = VehicleMode("GUIDED")
+time.sleep(1)
 reupload_commands(stopping_point)
 print("Reuploaded size", aviDrone.commands.count)
 time.sleep(1)
@@ -581,13 +587,16 @@ if not reached_end:
         reached_end_again, stopping_point2 = follow_primary()
 
         print("holding alt again")
-        aviDrone.mode = VehicleMode("ALT_HOLD")
-        hold_count = 0
-        hold_sec = 1
+        aviDrone.mode = VehicleMode("GUIDED")
         while True:
-            if aviDrone.mode != "ALT_HOLD":
-                print("Not holding alt again")
+            if aviDrone.mode != "GUIDED":
+                print("Not holding alt")
                 time.sleep(1)
+            if(aviDrone.location.global_frame.alt < 10):
+                a_location = LocationGlobalRelative(aviDrone.location.global_frame.lat, aviDrone.location.global_frame.lon, 10)
+                aviDrone.simple_goto(a_location)
+                # ascend with negative z value
+                # send_ned_velocity(velocity_x=0,velocity_y=0,velocity_z=-0.5,duration=1)
             if hold_count != 0:
                 time.sleep(hold_sec)
                 break
