@@ -57,7 +57,7 @@ To use our custom build of QGroundControl, you will need to follow this [guide](
 You can find more details about using QGroundControl in the [frontend](https://github.com/AviDrone/frontend) repository.
 
 <!-- TODO Add youtube video -->
-You can also see this video [walktrhough](https://youtu.be/glC99FwFnAc) to learn how to connect and interact with the UAV. 
+You can also see this video [walkthrough](https://youtu.be/glC99FwFnAc) to learn how to connect and interact with the UAV. 
 
 
 ## How to use
