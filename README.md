@@ -100,9 +100,10 @@ To contribute, carefully read the [CONTRIBUTING.md](CONTRIBUTING.md) file.
 <!-- TODO Update contributors -->
 Thanks goes to these wonderful people 
 
-* Nathaniel Price
 * Samuel Hernandez
+* Nathaniel Price
 * Stefan Hess
+* Matthew Harter
 
 
 ## License
