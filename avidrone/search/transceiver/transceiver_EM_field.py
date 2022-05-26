@@ -40,12 +40,12 @@ Bamp_2 /= np.amax(Bamp_2)
 # coil_2.show()
 
 # plotting magnetic fields of coil 1 and coil 2
-B = np.add(B_1, B_2)
-B_amp = np.linalg.norm(B, axis=2)
-B_amp /= np.amax(B_amp)
+# B = np.add(B_1, B_2)
+# B_amp = np.linalg.norm(B, axis=2)
+# B_amp /= np.amax(B_amp)
 
-# Plot
-fig, [ax1, ax2] = plt.subplots(1, 2, figsize=(9, 4))
+# # Plot
+# fig, [ax1, ax2] = plt.subplots(1, 2, figsize=(9, 4))
 
 sp_1 = ax1.streamplot(
     grid[:, :, 0],

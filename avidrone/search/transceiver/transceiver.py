@@ -2,7 +2,7 @@ import datetime
 import logging
 import time
 
-import transceiver.transceiver_EM_field
+import transceiver_EM_field
 import transceiver.util
 from transceiver.util import (
     get_direction,
@@ -182,19 +182,19 @@ while True:
     # Navigation algorithm
     if uav_pos[0] < beacon_pos[0]:  # x
         uav_pos[0] += 1
-        # log.debug("x_uav < x_beacon")
+        log.debug("x_uav < x_beacon")
 
     elif uav_pos[0] > beacon_pos[0]:  # x
         uav_pos[0] -= 1
-        # log.debug("x_uav > x_beacon")
+        log.debug("x_uav > x_beacon")
 
     if uav_pos[1] < beacon_pos[1]:  # y
         uav_pos[1] += 1
-        # log.debug("y_uav < y_beacon")
+        log.debug("y_uav < y_beacon")
 
     elif uav_pos[1] > beacon_pos[1]:  # y
         uav_pos[1] -= 1
-        # log.debug("y_uav > y_beacon")
+        log.debug("y_uav > y_beacon")
 
     else:
         # time.sleep(0.5)  # Transceiver receives reading every half seconds

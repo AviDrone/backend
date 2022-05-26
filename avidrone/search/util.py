@@ -154,7 +154,7 @@ class Mission:
     # This will be called repeatedly and return true when the break condition is true.
     def break_condition(self):
         nextwaypoint = self.aviDrone.commands.next
-        if nextwaypoint == 4:
+        if nextwaypoint == 40:
             self.aviDrone.mode = VehicleMode("GUIDED")
             print("breaking...")
             return True
