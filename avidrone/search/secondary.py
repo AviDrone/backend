@@ -135,6 +135,7 @@ def run(transceiver):
         time.sleep(2)
 
 
+# A version much closer to the previous version to serve as a better reference
 def run_prev_sec_search():
     # Initialize the gps_window to be WINDOW_SIZE long
     import gps_data
