@@ -48,6 +48,12 @@ search = drone.search
 # If test, use the following command to run
 IS_TEST = True  # set to False for real flight
 
+# TODO add timeout like with transceiver
+
+"""
+            log.info("Return to launch")
+            Avidrone.mode = VehicleModle("RTL)")
+"""
 
 def run(transceiver):
     log.info("-- SECONDARY SEARCH --")
