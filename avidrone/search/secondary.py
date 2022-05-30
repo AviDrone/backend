@@ -28,7 +28,7 @@ from util import (
     get_distance_metres,
     get_location_metres,
     get_location_metres_with_alt,
-    get_range,
+    get_range
 )
 
 log = logging.getLogger(__name__)
@@ -39,7 +39,7 @@ file_handler.setFormatter(formatter)
 log.addHandler(file_handler)
 
 # initialization
-Avidrone = drone.vehicle
+aviDrone = drone.vehicle
 sitl = drone.sitl
 vector = drone.vector
 mission = drone.mission
@@ -60,16 +60,16 @@ def run(transceiver):
         beacon = transceiver.Transceiver()
     search.start()
     gps_window = WINDOW_SIZE
-    while Avidrone.mode.name == "GUIDED":
+    while aviDrone.mode.name == "GUIDED":
         log.info(transceiver.direction, ", ", transceiver.distance)
 
         if beacon.direction < 2:  # Turn left
             log.info("-- Turning left")
-            Mission.condition_yaw(-DEGREES, True)
+            mission.condition_yaw(-DEGREES, True)
 
         elif beacon.direction > 2:  # Turn right
             log.info("-- Turning right")
-            Mission.condition_yaw(DEGREES, True)
+            mission.condition_yaw(DEGREES, True)
 
         elif beacon.direction == 2:  # Continue forward
             log.info("-- Continuing forward")
@@ -82,13 +82,13 @@ def run(transceiver):
                 # If the minimum is the center point of the gps_window we need to go
                 # back to that location, Min index = middle
 
-                Mission.simple_goto_wait(
+                mission.simple_goto_wait(
                     gps_window.gps_points[int((gps_window.window_size - 1) / 2)]
                 )
 
                 if gps_window.distance[2] <= LAND_THRESHOLD:
                     log.info("-- Landing")
-                    Avidrone.mode = VehicleMode("LAND")
+                    aviDrone.mode = VehicleMode("LAND")
                     signal_found = True
 
                 if signal_found:
@@ -97,7 +97,7 @@ def run(transceiver):
                         f"\n-------- VICTIM FOUND: {transceiver.signal_detected} -------- "
                     )
                     print(f"-- Time: {current_time}")
-                    print(f"-- Location: {Avidrone.location.global_frame}\n")
+                    print(f"-- Location: {aviDrone.location.global_frame}\n")
 
                 else:
                     log.info("Not close, continuing")
@@ -111,8 +111,8 @@ def run(transceiver):
                 # If the minimum data point is the last one in the array,
                 log.info("too far in the wrong direction")
 
-                Mission.condition_yaw(180, True)
-                Mission.simple_goto_wait(
+                mission.condition_yaw(180, True)
+                mission.simple_goto_wait(
                     gps_window.gps_points[gps_window.window_size - 1]
                 )
                 gps_window.purge_gps_window()
@@ -120,14 +120,91 @@ def run(transceiver):
             elif gps_window.get_minimum_index() == 0:
                 # If the minimum data point is in the first index,
                 log.info("continue forward")
-                Mission.go_to_location(MAGNITUDE, Avidrone.attitude.yaw, Avidrone)
+                mission.go_to_location(MAGNITUDE, aviDrone.attitude.yaw, aviDrone)
 
             else:
                 log.info(f"Did not find signal at altitude: {ALTITUDE}")
                 log.info("Climbing...")
-                Mission.go_to_location(MAGNITUDE, Avidrone.attitude.yaw, Avidrone)
+                mission.go_to_location(MAGNITUDE, aviDrone.attitude.yaw, aviDrone)
         time.sleep(2)
 
+
+def run_prev_sec_search():
+    # Initialize the gps_window to be WINDOW_SIZE long
+    import gps_data
+    import transceiver.read_transceiver as rt
+    gps_window = gps_data.GPSData(WINDOW_SIZE)
+
+    while aviDrone.mode.name != "GUIDED":
+        print("Waiting for GUIDED mode")
+        time.sleep(1)
+
+    while aviDrone.mode.name == "GUIDED":
+        direction_distance = rt.read_transceiver()
+
+        print("Direction: ", direction_distance.direction, "Distance: ", direction_distance.distance)
+
+        if direction_distance.direction < 2:
+            # Turn left
+            mission.condition_yaw(-DEGREES, True)
+
+        elif direction_distance.direction > 2:
+            # Turn right
+            mission.condition_yaw(DEGREES, True)
+
+        elif direction_distance.direction == 2:
+            print("Fly forward")
+            flight_dir = mission.forward_calculation()
+            print("Flight dir[0]: ", flight_dir[0])
+            print("Flight dir[1]: ", flight_dir[1])
+
+            gps_window.add_point(search.get_global_pos(), direction_distance.distance)
+
+            if gps_window.get_minimum_index() == ((gps_window.window_size - 1) / 2) \
+                    and len(gps_window.gps_points) == gps_window.window_size:
+
+                # If the minimum is the center point of the gps_window we need to go
+                # back to that location
+                print("Min index = middle")
+
+                mission.simple_goto_wait(gps_window.gps_points[int((gps_window.window_size - 1) / 2)])
+
+                if gps_window.distance[2] <= LAND_THRESHOLD:
+                    print("Close, landing")
+                    aviDrone.mode = VehicleMode('LAND')
+                else:
+                    print("Not close, continuing")
+                    gps_window.purge_gps_window()
+
+            elif gps_window.get_minimum_index() == (gps_window.window_size - 1) \
+                    and len(gps_window.gps_points) == gps_window.window_size:
+
+                # If the minimum data point is the last one in the array we have gone
+                # too far and in the wrong direction
+                print("Min index = window_size - 1")
+
+                mission.condition_yaw(180, True)
+                mission.simple_goto_wait(gps_window.gps_points[gps_window.window_size - 1])
+                gps_window.purge_gps_window()
+
+            elif gps_window.get_minimum_index() == 0:
+                # If the minimum data point is in the first index, continue forward
+                print("Min index = 0")
+
+                # goto(flight_dir[0], flight_dir[1])
+                search.better_goto(MAGNITUDE, aviDrone.attitude.yaw, aviDrone)
+
+            else:
+                # Possibly going in the wrong direction.... But we still need to keep
+                # going to make sure
+
+                print("Goin' on up")
+                # goto(flight_dir[0], flight_dir[1])
+                mission.better_goto(MAGNITUDE, aviDrone.attitude.yaw, aviDrone)
+
+            # send_ned_velocity(flight_dir[0], flight_dir[1], 0, 1)
+
+        time.sleep(2)
 
 if __name__ == "__main__":
     uav_pos = [20, 20, 2]  # Example

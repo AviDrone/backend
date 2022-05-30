@@ -191,6 +191,75 @@ class Mission:
                 break
             time.sleep(2)
 
+    
+    def better_get_distance_meters(a_location1, a_location2):
+        lat1, lat2 = a_location1.lat, a_location2.lat
+        lon1, lon2 = a_location1.lon, a_location2.lon
+
+        # 6371.009e3 is the mean radius of the earth that gives us the distance
+        # (NOT USED)
+        #
+        # 1.113195e5 gives us meters
+        distance = 2 * math.asin(math.sqrt((math.sin((lat1 - lat2) / 2)) ** 2 +
+                                        math.cos(lat1) * math.cos(lat2) *
+                                        (math.sin((lon1 - lon2) / 2)) ** 2)) * 1.113195e5
+        return distance
+
+
+    def better_get_location_meters(original_location, distance, angle):
+        lat = math.asin(math.sin(original_location.lat) * math.cos(distance) + math.cos(original_location.lat) *
+                        math.sin(distance) * math.cos(angle))
+
+        d_lon = math.atan2(math.sin(angle) * math.sin(distance) * math.cos(original_location.lat),
+                        math.cos(distance) - math.sin(original_location.lat) * math.sin(lat))
+
+        lon = (original_location.lon - d_lon + math.pi) % (2 * math.pi) - math.pi
+
+        return LocationGlobal(lat, lon, original_location.alt)
+    
+    
+    def better_goto(distance, angle, vehicle):
+        """
+        Moves the vehicle to a position d_north metres North and d_east metres East of the current position.
+        The method takes a function pointer argument with a single `dronekit.lib.LocationGlobal` parameter for
+        the target position. This allows it to be called with different position-setting commands.
+        By default it uses the standard method: dronekit.lib.Vehicle.simple_goto().
+        The method reports the distance to target every two seconds.
+
+        Retrieved from this link:
+        https://dronekit-python.readthedocs.io/en/latest/examples/guided-set-speed-yaw-demo.html
+        """
+
+        vehicle = drone.vehicle
+        currentLocation = vehicle.location.global_frame  # was global_relative_frame
+        targetLocation = Mission.better_get_location_meters(currentLocation, distance, angle)
+        # targetDistance = better_get_distance_meters(currentLocation, targetLocation)
+        # targetDistance = get_distance_meters(currentLocation, targetLocation)
+        vehicle.simple_goto(targetLocation)
+
+        # print "DEBUG: targetLocation: %s" % targetLocation
+        # print "DEBUG: targetLocation: %s" % targetDistance
+
+        loop_count = 0
+        while vehicle.mode.name == "GUIDED":  # Stop action if we are no longer in guided mode.
+            # print "DEBUG: mode: %s" % vehicle.mode.name
+            remainingDistance = Mission.better_get_distance_meters(vehicle.location.global_frame, targetLocation)
+            # global_frame was global_relative_frame
+            # remainingDistance=get_distance_meters(vehicle.location.global_frame, targetLocation)
+            # #global_frame was global_relative_frame
+            print("Distance to target: ", remainingDistance)
+            # if remainingDistance<=targetDistance*0.01: #Just below target, in case of undershoot.
+
+            loop_count += 1
+
+            if remainingDistance <= 0.35:
+                print("Reached target")
+                break
+            elif loop_count >= 10:
+                print("Stuck, skipping target")
+                break
+            time.sleep(2)
+
     def simple_goto_wait(self, go_to_checkpoint):
         self.aviDrone.simple_goto(go_to_checkpoint)
         global_frame = self.aviDrone.location.global_frame
@@ -211,16 +280,15 @@ class Mission:
 
         print("Checkpoint reached")
 
-    # def wobble_wait(self):
-    # make vehicle wait until the wobbling settles down before moving forward.
-    #    heading_rad = self.heading * math.pi / 180
+    def forward_calculation():
+        flight_direction = []
+        yaw = drone.vehicle.attitude.yaw
 
-    #    target_yaw = self.original_yaw + cw * heading_rad
+        print(yaw)
+        flight_direction.append(MAGNITUDE * math.cos(yaw))
+        flight_direction.append(MAGNITUDE * math.sin(yaw))
 
-    #   while abs(target_yaw - vehicle.attitude.yaw) % math.pi > 0.01745 * DEGREE_ERROR:
-    #        error_degree = abs(target_yaw - vehicle.attitude.yaw) % math.pi
-    #        print("Turn error: ", error_degree)  # 1 degree
-    #        time.sleep(0.25)
+        return flight_direction
 
     def condition_yaw(self):
         heading = self.heading
@@ -258,56 +326,6 @@ class Vector:
         vect2 = []
         self.vect1 = np.asarray(vect1)
         self.vect2 = np.asarray(vect2)
-
-    def rotate_cloud_self(self, Points):
-        # V1 is the current vector which the coordinate system is aligned to
-        # V2 is the vector we want the system aligned to
-        # Points is an (n,3) array of n points (x,y,z)
-
-        V1 = self.vect1
-        V2 = self.vect2
-
-        # Normalize V1 and V2 in case they aren't already
-        V1Len = (V1[0] ** 2 + V1[1] ** 2 + V1[2] ** 2) ** 0.5
-        V2Len = (V2[0] ** 2 + V2[1] ** 2 + V2[2] ** 2) ** 0.5
-        V1 = V1 / V1Len
-        V2 = V2 / V2Len
-
-        # Calculate the vector cross product
-        V1V2Cross = np.cross(V1, V2)
-        V1V2CrossNorm = (
-            V1V2Cross[0] ** 2 + V1V2Cross[1] ** 2 + V1V2Cross[2] ** 2
-        ) ** 0.5
-        V1V2CrossNormalized = V1V2Cross / V1V2CrossNorm
-
-        # Dot product
-        V1V2Dot = np.dot(V1, V2)
-        V1Norm = (V1[0] ** 2 + V1[1] ** 2 + V1[2] ** 2) ** 0.5
-        V2Norm = (V2[0] ** 2 + V2[1] ** 2 + V2[2] ** 2) ** 0.5
-
-        # angle between the vectors
-        Theta = np.arccos(V1V2Dot / (V1Norm * V2Norm))
-
-        # Using Rodriguez' rotation formula (wikipedia):
-        e = V1V2CrossNormalized
-        pts_rotated = np.empty((len(Points), 3))
-        if np.size(Points) == 3:
-            p = Points
-            p_rotated = (
-                np.cos(Theta) * p
-                + np.sin(Theta) * (np.cross(e, p))
-                + (1 - np.cos(Theta)) * np.dot(e, p) * e
-            )
-            pts_rotated = p_rotated
-        else:
-            for i, p in enumerate(Points):
-                p_rotated = (
-                    np.cos(Theta) * p
-                    + np.sin(Theta) * (np.cross(e, p))
-                    + (1 - np.cos(Theta)) * np.dot(e, p) * e
-                )
-                pts_rotated[i] = p_rotated
-        return pts_rotated
 
     def rotate_vector(self, vector, angle):
         # vector is the vector being rotated

@@ -375,7 +375,7 @@ def arm_and_takeoff(aTargetAltitude):
     """
 
     print("Basic pre-arm checks")
-    # Don't let the user try to arm until autopilot is ready
+    # Don not let the user try to arm until autopilot is ready
     while not aviDrone.is_armable:
         print(" Waiting for vehicle to initialise...")
         time.sleep(1)
