@@ -4,7 +4,6 @@
 [![All Contributors](https://img.shields.io/badge/all_contributors-4-orange.svg?style=flat-square)](#contributors-)
 ![license](https://img.shields.io/github/license/AviDrone/AviDrone)
 ![stars](https://img.shields.io/github/stars/AviDrone/AviDrone?style=social)
-<!-- TODO add pipeline test badge -->
 
 <!-- BADGE:END -->
 
