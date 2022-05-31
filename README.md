@@ -4,6 +4,8 @@
 [![All Contributors](https://img.shields.io/badge/all_contributors-4-orange.svg?style=flat-square)](#contributors-)
 ![license](https://img.shields.io/github/license/AviDrone/AviDrone)
 ![stars](https://img.shields.io/github/stars/AviDrone/AviDrone?style=social)
+<!-- TODO add pipeline test badge -->
+
 <!-- BADGE:END -->
 
 Avalanches kill over 150 people worldwide every year.[^1] After getting caught in an avalanche, your chances of survival in the first 15 minutes are around 90%. After 30 minutes, your chances drop to 30%. Rescue teams must get to avalanche victims in the fastest time possible.
@@ -11,7 +13,7 @@ Avalanches kill over 150 people worldwide every year.[^1] After getting caught i
 
 ## Objective
 
-Our objective for this project is to use UAV systems to search for avalanche transceiver signals. This allows us to
+Our objective for this project is to use Unmanned Aerial Systems (UAS) to search for avalanche transceiver signals. This allows rescuers to
 
 - Search over unsafe avalanche debris
 - Flag the victim's locations autonomously
@@ -51,19 +53,19 @@ chmod -x install.sh && bash install.sh
 
 This will take care of installing the libraries used in the backend of this project.
 
-<!-- #### QGroundControl
-
- Avidrone search is compatible with the original version of QGroundControl while using command line arguments, and a few other steps.
-
-<!--  TODO Add GUI tutorial here -->
-To use our custom build of QGroundControl, you will need to follow this [guide](linkGUI)
-
-You can find more details about using QGroundControl in the [frontend](https://github.com/AviDrone/frontend) repository.
-
-<!-- TODO Add youtube video -->
-You can also see this video [walkthrough](https://youtu.be/glC99FwFnAc) to learn how to connect and interact with the UAV. -->
+It is possible to run a search mission using our command line arguments (CLI) arguments, but using our frontend will defenitely speed things up. To install QGroundControl for Avidrone, see the [frontend repository](https://github.com/AviDrone/frontend).
 
 ## How to use
+
+
+### Examples
+
+<!--TODO Add tutorial-->
+#### Running a Basic Mission
+
+<!--TODO Add tutorial-->
+#### Running a transceiver simulation
+
 
 ### Search
 
@@ -84,10 +86,16 @@ To run a full search mission using command-line arguments, run the following com
   ```{bash)
   avidrone-search --secondary
   ```
+  
+  We recommend that you also run the following command to see what other things you can do with avidrone-search
+  
+  ```{bash)
+  avidrone-search --help
+  ```
+  
+### Simulation
 
-### Example: Running a Basic Mission
-
-### Example: Running a simulated search mission
+To run a simulated search mission, you will need
 
 ## How to contribute
 
