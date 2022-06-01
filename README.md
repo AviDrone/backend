@@ -4,25 +4,12 @@
 [![All Contributors](https://img.shields.io/badge/all_contributors-4-orange.svg?style=flat-square)](#contributors-)
 ![license](https://img.shields.io/github/license/AviDrone/AviDrone)
 ![stars](https://img.shields.io/github/stars/AviDrone/AviDrone?style=social)
-<!-- TODO add pipeline test badge -->
 
 <!-- BADGE:END -->
-
-Avalanches kill over 150 people worldwide every year.[^1] After getting caught in an avalanche, your chances of survival in the first 15 minutes are around 90%. After 30 minutes, your chances drop to 30%. Rescue teams must get to avalanche victims in the fastest time possible.
-[^1]: [National Geographic](https://www.nationalgeographic.org/encyclopedia/avalanche/)
-
-## Objective
-
-Our objective for this project is to use Unmanned Aerial Systems (UAS) to search for avalanche transceiver signals. This allows rescuers to
-
-- Search over unsafe avalanche debris
-- Flag the victim's locations autonomously
-- Reduce search time for avalanche victims.
 
 ## Table of Contents
 
 - [Avidrone Avalanche Rescue 🏔⛑](#avidrone-avalanche-rescue-)
-  - [Objective](#objective)
   - [Table of Contents](#table-of-contents)
   - [Getting Started](#getting-started)
     - [Set up](#set-up)
