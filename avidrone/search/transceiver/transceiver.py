@@ -1,11 +1,8 @@
 import datetime
 import logging
-
-# import transceiver_EM_field
-# import Transceiver.util
-from transceiver import util
-
 import time
+# from transceiver import transceiver_EM_field
+from transceiver import util
 
 
 # log
@@ -149,7 +146,6 @@ IS_TIMEOUT = False
 timeout_count = 0
 
 
-
 mock_transceiver = transceiver.mock_transceiver(uav_pos, beacon_pos)
 
 while True:
@@ -200,9 +196,10 @@ while True:
 
     else:
         if IS_TEST:
-            time.sleep(0.0)     # To speed up search time during testing
+            time.sleep(0.0)  # To speed up search time during testing
         else:
-            time.sleep(0.5)     # Beacon reads values every 0.5 seconds
+            time.sleep(0.5)  # Beacon reads values every 0.5 seconds
+
         if IS_TIMEOUT:
             log.warning("\n reached timeout \n")
             c_t = datetime.datetime.now()

@@ -4,7 +4,7 @@ import random
 
 import numpy as np
 
-# log
+# logging
 log = logging.getLogger(__name__)
 log.setLevel(logging.INFO)  # Set to loging.DEBUG to see individual parameter values
 formatter = logging.Formatter("%(asctime)s  [%(levelname)s]  %(message)s")
