@@ -12,11 +12,11 @@ import time
 import drone
 import numpy as np
 import primary_functions as pf
+from avidrone.search.primary_functions import set_FS_BATT
 from dronekit import LocationGlobalRelative, VehicleMode
 from pymavlink import mavutil
 from util import get_range
 
-from avidrone.search.primary_functions import set_FS_BATT
 
 aviDrone = drone.vehicle
 sitl = drone.sitl

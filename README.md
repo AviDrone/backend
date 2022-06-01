@@ -35,7 +35,7 @@ git clone https://github.com/AviDrone/backend.git --single-branch --branch main
 Before getting started, you will need to install a few libraries by running **install.sh**.
 
   ```{bash)
-chmod -x install.sh && bash install.sh
+chmod -x scripts/install.sh && bash scripts/install.sh
   ```
 
 This will take care of installing the libraries used in the backend of this project.
