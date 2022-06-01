@@ -105,6 +105,6 @@ Licensed under the [LGPL-2.1](https://www.gnu.org/licenses/lgpl-3.0.html) Licens
 
 ## Contact
 
-For any questions, feel free to contact me at any time through email 
+For any questions, feel free to contact me at any time through email
 
 - [Samuel S. Hernandez](mailto:samuel.hernandez@wallawalla.edu)

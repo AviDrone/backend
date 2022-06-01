@@ -21,7 +21,7 @@ from dronekit import (
 
 WITH_TRANSCEIVER = True  # set to false for quicker primary search only operation
 if WITH_TRANSCEIVER:
-    from transceiver import Transceiver
+    import transceiver
 
 IS_VERBOSE = False  # for verbose command-line interface output
 IS_TEST = False  # for running simulations
@@ -115,7 +115,7 @@ class Search:
 
     @staticmethod
     def mock_transceiver(uav_pos, beacon_pos):
-        using = Transceiver()
+        using = transceiver.Transceiver()
         mock_beacon = using.mock_transceiver(uav_pos, beacon_pos)
         return mock_beacon
 
