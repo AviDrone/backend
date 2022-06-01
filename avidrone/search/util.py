@@ -343,7 +343,7 @@ class Vector:
         vector_1 = []
         vector_2 = []
         self.vector_1 = np.asarray(vector_1)
-        self.vector_2 = np.asarray(vect2)
+        self.vector_2 = np.asarray(vector_2)
 
     @staticmethod
     def rotate_cloud(Points, V1, V2):
@@ -426,7 +426,7 @@ class Vector:
 
     @staticmethod
     def get_range(total_length, d_length):
-        return (totalLength / dLength) * 2
+        return (total_length / d_length) * 2
 
 
 def get_distance_metres(a_location1, a_location2):

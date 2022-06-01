@@ -43,8 +43,6 @@ file_handler.setFormatter(formatter)
 log.addHandler(file_handler)
 
 # Initialization
-SIGNAL_FOUND = False
-IS_TIMEOUT = False
 avidrone = drone.vehicle
 mission = drone.mission
 search = drone.search
@@ -68,8 +66,11 @@ if IS_VERBOSE:
 
 def run(beacon):
     # Initialize values
+    SIGNAL_FOUND = False
     theta = 90  # TODO replace with transceiver theta values
     uav_pos = [0, 0, 0]
+
+    IS_TIMEOUT = False
     timeout_counter = 0
 
     if IS_TEST:
