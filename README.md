@@ -35,12 +35,12 @@ git clone https://github.com/AviDrone/backend.git --single-branch --branch main
 Before getting started, you will need to install a few libraries by running **install.sh**.
 
   ```{bash)
-chmod -x install.sh && bash install.sh
+chmod -x scripts/install.sh && bash scripts/install.sh
   ```
 
 This will take care of installing the libraries used in the backend of this project.
 
-It is possible to run a search mission using our command line arguments (CLI) arguments, but using our frontend will definitely speed things up. To install QGroundControl for Avidrone, see the [frontend repository](https://github.com/AviDrone/frontend).
+It is possible to run a search mission using our command-line arguments (CLI) arguments, but using our frontend will definitely speed things up. To install QGroundControl for Avidrone, see the [frontend repository](https://github.com/AviDrone/frontend).
 
 ## How to use
 
@@ -105,6 +105,6 @@ Licensed under the [LGPL-2.1](https://www.gnu.org/licenses/lgpl-3.0.html) Licens
 
 ## Contact
 
-For any questions, feel free to contact me at any time through email 
+For any questions, feel free to contact me at any time through email
 
 - [Samuel S. Hernandez](mailto:samuel.hernandez@wallawalla.edu)

@@ -13,12 +13,11 @@ import logging
 import math
 import time
 
-import dronekit_sitl
-from dronekit import LocationGlobal, VehicleMode, connect
-
 import drone
+import dronekit_sitl
 import transceiver
 import transceiver.util
+from dronekit import LocationGlobal, VehicleMode, connect
 from util import (
     ALTITUDE,
     DEGREES,

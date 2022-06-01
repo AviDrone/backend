@@ -9,13 +9,12 @@ from __future__ import print_function
 # Set up option parsing to get connection string
 import time
 
+import drone
 import numpy as np
+import primary_functions as pf
 from avidrone.search.primary_functions import set_FS_BATT
 from dronekit import LocationGlobalRelative, VehicleMode
 from pymavlink import mavutil
-
-import drone
-import primary_functions as pf
 from util import get_range
 
 aviDrone = drone.vehicle

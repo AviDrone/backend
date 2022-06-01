@@ -10,14 +10,18 @@ import logging as log
 import math
 import time
 
-import numpy as np
-from dronekit import Command, LocationGlobal, LocationGlobalRelative, VehicleMode
-
 import drone
+import numpy as np
+from dronekit import (
+    Command,
+    LocationGlobal,
+    LocationGlobalRelative,
+    VehicleMode,
+)
 
 WITH_TRANSCEIVER = True  # set to false for quicker primary search only operation
 if WITH_TRANSCEIVER:
-    from transceiver import Transceiver
+    import transceiver
 
 IS_VERBOSE = False  # for verbose command-line interface output
 IS_TEST = False  # for running simulations
@@ -57,6 +61,7 @@ class GpsData:
         self.gps_points.clear()
         self.distance.clear()
 
+
 class Search:
     def __init__(self):
         aviDrone = drone.vehicle
@@ -75,7 +80,7 @@ class Search:
         #     )
         #     * 1.113195e5
         # )
-        
+
     @staticmethod
     def get_distance(location_a, location_b):
         lat_a, lat_b = location_a.lat, location_b.lat
@@ -105,15 +110,15 @@ class Search:
         else:
             return LocationGlobal(new_lat, new_lon, d_alt)
 
-
     def get_global_pos(self):
         return self.global_frame
 
     @staticmethod
     def mock_transceiver(uav_pos, beacon_pos):
-        using = Transceiver()
+        using = transceiver.Transceiver()
         mock_beacon = using.mock_transceiver(uav_pos, beacon_pos)
         return mock_beacon
+
 
 class Mission:
     def __init__(self):
@@ -127,6 +132,7 @@ class Mission:
         self.relative = False
         self.cw = -1  # TODO get correct value
 
+    @staticmethod
     def better_get_distance_meters(a_location1, a_location2):
         lat1, lat2 = a_location1.lat, a_location2.lat
         lon1, lon2 = a_location1.lon, a_location2.lon
@@ -148,7 +154,8 @@ class Mission:
             * 1.113195e5
         )
         return distance
-    
+
+    @staticmethod
     def better_get_location_meters(original_location, distance, angle):
         lat = math.asin(
             math.sin(original_location.lat) * math.cos(distance)
@@ -163,7 +170,8 @@ class Mission:
         lon = (original_location.lon - d_lon + math.pi) % (2 * math.pi) - math.pi
 
         return LocationGlobal(lat, lon, original_location.alt)
-    
+
+    @staticmethod
     def better_goto(distance, angle, vehicle):
         """
         Moves the vehicle to a position d_north metres North and d_east metres East of the current position.
@@ -251,7 +259,8 @@ class Mission:
         )  # param 5 ~ 7 not used
         self.aviDrone.send_mavlink(msg)  # send command to vehicle
 
-    def forward_calculation(self):
+    @staticmethod
+    def forward_calculation():
         flight_direction = []
         yaw = drone.vehicle.attitude.yaw
 
@@ -276,7 +285,7 @@ class Mission:
             if remaining_distance <= 0.35:
                 print("Reached target")
                 break
-            elif loop_count >= 10:  # TODO experiment with this variable.
+            elif loop_count >= 10:
                 print("Stuck, skipping target")
                 break
             time.sleep(2)
@@ -332,14 +341,16 @@ class Mission:
                 break
             time.sleep(1)
 
+
 class Vector:
     def __init__(self):
-        vect1 = []
-        vect2 = []
-        self.vect1 = np.asarray(vect1)
-        self.vect2 = np.asarray(vect2)
+        vector_1 = []
+        vector_2 = []
+        self.vector_1 = np.asarray(vector_1)
+        self.vector_2 = np.asarray(vector_2)
 
-    def rotate_cloud(self, Points, V1, V2):
+    @staticmethod
+    def rotate_cloud(Points, V1, V2):
         # V1 is the current vector which the coordinate system is aligned to
         # V2 is the vector we want the system aligned to
         # Points is an (n,3) array of n points (x,y,z)
@@ -388,7 +399,8 @@ class Vector:
                 pts_rotated[i] = p_rotated
         return pts_rotated
 
-    def rotate_vector(self, vector, angle):
+    @staticmethod
+    def rotate_vector(vector, angle):
         # vector is the vector being rotated
         # angle is used to rotate vector and is given in degrees
 
@@ -416,8 +428,9 @@ class Vector:
 
         return NewVector
 
-    def get_range(self, total_length, d_length):
-        return (totalLength / dLength) * 2
+    @staticmethod
+    def get_range(total_length, d_length):
+        return (total_length / d_length) * 2
 
 
 def get_distance_metres(a_location1, a_location2):
@@ -430,6 +443,7 @@ def get_distance_metres(a_location1, a_location2):
     d_lat = a_location2.lat - a_location1.lat
     d_long = a_location2.lon - a_location1.lon
     return math.sqrt((d_lat * d_lat) + (d_long * d_long)) * 1.113195e5
+
 
 def get_location_metres(original_location, dNorth, dEast):
     """
@@ -448,9 +462,10 @@ def get_location_metres(original_location, dNorth, dEast):
     dLon = dEast / (earth_radius * math.cos(math.pi * original_location.lat / 180))
 
     # New position in decimal degrees
-    newlat = original_location.lat + (dLat * 180 / math.pi)
-    newlon = original_location.lon + (dLon * 180 / math.pi)
-    return LocationGlobal(newlat, newlon, original_location.alt)
+    new_lat = original_location.lat + (dLat * 180 / math.pi)
+    new_lon = original_location.lon + (dLon * 180 / math.pi)
+    return LocationGlobal(new_lat, new_lon, original_location.alt)
+
 
 def get_location_metres_with_alt(original_location, dNorth, dEast, newAlt):
     """
@@ -469,10 +484,11 @@ def get_location_metres_with_alt(original_location, dNorth, dEast, newAlt):
     dLon = dEast / (earth_radius * math.cos(math.pi * original_location.lat / 180))
 
     # New position in decimal degrees
-    newlat = original_location.lat + (dLat * 180 / math.pi)
-    newlon = original_location.lon + (dLon * 180 / math.pi)
+    new_lat = original_location.lat + (dLat * 180 / math.pi)
+    new_lon = original_location.lon + (dLon * 180 / math.pi)
 
-    return LocationGlobal(newlat, newlon, newAlt)
+    return LocationGlobal(new_lat, new_lon, newAlt)
+
 
 def get_range(totalLength, dLength):
     return (totalLength / dLength) * 2

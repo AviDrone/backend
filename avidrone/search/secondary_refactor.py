@@ -14,12 +14,11 @@ import math
 import time
 from re import S
 
-import dronekit_sitl
-from dronekit import LocationGlobal, VehicleMode, connect
-
 import drone
+import dronekit_sitl
 import gps_data
 import transceiver.util
+from dronekit import LocationGlobal, VehicleMode, connect
 from transceiver.transceiver import Transceiver
 from util import (
     ALTITUDE,
@@ -43,8 +42,6 @@ file_handler.setFormatter(formatter)
 log.addHandler(file_handler)
 
 # Initialization
-SIGNAL_FOUND = False
-IS_TIMEOUT = False
 avidrone = drone.vehicle
 mission = drone.mission
 search = drone.search
@@ -68,8 +65,11 @@ if IS_VERBOSE:
 
 def run(beacon):
     # Initialize values
+    SIGNAL_FOUND = False
     theta = 90  # TODO replace with transceiver theta values
     uav_pos = [0, 0, 0]
+
+    IS_TIMEOUT = False
     timeout_counter = 0
 
     if IS_TEST:
