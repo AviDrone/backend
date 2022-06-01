@@ -15,13 +15,8 @@ import drone
 import numpy as np
 from dronekit import Command, LocationGlobalRelative, VehicleMode, connect
 from pymavlink import mavutil
-from util import (
-    ALTITUDE,
-    get_distance_metres,
-    get_location_metres,
-    get_location_metres_with_alt,
-    get_range,
-)
+from util import (ALTITUDE, get_distance_metres, get_location_metres,
+                  get_location_metres_with_alt, get_range)
 
 aviDrone = drone.vehicle
 sitl = drone.sitl

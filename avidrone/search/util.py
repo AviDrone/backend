@@ -12,7 +12,7 @@ import time
 
 import drone
 import numpy as np
-from dronekit import Command, LocationGlobal, LocationGlobalRelative, VehicleMode
+from dronekit import Command, LocationGlobalRelative, VehicleMode
 
 WITH_TRANSCEIVER = True  # set to false for quicker primary search only operation
 if WITH_TRANSCEIVER:
