@@ -5,6 +5,7 @@ from re import S
 from unittest import TestCase
 
 import numpy as np
+
 from avidrone.search.transceiver import util
 
 

@@ -14,12 +14,11 @@ import math
 import time
 from re import S
 
-import dronekit_sitl
-from dronekit import LocationGlobal, VehicleMode, connect
-
 import drone
+import dronekit_sitl
 import gps_data
 import transceiver.util
+from dronekit import LocationGlobal, VehicleMode, connect
 from transceiver.transceiver import Transceiver
 from util import (
     ALTITUDE,

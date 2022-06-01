@@ -10,10 +10,9 @@ import logging as log
 import math
 import time
 
+import drone
 import numpy as np
 from dronekit import Command, LocationGlobal, LocationGlobalRelative, VehicleMode
-
-import drone
 
 WITH_TRANSCEIVER = True  # set to false for quicker primary search only operation
 if WITH_TRANSCEIVER:

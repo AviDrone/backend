@@ -5,6 +5,7 @@ To push your code successfully through the GitHub Actions super-linter, you have
 To do so manually for all files in your current directory, use the following commands
 
 ```{bash}
+black .
 isort .
 black .
 ```
