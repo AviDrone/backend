@@ -1,11 +1,11 @@
 import datetime
 import logging
 import time
+
 # from transceiver import transceiver_EM_field
 from transceiver import util
 
-
-# log
+# logging
 log = logging.getLogger(__name__)
 log.setLevel(logging.INFO)
 formatter = logging.Formatter("%(asctime)s : [%(levelname)s] : %(message)s")

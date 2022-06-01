@@ -10,7 +10,6 @@ import logging as log
 import math
 import time
 
-
 import drone
 import numpy as np
 from dronekit import (
