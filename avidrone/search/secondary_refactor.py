@@ -20,9 +20,19 @@ import gps_data
 import transceiver.util
 from dronekit import LocationGlobal, VehicleMode, connect
 from transceiver.transceiver import Transceiver
-from util import (ALTITUDE, DEGREES, LAND_THRESHOLD, MAGNITUDE, WINDOW_SIZE,
-                  Mission, Search, get_distance_metres, get_location_metres,
-                  get_location_metres_with_alt, get_range)
+from util import (
+    ALTITUDE,
+    DEGREES,
+    LAND_THRESHOLD,
+    MAGNITUDE,
+    WINDOW_SIZE,
+    Mission,
+    Search,
+    get_distance_metres,
+    get_location_metres,
+    get_location_metres_with_alt,
+    get_range,
+)
 
 log = logging.getLogger(__name__)
 log.setLevel(logging.INFO)

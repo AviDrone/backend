@@ -1,4 +1,4 @@
-# Linting and sorting using the python libraries black and isort.
+# Linting and sorting using the python libraries black and isort
 
 To push your code successfully through the GitHub Actions super-linter, you have to run the commands in a specific order.
 

@@ -40,7 +40,7 @@ chmod -x install.sh && bash install.sh
 
 This will take care of installing the libraries used in the backend of this project.
 
-It is possible to run a search mission using our command line arguments (CLI) arguments, but using our frontend will definitely speed things up. To install QGroundControl for Avidrone, see the [frontend repository](https://github.com/AviDrone/frontend).
+It is possible to run a search mission using our command-line arguments (CLI) arguments, but using our frontend will definitely speed things up. To install QGroundControl for Avidrone, see the [frontend repository](https://github.com/AviDrone/frontend).
 
 ## How to use
 
