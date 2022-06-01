@@ -2,8 +2,7 @@ import datetime
 import logging
 import time
 
-# from transceiver import transceiver_EM_field
-from transceiver import util
+from transceiver import util, EM_field
 
 # logging
 log = logging.getLogger(__name__)
@@ -13,14 +12,13 @@ file_handler = logging.FileHandler("transceiver.log")
 file_handler.setFormatter(formatter)
 log.addHandler(file_handler)
 
-
 class Transceiver:
     def __init__(self):
         self.direction = -1  # initially not detected
         self.distance = -1  # initially not detected
         self.signal_detected = False  # not detected
         self.position = [0, 0, -1]  # Default example (1 meter underground)
-
+        self.EM_field = EM_field.EM_field()
         # settings
         self.mode = "transmit"  # or detect
         self.model_number = 0  # Avidrone (default)
@@ -63,10 +61,6 @@ class Transceiver:
         self.coil_length_ = 120  # mm
         self.coil_current_ = 750  # AAA Battery power source
         self.coil_angle_offset_ = 45  # degrees
-
-        # self.theta_grid = (
-        #     util.transceiver_EM_field.get_theta_grid()
-        # )  # TODO Make settable with simulation values
 
     def get_model(self):
         return transceiver.model[self.model_number]
@@ -205,7 +199,8 @@ while True:
             c_t = datetime.datetime.now()
             current_time = c_t.strftime("%c")
             mission_end_time = datetime.datetime.now()
-            mission_time = mission_end_time - mission_begin_time
+            m_t = mission_end_time - mission_begin_time
+            mission_time = m_t.strftime("%H:%M:%S")
             transceiver.victim_not_found_msg()
             IS_TIMEOUT = True
             break
