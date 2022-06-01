@@ -14,6 +14,7 @@ Now, commit and push as you normally would with this message,  "Linted using bla
 
 To so lint and push automatically, run **bash scripts/git_lint_push.sh**
 
+<!--TODO modify so it runs from current directory-->
 ```{bash}
 chmod -x scripts/git_lint_push.sh
 bash scripts/git_lint_push.sh
