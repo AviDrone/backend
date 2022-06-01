@@ -41,6 +41,7 @@ B_amp /= np.amax(B_amp)
 def plot_coil_em_field():
     pass
 
+
 def plot_transceiver_em_field():
     # Creating plot
     plt.figure(figsize=(12, 7))

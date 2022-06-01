@@ -1,16 +1,12 @@
 import datetime
 import logging
-import time
 
-import transceiver_EM_field
-import util
-from util import (
-    get_direction,
-    get_displacement,
-    get_distance_xy,
-    get_unique_theta,
-    normalize,
-)
+# import transceiver_EM_field
+# import Transceiver.util
+from transceiver import util
+
+# import time
+
 
 # log
 log = logging.getLogger(__name__)
@@ -26,7 +22,7 @@ class Transceiver:
         self.direction = -1  # initially not detected
         self.distance = -1  # initially not detected
         self.signal_detected = False  # not detected
-        self.position = [None, None, None]  # not detected
+        self.position = [0, 0, -1]  # Default example (1 meter underground)
 
         # settings
         self.mode = "transmit"  # or detect
@@ -71,9 +67,9 @@ class Transceiver:
         self.coil_current_ = 750  # AAA Battery power source
         self.coil_angle_offset_ = 45  # degrees
 
-        self.theta_grid = (
-            transceiver_EM_field.get_theta_grid()
-        )  # TODO Make settable with simulation values
+        # self.theta_grid = (
+        #     util.transceiver_EM_field.get_theta_grid()
+        # )  # TODO Make settable with simulation values
 
     def get_model(self):
         return transceiver.model[self.model_number]
@@ -128,11 +124,11 @@ class Transceiver:
         y_2 = beacon_pos[1]
         z_2 = beacon_pos[2]
 
-        displacement = get_displacement(x_1, x_2, y_1, y_2, z_1, z_2)
-        disp_n = normalize(displacement)
-        dist = get_distance_xy(displacement)
-        theta = get_unique_theta(disp_n)
-        direction = get_direction(theta)
+        displacement = util.get_displacement(x_1, x_2, y_1, y_2, z_1, z_2)
+        disp_n = util.normalize(displacement)
+        dist = util.get_distance_xy(displacement)
+        theta = util.get_unique_theta(disp_n)
+        direction = util.get_direction(theta)
         return direction, dist
 
 
@@ -144,10 +140,10 @@ transceiver.curr_search_strip_width = transceiver.search_strip_width[
     transceiver.model_number
 ][model]
 
-IS_TEST = False  # set to true to use mock transceiver simulation
+IS_TEST = True  # set to true to use mock transceiver simulation
 
 uav_pos = [140, 145, 980]  # Example
-beacon_pos = [31, 16, 51]  # Example
+beacon_pos = transceiver.position  # Example
 
 timeout_count = 0
 timeout = False
@@ -161,8 +157,9 @@ while True:
         transceiver.distance = mock_transceiver[1]
 
     else:
-        transceiver.direction = int(transceiver.theta[timeout_count])
-        transceiver.distance = mock_transceiver[1]  # TODO real vals
+        print("Too bad!!")
+        # transceiver.direction = int(transceiver.theta[timeout_count])
+        # transceiver.distance = mock_transceiver[1]  # TODO real vals
 
         timeout_count += 1
     if timeout_count == transceiver.battery:

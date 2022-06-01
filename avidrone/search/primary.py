@@ -8,19 +8,15 @@ from __future__ import print_function
 
 # Set up option parsing to get connection string
 import time
-from avidrone.search.primary_functions import set_FS_BATT
 
-import primary_functions as pf
-import drone
 import numpy as np
-from dronekit import (
-    LocationGlobalRelative,
-    VehicleMode
-)
+from avidrone.search.primary_functions import set_FS_BATT
+from dronekit import LocationGlobalRelative, VehicleMode
 from pymavlink import mavutil
-from util import (
-    get_range,
-)
+
+import drone
+import primary_functions as pf
+from util import get_range
 
 aviDrone = drone.vehicle
 sitl = drone.sitl
@@ -46,10 +42,10 @@ pf.battery_information()
 
 # Save search to file.
 SAVE_FILE = False
-if(SAVE_FILE):
+if SAVE_FILE:
     mission_file = "r_mission3.txt"
     print("Saving to file", mission_file)
-    pf.save_search_to_file(mission_file,totalAlt,width,dLength,totalLength)
+    pf.save_search_to_file(mission_file, totalAlt, width, dLength, totalLength)
 
 # Start in Guided mode
 print("Set mode to GUIDED: ")
@@ -84,12 +80,12 @@ aviDrone.mode = VehicleMode("AUTO")
 print("final waypoint: %s" % (get_range(totalLength, dLength)))
 
 # stay in follow_primary function during search
-reached_end, stopping_point = pf.follow_primary(totalLength,dLength)
-if(not reached_end):
+reached_end, stopping_point = pf.follow_primary(totalLength, dLength)
+if not reached_end:
     print("holding alt")
     aviDrone.mode = VehicleMode("GUIDED")
-    hold_count = 0  
-    hold_sec = 3    # amount of time we hold
+    hold_count = 0
+    hold_sec = 3  # amount of time we hold
 
     while True:
         if aviDrone.mode != "GUIDED":
@@ -97,8 +93,12 @@ if(not reached_end):
             time.sleep(1)
 
         # hold altitude
-        if(aviDrone.location.global_frame.alt < 10):
-            a_location = LocationGlobalRelative(aviDrone.location.global_frame.lat, aviDrone.location.global_frame.lon, 10)
+        if aviDrone.location.global_frame.alt < 10:
+            a_location = LocationGlobalRelative(
+                aviDrone.location.global_frame.lat,
+                aviDrone.location.global_frame.lon,
+                10,
+            )
             aviDrone.simple_goto(a_location)
         if hold_count != 0:
             time.sleep(hold_sec)
@@ -122,7 +122,7 @@ if not reached_end:
         aviDrone.mode = VehicleMode("AUTO")
         time.sleep(1)
 
-        reached_end_again, stopping_point2 = pf.follow_primary(totalLength,dLength)
+        reached_end_again, stopping_point2 = pf.follow_primary(totalLength, dLength)
 
         print("holding alt again")
         aviDrone.mode = VehicleMode("GUIDED")
@@ -132,8 +132,12 @@ if not reached_end:
                 time.sleep(1)
 
             # hold altitude
-            if(aviDrone.location.global_frame.alt < 10):
-                a_location = LocationGlobalRelative(aviDrone.location.global_frame.lat, aviDrone.location.global_frame.lon, 10)
+            if aviDrone.location.global_frame.alt < 10:
+                a_location = LocationGlobalRelative(
+                    aviDrone.location.global_frame.lat,
+                    aviDrone.location.global_frame.lon,
+                    10,
+                )
                 aviDrone.simple_goto(a_location)
             if hold_count != 0:
                 time.sleep(hold_sec)
@@ -141,7 +145,7 @@ if not reached_end:
             hold_count += 1
 
 # Return to launch if search complete
-if(reached_end or reached_end_again):
+if reached_end or reached_end_again:
     print("Return to launch")
     aviDrone.mode = VehicleMode("RTL")
     pf.save_mission("mission.txt")
@@ -151,6 +155,7 @@ EN_SECONDARY_SWITCH = False
 print("Switch to secondary:")
 if EN_SECONDARY_SWITCH and not reached_end:
     import secondary
+
     secondary.run()
 
 

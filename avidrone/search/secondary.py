@@ -3,6 +3,7 @@
 """
     SECONDARY SEARCH
 """
+
 from __future__ import print_function
 
 # Set up option parsing to get connection string
@@ -12,11 +13,12 @@ import logging
 import math
 import time
 
-import drone
 import dronekit_sitl
+from dronekit import LocationGlobal, VehicleMode, connect
+
+import drone
 import transceiver
 import transceiver.util
-from dronekit import LocationGlobal, VehicleMode, connect
 from util import (
     ALTITUDE,
     DEGREES,
@@ -28,7 +30,7 @@ from util import (
     get_distance_metres,
     get_location_metres,
     get_location_metres_with_alt,
-    get_range
+    get_range,
 )
 
 log = logging.getLogger(__name__)
@@ -52,8 +54,9 @@ IS_TEST = True  # set to False for real flight
 
 """
             log.info("Return to launch")
-            Avidrone.mode = VehicleModle("RTL)")
+            Avidrone.mode = VehicleMode("RTL)"
 """
+
 
 def run(transceiver):
     log.info("-- SECONDARY SEARCH --")
@@ -140,6 +143,7 @@ def run_prev_sec_search():
     # Initialize the gps_window to be WINDOW_SIZE long
     import gps_data
     import transceiver.read_transceiver as rt
+
     gps_window = gps_data.GPSData(WINDOW_SIZE)
 
     while aviDrone.mode.name != "GUIDED":
@@ -149,7 +153,12 @@ def run_prev_sec_search():
     while aviDrone.mode.name == "GUIDED":
         direction_distance = rt.read_transceiver()
 
-        print("Direction: ", direction_distance.direction, "Distance: ", direction_distance.distance)
+        print(
+            "Direction: ",
+            direction_distance.direction,
+            "Distance: ",
+            direction_distance.distance,
+        )
 
         if direction_distance.direction < 2:
             # Turn left
@@ -167,31 +176,39 @@ def run_prev_sec_search():
 
             gps_window.add_point(search.get_global_pos(), direction_distance.distance)
 
-            if gps_window.get_minimum_index() == ((gps_window.window_size - 1) / 2) \
-                    and len(gps_window.gps_points) == gps_window.window_size:
+            if (
+                gps_window.get_minimum_index() == ((gps_window.window_size - 1) / 2)
+                and len(gps_window.gps_points) == gps_window.window_size
+            ):
 
                 # If the minimum is the center point of the gps_window we need to go
                 # back to that location
                 print("Min index = middle")
 
-                mission.simple_goto_wait(gps_window.gps_points[int((gps_window.window_size - 1) / 2)])
+                mission.simple_goto_wait(
+                    gps_window.gps_points[int((gps_window.window_size - 1) / 2)]
+                )
 
                 if gps_window.distance[2] <= LAND_THRESHOLD:
                     print("Close, landing")
-                    aviDrone.mode = VehicleMode('LAND')
+                    aviDrone.mode = VehicleMode("LAND")
                 else:
                     print("Not close, continuing")
                     gps_window.purge_gps_window()
 
-            elif gps_window.get_minimum_index() == (gps_window.window_size - 1) \
-                    and len(gps_window.gps_points) == gps_window.window_size:
+            elif (
+                gps_window.get_minimum_index() == (gps_window.window_size - 1)
+                and len(gps_window.gps_points) == gps_window.window_size
+            ):
 
                 # If the minimum data point is the last one in the array we have gone
                 # too far and in the wrong direction
                 print("Min index = window_size - 1")
 
                 mission.condition_yaw(180, True)
-                mission.simple_goto_wait(gps_window.gps_points[gps_window.window_size - 1])
+                mission.simple_goto_wait(
+                    gps_window.gps_points[gps_window.window_size - 1]
+                )
                 gps_window.purge_gps_window()
 
             elif gps_window.get_minimum_index() == 0:
@@ -212,6 +229,7 @@ def run_prev_sec_search():
             # send_ned_velocity(flight_dir[0], flight_dir[1], 0, 1)
 
         time.sleep(2)
+
 
 if __name__ == "__main__":
     uav_pos = [20, 20, 2]  # Example

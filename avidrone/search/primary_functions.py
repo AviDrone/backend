@@ -11,15 +11,11 @@ import argparse
 import logging as log
 import time
 
-import drone
 import numpy as np
-from dronekit import (
-    Command,
-    LocationGlobalRelative,
-    VehicleMode,
-    connect,
-)
+from dronekit import Command, LocationGlobalRelative, VehicleMode, connect
 from pymavlink import mavutil
+
+import drone
 from util import (
     ALTITUDE,
     get_distance_metres,
@@ -35,12 +31,14 @@ mission = drone.mission
 
 # set to RTL mode if battery low (https://github.com/ArduPilot/ardupilot_wiki/issues/291)
 def set_FS_BATT():
-    aviDrone.parameters.set('FS_BATT_ENABLE',2)
+    aviDrone.parameters.set("FS_BATT_ENABLE", 2)
+
 
 def print_parameters():
     print("\nPrint all parameters (iterate `aviDrone.parameters`):")
     for key, value in aviDrone.parameters.items():
-        print( " Key:%s Value:%s" % (key,value))
+        print(" Key:%s Value:%s" % (key, value))
+
 
 def battery_information():
     print("Level:", aviDrone.battery.level)
@@ -198,6 +196,7 @@ def reupload_commands(index):
     cmds.next = index - 1
     print("nxt2:", cmds.next)
 
+
 aviDrone_commands_copy = []
 # Rectangular search over a flat plane taking angle into account
 def rectangular_primary_search_basic(a_location, width, dLength, totalLength, angle):
@@ -263,7 +262,7 @@ def rectangular_primary_search_basic(a_location, width, dLength, totalLength, an
     vector1 = (initArray[1][0], initArray[1][1], 0)
     vector1 = np.asarray(vector1)
     vector2 = vector.rotate_vector(vector1, angle)
-    rotated = vector.Rotate_Cloud(initArray, vector1, vector2)
+    rotated = vector.rotate_cloud(initArray, vector1, vector2)
 
     # rotate points in array
     print("Rotating")
@@ -309,6 +308,7 @@ def rectangular_primary_search_basic(a_location, width, dLength, totalLength, an
     aviDrone_commands_copy.append(dummy)
     print(" Upload new commands to vehicle")
     cmds.upload()
+
 
 def distance_to_current_waypoint():
     """
@@ -425,7 +425,7 @@ def return_to_launch():
     )
 
 
-def save_search_to_file(file,totalAlt,width,dLength,totalLength):
+def save_search_to_file(file, totalAlt, width, dLength, totalLength):
     # aviDrone.simple_takeoff(ALTITUDE)
     print("adding takeoff to altitude ", ALTITUDE)
     aviDrone.commands.add(
@@ -503,4 +503,3 @@ def follow_primary(totalLength, dLength):
             break
         time.sleep(1)
     return reached_end, stopping_point
-
