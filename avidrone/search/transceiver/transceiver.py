@@ -5,7 +5,7 @@ import logging
 # import Transceiver.util
 from transceiver import util
 
-# import time
+import time
 
 
 # log
@@ -145,8 +145,9 @@ IS_TEST = True  # set to true to use mock transceiver simulation
 uav_pos = [140, 145, 980]  # Example
 beacon_pos = transceiver.position  # Example
 
+IS_TIMEOUT = False
 timeout_count = 0
-timeout = False
+
 
 
 mock_transceiver = transceiver.mock_transceiver(uav_pos, beacon_pos)
@@ -163,7 +164,7 @@ while True:
 
         timeout_count += 1
     if timeout_count == transceiver.battery:
-        timeout = True
+        IS_TIMEOUT = True
 
     log.info(f"-- direction, distance: {(transceiver.direction, transceiver.distance)}")
     mission_begin_time = datetime.datetime.now()
@@ -172,7 +173,8 @@ while True:
         transceiver.signal_detected = True
 
         if transceiver.signal_detected:
-            current_time = datetime.datetime.now()
+            c_t = datetime.datetime.now()
+            current_time = c_t.strftime("%c")
             mission_end_time = datetime.datetime.now()
             mission_time = mission_end_time - mission_begin_time
             transceiver.position = uav_pos
@@ -197,11 +199,16 @@ while True:
         log.debug("y_uav > y_beacon")
 
     else:
-        # time.sleep(0.5)  # Transceiver receives reading every half seconds
-        if timeout:
+        if IS_TEST:
+            time.sleep(0.0)     # To speed up search time during testing
+        else:
+            time.sleep(0.5)     # Beacon reads values every 0.5 seconds
+        if IS_TIMEOUT:
             log.warning("\n reached timeout \n")
-            current_time = datetime.datetime.now()
+            c_t = datetime.datetime.now()
+            current_time = c_t.strftime("%c")
             mission_end_time = datetime.datetime.now()
             mission_time = mission_end_time - mission_begin_time
             transceiver.victim_not_found_msg()
+            IS_TIMEOUT = True
             break
