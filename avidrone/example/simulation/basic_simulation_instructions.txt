@@ -23,6 +23,9 @@ To run a script:
 
 
 also for my windows machine:
+Start search at WWU
 dronekit-sitl copter --home=46.045577,-118.391351,584,353
+dronekit-sitl copter --home=46.045577,-118.391351,584,127
+
 
 python modified_mission_basic.py --connect udp:127.0.0.1:14551
