@@ -1,0 +1,31 @@
+Commands run for simulation:
+(I just copied the full line, use the relevant parts)
+
+(mavproxy, dronekit, dronekit-sitl, and qgroundcontrol need to be installed)
+
+In a terminal:
+sam@sam-Aspire-E5-575:~$ dronekit-sitl copter
+
+In another:
+sam@sam-Aspire-E5-575:~$ mavproxy.py --master tcp:127.0.0.1:5760 --sitl 127.0.0.1:5501 --out 127.0.0.1:14550 --out 127.0.0.1:14551 --out 127.0.0.1:14552
+
+In QGroundControl:
+Application settings -> Comm links -> connect using "sim" (which is setup using a UDP connection)
+
+To run a script:
+	In another terminal:
+	- navigate to directory
+	- run: "python3 insertScriptHere.py --connect udp:127.0.0.1:14551"
+	
+	Example:
+	sam@sam-Aspire-E5-575:~/Downloads/dronekit-python-master/examples/mission_basic$ python3 mission_basic.py --connect udp:127.0.0.1:14551
+
+
+
+also for my windows machine:
+Start search at WWU
+dronekit-sitl copter --home=46.045577,-118.391351,584,353
+dronekit-sitl copter --home=46.045577,-118.391351,584,127
+
+
+python modified_mission_basic.py --connect udp:127.0.0.1:14551
