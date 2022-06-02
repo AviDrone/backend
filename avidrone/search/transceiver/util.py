@@ -4,9 +4,9 @@ import random
 
 import numpy as np
 
-# log
+# logging
 log = logging.getLogger(__name__)
-log.setLevel(logging.DEBUG)
+log.setLevel(logging.INFO)  # Set to logging.DEBUG to see individual parameter values
 formatter = logging.Formatter("%(asctime)s  [%(levelname)s]  %(message)s")
 file_handler = logging.FileHandler("util.log")
 file_handler.setFormatter(formatter)
@@ -38,7 +38,7 @@ def normalize(disp):
     return d_v_normal
 
 
-def get_unique_theta(disp):
+def get_theta(disp):
     fwd = [1, 0]  # UAV's forward vector.
     v_d = [disp[0], disp[1]]
     d_xy = get_distance_xy(disp)

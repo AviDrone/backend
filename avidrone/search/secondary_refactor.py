@@ -19,19 +19,14 @@ import dronekit_sitl
 import gps_data
 import transceiver.util
 from dronekit import LocationGlobal, VehicleMode, connect
-from transceiver.transceiver import Transceiver
+from transceiver.transceiver import EM_field, Transceiver
 from util import (
     ALTITUDE,
     DEGREES,
     LAND_THRESHOLD,
     MAGNITUDE,
     WINDOW_SIZE,
-    Mission,
     Search,
-    get_distance_metres,
-    get_location_metres,
-    get_location_metres_with_alt,
-    get_range,
 )
 
 log = logging.getLogger(__name__)
@@ -41,6 +36,7 @@ file_handler = logging.FileHandler("secondary_.log")
 file_handler.setFormatter(formatter)
 log.addHandler(file_handler)
 
+log.info("**************** SECONDARY SEARCH ****************")
 # Initialization
 avidrone = drone.vehicle
 mission = drone.mission
@@ -66,17 +62,26 @@ if IS_VERBOSE:
 def run(beacon):
     # Initialize values
     SIGNAL_FOUND = False
-    theta = 90  # TODO replace with transceiver theta values
-    uav_pos = [0, 0, 0]
+    uav_pos = [
+        avidrone.location.global_frame.lat,
+        avidrone.location.global_frame.lon,
+        avidrone.location.global_frame.alt,
+    ]
+    theta = 90  # TODO replace with correct value (from direction_distance [last year's code])
 
     IS_TIMEOUT = False
     timeout_counter = 0
 
+    mock_EM_field = EM_field.EM_field()
+    mock_theta = EM_field.EM_field.get_theta_at_pos(mock_EM_field, uav_pos)
+
     if IS_TEST:
+        # TODO use mock beacon
         beacon = search.mock_transceiver(uav_pos, beacon.position)
-    log.info("----- secondary search ran successfully -----")
 
     while avidrone.mode.name == "GUIDED":
+        theta_counter = 0  # to iterate over theta values continuously
+
         gps_window = gps_data.GPSData(WINDOW_SIZE)
         if IS_TIMEOUT:  # return to landing
             log.critical("Return to launch site")
@@ -86,13 +91,13 @@ def run(beacon):
             gps_window.get_minimum_index() == ((gps_window.window_size - 1) / 2)
             and len(gps_window.gps_points) == gps_window.window_size
         ):  # TODO add comment to explain what this means
-            if transceiver.util.get_direction(theta) < 2:  # Turn left
+            if transceiver.util.get_direction(mock_theta) < 2.0:  # Turn left
                 mission.condition_yaw(-DEGREES, True)
 
-            elif transceiver.util.get_direction(theta) > 2:  # turn right
+            elif transceiver.util.get_direction(mock_theta) > 2.0:  # turn right
                 mission.condition_yaw(DEGREES, True)
 
-            elif transceiver.util.get_direction(theta) == 2:  # keep straight
+            elif transceiver.util.get_direction(mock_theta) == 2.0:  # keep straight
                 print("keep flying straight")
                 gps_window.add_point(search.get_global_pos(), beacon.distance)
 
@@ -146,3 +151,4 @@ if __name__ == "__main__":
     beacon_pos = [1, 1, 1]  # Example
     mock_transceiver = Search.mock_transceiver(uav_pos, beacon_pos)
     run(mock_transceiver)
+    log.info("----- secondary search ran successfully -----")

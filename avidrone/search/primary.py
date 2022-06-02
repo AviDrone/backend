@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-
 """
     PRIMARY SEARCH
 """
+
 from __future__ import print_function
 
 # Set up option parsing to get connection string
