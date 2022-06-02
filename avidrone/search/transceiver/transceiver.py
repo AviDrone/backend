@@ -6,7 +6,7 @@ from transceiver import EM_field, util
 
 # logging
 log = logging.getLogger(__name__)
-log.setLevel(logging.DEBUG)
+log.setLevel(logging.INFO)
 formatter = logging.Formatter("%(asctime)s  [%(levelname)s]  %(message)s")
 file_handler = logging.FileHandler("transceiver.log")
 file_handler.setFormatter(formatter)
@@ -133,6 +133,9 @@ transceiver.curr_search_strip_width = transceiver.search_strip_width[
     transceiver.model_number
 ][model]
 
+
+
+
 IS_TEST = True  # set to true to use mock transceiver simulation
 
 uav_pos = [140, 145, 980]  # Example
@@ -141,18 +144,20 @@ beacon_pos = transceiver.position  # Example
 IS_TIMEOUT = False
 timeout_count = 0
 
+# SIMULATION PARAMETERS
 
-mock_transceiver = transceiver.mock_transceiver(uav_pos, beacon_pos)
+# Mock beacon
+mock_beacon = transceiver.mock_transceiver(uav_pos, beacon_pos)
 
 while True:
     if IS_TEST:
-        transceiver.direction = mock_transceiver[0]
-        transceiver.distance = mock_transceiver[1]
+        transceiver.direction = mock_beacon[0]
+        transceiver.distance = mock_beacon[1]
 
     else:
         print("Too bad!!")
         # transceiver.direction = int(transceiver.theta[timeout_count])
-        # transceiver.distance = mock_transceiver[1]  # TODO real vals
+        # transceiver.distance = mock_transceiver[1]  # TODO replace with real values
         timeout_count += 1
 
     if timeout_count == transceiver.battery:
@@ -181,17 +186,17 @@ while True:
         uav_pos[0] += 1
         log.debug("x_uav < x_beacon")
 
-    elif uav_pos[0] > beacon_pos[0]:  # x
-        uav_pos[0] -= 1
-        log.debug("x_uav > x_beacon")
-
-    if uav_pos[1] < beacon_pos[1]:  # y
+    elif uav_pos[1] < beacon_pos[1]:  # y
         uav_pos[1] += 1
         log.debug("y_uav < y_beacon")
 
-    elif uav_pos[1] > beacon_pos[1]:  # y
-        uav_pos[1] -= 1
+    if uav_pos[0] > beacon_pos[0]:  # y
+        uav_pos[0] -= 1
         log.debug("y_uav > y_beacon")
+        
+    elif uav_pos[1] > beacon_pos[1]:  # x
+        uav_pos[1] -= 1
+        log.debug("x_uav > x_beacon")
 
     else:
         if IS_TEST:

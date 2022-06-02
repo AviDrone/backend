@@ -14,7 +14,7 @@ import numpy as np
 class EM_field:
     def __init__(self):
         # create grid
-        self.ts = np.linspace(-100, 100, 100)
+        self.ts = np.linspace(-140, 140, 140)
         self.grid = np.array([[(x, 0, z) for x in self.ts] for z in self.ts])
 
         # coil 1
@@ -50,17 +50,16 @@ class EM_field:
         self.B
 
         uav_pos_x = uav_pos[0]
-        uav_pos_y = uav_pos[1]
 
         B_x = self.B[:, :, 0]
         B_y = self.B[:, :, 1]
         # B_z = B[:, :, 2]  # currently not used for 2D model
 
-        theta_grid = []  # empty list
+        theta_grid = [None,None]  # empty list
         theta_val = np.arctan2(B_y, B_x)
 
         for i in range(len(theta_val)):
             for j in range(len(theta_val[i])):
                 theta_grid.append(theta_val[i][j])
 
-        return theta_grid[uav_pos_x][uav_pos_y]
+        return theta_grid
