@@ -1,8 +1,8 @@
+import EM_field as beacon
 import magpylib as magpy
 import matplotlib.pyplot as plt
 import numpy as np
 
-import EM_field as beacon
 
 beacon_EM_field = beacon.EM_field()
 

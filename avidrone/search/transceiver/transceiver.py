@@ -6,18 +6,20 @@ from transceiver import EM_field, util
 
 # logging
 log = logging.getLogger(__name__)
-log.setLevel(logging.INFO)
-formatter = logging.Formatter("%(asctime)s : [%(levelname)s] : %(message)s")
+log.setLevel(logging.DEBUG)
+formatter = logging.Formatter("%(asctime)s  [%(levelname)s]  %(message)s")
 file_handler = logging.FileHandler("transceiver.log")
 file_handler.setFormatter(formatter)
 log.addHandler(file_handler)
+log.info("*********** TRANSCEIVER ***********")
+
 
 class Transceiver:
     def __init__(self):
         self.direction = -1  # initially not detected
         self.distance = -1  # initially not detected
         self.signal_detected = False  # not detected
-        self.position = [0, 0, -1]  # Default example (1 meter underground)
+        self.position = [0, 0, 0]  # Default example (1 meter underground)
         self.EM_field = EM_field.EM_field()
         # settings
         self.mode = "transmit"  # or detect
@@ -151,8 +153,8 @@ while True:
         print("Too bad!!")
         # transceiver.direction = int(transceiver.theta[timeout_count])
         # transceiver.distance = mock_transceiver[1]  # TODO real vals
-
         timeout_count += 1
+
     if timeout_count == transceiver.battery:
         IS_TIMEOUT = True
 
@@ -163,14 +165,17 @@ while True:
         transceiver.signal_detected = True
 
         if transceiver.signal_detected:
-            c_t = datetime.datetime.now()
-            current_time = c_t.strftime("%c")
-            mission_end_time = datetime.datetime.now()
-            mission_time = mission_end_time - mission_begin_time
-            transceiver.position = uav_pos
-            transceiver.victim_found_msg()
-        break
+            uav_pos[2] -= 1
+            
+            if uav_pos[2] == 0:
+                current_time = datetime.datetime.now().strftime("%c")
+                mission_end_time = datetime.datetime.now()
+                mission_time = mission_end_time - mission_begin_time
+                transceiver.position = uav_pos
+                transceiver.victim_found_msg()
+                break
 
+# TODO this should happen in secondary
     # Navigation algorithm
     if uav_pos[0] < beacon_pos[0]:  # x
         uav_pos[0] += 1

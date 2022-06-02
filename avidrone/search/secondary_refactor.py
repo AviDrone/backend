@@ -41,6 +41,7 @@ file_handler = logging.FileHandler("secondary_.log")
 file_handler.setFormatter(formatter)
 log.addHandler(file_handler)
 
+log.info("**************** SECONDARY SEARCH ****************")
 # Initialization
 avidrone = drone.vehicle
 mission = drone.mission
@@ -52,7 +53,7 @@ beacon = search.mock_transceiver  # This is what is being searched for (rn)
 
 # CLI conditions
 IS_TEST = True
-IS_VERBOSE = False
+IS_VERBOSE = True
 
 if IS_VERBOSE:
     log.info(f"- SEARCH PARAMETERS")
@@ -67,14 +68,13 @@ def run(beacon):
     # Initialize values
     SIGNAL_FOUND = False
     theta = 90  # TODO replace with transceiver theta values
-    uav_pos = [0, 0, 0]
+    uav_pos = [100, 90, 20]
 
     IS_TIMEOUT = False
     timeout_counter = 0
 
     if IS_TEST:
         beacon = search.mock_transceiver(uav_pos, beacon.position)
-    log.info("----- secondary search ran successfully -----")
 
     while avidrone.mode.name == "GUIDED":
         gps_window = gps_data.GPSData(WINDOW_SIZE)
@@ -146,3 +146,4 @@ if __name__ == "__main__":
     beacon_pos = [1, 1, 1]  # Example
     mock_transceiver = Search.mock_transceiver(uav_pos, beacon_pos)
     run(mock_transceiver)
+    log.info("----- secondary search ran successfully -----")
