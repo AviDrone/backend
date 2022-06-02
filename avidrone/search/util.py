@@ -157,7 +157,8 @@ class Mission:
             print(" Altitude: ", self.avidrone.location.global_relative_frame.alt)
             time.sleep(1)
             if (
-                self.avidrone.location.global_relative_frame.alt >= target_altitude * 0.95
+                self.avidrone.location.global_relative_frame.alt
+                >= target_altitude * 0.95
             ):  # Trigger just below target alt.
                 print("Reached target altitude")
                 break
@@ -231,7 +232,7 @@ class Mission:
             vehicle.mode.name == "GUIDED"
         ):  # Stop action if we are no longer in guided mode.
             # print "DEBUG: mode: %s" % vehicle.mode.name
-            remainingDistance = Mission.better_get_distance_meters(
+            remainingDistance = Mission.get_distance_meters(
                 vehicle.location.global_frame, targetLocation
             )
             # global_frame was global_relative_frame
