@@ -210,7 +210,8 @@ while True:
             log.warning("\n reached timeout \n")
             current_time = datetime.datetime.now()
             mission_end_time = datetime.datetime.now()
-            mission_time = str(mission_end_time - mission_begin_time)
+            time_total = mission_end_time - mission_begin_time
+            mission_time = str(time_total)
             transceiver.victim_not_found_msg()
             IS_TIMEOUT = True
             break
