@@ -23,8 +23,26 @@ mavproxy.py --master tcp:127.0.0.1:5760 --sitl 127.0.0.1:5501 --out 127.0.0.1:14
 
 Set **dronekit-sitl copter** to a test location.
 
+## Test locations
+
+## Default dronekit test location
+
 ```{bash}
 dronekit-sitl copter --home=46.045577,-118.391351,584,353
+```
+
+or, to test over WWU, use the following locations:
+
+### Roger's field
+
+```{bash}
+dronekit-sitl copter --home=46.045577,-118.391351,584,353
+```
+
+### Kretchmar
+
+```{bash}
+dronekit-sitl copter --home=46.045577,-118.391351,584,127
 ```
 
 In QGroundControl:

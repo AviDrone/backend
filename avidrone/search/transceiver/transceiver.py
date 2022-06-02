@@ -4,8 +4,10 @@
     TRANSCEIVER
 """
 
+import ctypes
 import datetime
 import logging
+import pathlib
 import time
 
 from transceiver import EM_field, util
@@ -66,6 +68,22 @@ class Transceiver:
         self.coil_length_ = 120  # mm
         self.coil_current_ = 750  # AAA Battery power source
         self.coil_angle_offset_ = 45  # degrees
+
+    def read_transceiver():
+        shared_ctypes_lib = pathlib.Path().absolute() / "read_transceiver.lib" # TODO implement this too
+        c_lib = ctypes.CDLL(shared_ctypes_lib)
+        output_array = (ctypes.c_double * 2)()
+        print("output_array before:", output_array[0], " ", output_array[1])
+        c_lib._Z11get_dir_digPd(ctypes.byref(output_array))
+        print(
+            "Direction: ",
+            output_array[0],
+            "Distance: ",
+            output_array[1],
+        )
+        
+        transceiver_output = [output_array[0],output_array[1]]
+        return transceiver_output
 
     def get_model(self):
         return transceiver.model[self.model_number]

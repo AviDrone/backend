@@ -1,3 +1,4 @@
+# For interfacing with the C code
 import logging
 import math
 import random
@@ -11,6 +12,7 @@ formatter = logging.Formatter("%(asctime)s  [%(levelname)s]  %(message)s")
 file_handler = logging.FileHandler("util.log")
 file_handler.setFormatter(formatter)
 log.addHandler(file_handler)
+
 
 
 def get_displacement(x_1, x_2, y_1, y_2, z_1=0, z_2=0):

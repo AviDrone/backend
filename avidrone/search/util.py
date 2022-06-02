@@ -124,36 +124,66 @@ class Mission:
     def __init__(self):
         from pymavlink import mavutil
 
-        self.aviDrone = drone.vehicle
+        self.avidrone = drone.vehicle
         self.mavutil = mavutil
-        self.global_frame = self.aviDrone.location.global_frame
-        self.original_yaw = self.aviDrone.attitude.yaw
+        self.global_frame = self.avidrone.location.global_frame
+        self.original_yaw = self.avidrone.attitude.yaw
         self.heading = -1  # TODO get correct value
         self.relative = False
         self.cw = -1  # TODO get correct value
 
-    @staticmethod
-    def better_get_distance_meters(a_location1, a_location2):
-        lat1, lat2 = a_location1.lat, a_location2.lat
-        lon1, lon2 = a_location1.lon, a_location2.lon
+    def arm_and_takeoff(self, target_altitude):
+        log.debug("Basic pre-arm checks")
+        # Don not let the user try to arm until autopilot is ready
+        while not self.avidrone.is_armable:
+            print(" Waiting for vehicle to initialize...")
+            time.sleep(2)
 
-        # 6371.009e3 is the mean radius of the earth that gives us the distance
-        # (NOT USED)
-        #
-        # 1.113195e5 gives us meters
-        distance = (
-            2
-            * math.asin(
-                math.sqrt(
-                    (math.sin((lat1 - lat2) / 2)) ** 2
-                    + math.cos(lat1)
-                    * math.cos(lat2)
-                    * (math.sin((lon1 - lon2) / 2)) ** 2
+            log.debug("Arming motors")
+            # Copter should arm in GUIDED mode
+            self.avidrone.mode = VehicleMode("GUIDED")
+            self.avidrone.armed = True
+
+        while not self.avidrone.armed:
+            log.info(" Waiting for arming...")
+            time.sleep(1)
+
+        log.warning("Taking off!")
+        self.avidrone.simple_takeoff(target_altitude)  # Take off to target altitude
+
+        # Wait until the vehicle reaches a safe height before processing the goto (otherwise the command
+        #  after Vehicle.simple_takeoff will execute immediately).
+        while True:
+            print(" Altitude: ", self.avidrone.location.global_relative_frame.alt)
+            time.sleep(1)
+            if (
+                self.avidrone.location.global_relative_frame.alt >= target_altitude * 0.95
+            ):  # Trigger just below target alt.
+                print("Reached target altitude")
+                break
+
+        @staticmethod
+        def better_get_distance_meters(a_location1, a_location2):
+            lat1, lat2 = a_location1.lat, a_location2.lat
+            lon1, lon2 = a_location1.lon, a_location2.lon
+
+            # 6371.009e3 is the mean radius of the earth that gives us the distance
+            # (NOT USED)
+            #
+            # 1.113195e5 gives us meters
+            distance = (
+                2
+                * math.asin(
+                    math.sqrt(
+                        (math.sin((lat1 - lat2) / 2)) ** 2
+                        + math.cos(lat1)
+                        * math.cos(lat2)
+                        * (math.sin((lon1 - lon2) / 2)) ** 2
+                    )
                 )
+                * 1.113195e5
             )
-            * 1.113195e5
-        )
-        return distance
+            return distance
 
     @staticmethod
     def better_get_location_meters(original_location, distance, angle):
