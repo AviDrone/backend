@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+
 """
     PRIMARY SEARCH
 """
-
 from __future__ import print_function
 
 # Set up option parsing to get connection string
@@ -12,7 +12,7 @@ import time
 import drone
 import numpy as np
 import primary_functions as pf
-from avidrone.search.primary_functions import set_FS_BATT
+from primary_functions import set_FS_BATT
 from dronekit import LocationGlobalRelative, VehicleMode
 from pymavlink import mavutil
 from util import get_range
@@ -153,9 +153,10 @@ if reached_end or reached_end_again:
 EN_SECONDARY_SWITCH = False
 print("Switch to secondary:")
 if EN_SECONDARY_SWITCH and not reached_end:
-    import secondary
+    pass
+    # import secondary
 
-    secondary.run()
+    # secondary.run()
 
 
 pf.battery_information()

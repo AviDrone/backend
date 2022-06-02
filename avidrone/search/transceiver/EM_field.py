@@ -20,13 +20,13 @@ class EM_field:
         # coil 1
         ts = np.linspace(-6, 6, 500)
         vertices_1 = np.c_[5 * np.cos(ts * 2 * np.pi), 5 * np.sin(ts * 2 * np.pi), ts]
-        coil_1 = magpy.current.Line(current=750, vertices=vertices_1)  # AAA battery
+        coil_1 = magpy.current.Line(current=7500, vertices=vertices_1)  # AAA battery
         self.coil_1 = coil_1.rotate_from_angax(45, "y")  # Front coil
 
         # coil 2
         ts = np.linspace(-6, 6, 500)
         vertices_2 = np.c_[5 * np.cos(ts * 2 * np.pi), 5 * np.sin(ts * 2 * np.pi), ts]
-        coil_2 = magpy.current.Line(current=750, vertices=vertices_2)  # AAA battery
+        coil_2 = magpy.current.Line(current=7500, vertices=vertices_2)  # AAA battery
         self.coil_2 = coil_2.rotate_from_angax(-45, "y")  # Back coil
 
         # compute field of coil 1
