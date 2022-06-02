@@ -58,6 +58,7 @@ if IS_VERBOSE:
     log.info(f"-- magnitude: {MAGNITUDE}")
     log.info(f"-- window size: {WINDOW_SIZE}")
 
+
 def run(beacon):
     # Initialize values
     SIGNAL_FOUND = False
@@ -65,22 +66,22 @@ def run(beacon):
         avidrone.location.global_frame.lat,
         avidrone.location.global_frame.lon,
         avidrone.location.global_frame.alt,
-        ]
-    theta = 90  # TODO replace with correct value
-
+    ]
+    theta = 90  # TODO replace with correct value (from direction_distance [last year's code])
 
     IS_TIMEOUT = False
     timeout_counter = 0
 
     mock_EM_field = EM_field.EM_field()
     mock_theta = EM_field.EM_field.get_theta_at_pos(mock_EM_field, uav_pos)
-        
+
     if IS_TEST:
+        # TODO use mock beacon
         beacon = search.mock_transceiver(uav_pos, beacon.position)
 
     while avidrone.mode.name == "GUIDED":
-        theta_counter = 0   # to iterate over theta values continuously
-        
+        theta_counter = 0  # to iterate over theta values continuously
+
         gps_window = gps_data.GPSData(WINDOW_SIZE)
         if IS_TIMEOUT:  # return to landing
             log.critical("Return to launch site")
