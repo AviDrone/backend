@@ -1,3 +1,9 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+    TRANSCEIVER
+"""
+
 import datetime
 import logging
 import time
@@ -11,7 +17,6 @@ formatter = logging.Formatter("%(asctime)s  [%(levelname)s]  %(message)s")
 file_handler = logging.FileHandler("transceiver.log")
 file_handler.setFormatter(formatter)
 log.addHandler(file_handler)
-log.info("*********** TRANSCEIVER ***********")
 
 
 class Transceiver:
