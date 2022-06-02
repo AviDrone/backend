@@ -23,7 +23,6 @@ class Transceiver:
     def __init__(self):
         self.direction = -1  # initially not detected
         self.distance = -1  # initially not detected
-        
         self.signal_detected = False  # not detected
         self.position = [0, 0, 0]  # Default example (1 meter underground)
         self.mode = "transmit"  # or detect
@@ -172,7 +171,7 @@ while True:
 
         if transceiver.signal_detected:
             uav_pos[2] -= 1
-            
+
             if uav_pos[2] == 0:
                 curr_t = datetime.datetime.now()
                 current_time = curr_t.strftime("%c")
@@ -183,7 +182,7 @@ while True:
                 transceiver.victim_found_msg()
                 break
 
-# TODO this should happen in secondary
+    # TODO this should happen in secondary
     # Navigation algorithm
     if uav_pos[0] < beacon_pos[0]:  # x
         uav_pos[0] += 1
@@ -196,7 +195,7 @@ while True:
     if uav_pos[0] > beacon_pos[0]:  # y
         uav_pos[0] -= 1
         log.debug("y_uav > y_beacon")
-        
+
     elif uav_pos[1] > beacon_pos[1]:  # x
         uav_pos[1] -= 1
         log.debug("x_uav > x_beacon")

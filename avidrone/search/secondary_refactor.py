@@ -19,7 +19,7 @@ import dronekit_sitl
 import gps_data
 import transceiver.util
 from dronekit import LocationGlobal, VehicleMode, connect
-from transceiver.transceiver import Transceiver, EM_field
+from transceiver.transceiver import EM_field, Transceiver
 from util import (
     ALTITUDE,
     DEGREES,
