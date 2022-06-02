@@ -10,3 +10,4 @@ pymavlink~=2.4.19
 magpylib~=4.0.3
 matplotlib~=3.5.2
 pathlib~=1.0.1
+datetime
