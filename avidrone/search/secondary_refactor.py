@@ -64,7 +64,7 @@ def run(beacon):
     uav_pos = [
         avidrone.location.global_frame.lat,
         avidrone.location.global_frame.lon,
-        avidrone.location.global_frame.alt
+        avidrone.location.global_frame.alt,
         ]
     theta = 90  # TODO replace with correct value
 

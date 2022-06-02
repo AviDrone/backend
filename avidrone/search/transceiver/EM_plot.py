@@ -3,7 +3,6 @@ import magpylib as magpy
 import matplotlib.pyplot as plt
 import numpy as np
 
-
 beacon_EM_field = beacon.EM_field()
 
 def plot_coil_em_field():
