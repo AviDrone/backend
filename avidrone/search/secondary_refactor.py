@@ -26,12 +26,7 @@ from util import (
     LAND_THRESHOLD,
     MAGNITUDE,
     WINDOW_SIZE,
-    Mission,
     Search,
-    get_distance_metres,
-    get_location_metres,
-    get_location_metres_with_alt,
-    get_range,
 )
 
 log = logging.getLogger(__name__)
@@ -63,12 +58,15 @@ if IS_VERBOSE:
     log.info(f"-- magnitude: {MAGNITUDE}")
     log.info(f"-- window size: {WINDOW_SIZE}")
 
-
 def run(beacon):
     # Initialize values
     SIGNAL_FOUND = False
-    theta = transceiver.util.something()
-    uav_pos = [130, 920, 20]
+    uav_pos = [
+        avidrone.location.global_frame.lat,
+        avidrone.location.global_frame.lon,
+        avidrone.location.global_frame.alt
+        ]
+    theta = 90  # TODO replace with correct value
 
     IS_TIMEOUT = False
     timeout_counter = 0

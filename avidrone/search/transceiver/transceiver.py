@@ -11,17 +11,16 @@ formatter = logging.Formatter("%(asctime)s  [%(levelname)s]  %(message)s")
 file_handler = logging.FileHandler("transceiver.log")
 file_handler.setFormatter(formatter)
 log.addHandler(file_handler)
-log.info("*********** TRANSCEIVER ***********")
 
 
 class Transceiver:
     def __init__(self):
         self.direction = -1  # initially not detected
         self.distance = -1  # initially not detected
+        
         self.signal_detected = False  # not detected
         self.position = [0, 0, 0]  # Default example (1 meter underground)
-        self.EM_field = EM_field.EM_field()
-        # settings
+
         self.mode = "transmit"  # or detect
         self.model_number = 0  # Avidrone (default)
 
@@ -125,6 +124,10 @@ class Transceiver:
         return direction, dist
 
 
+IS_TEST = True  # set to true to use mock transceiver simulation
+IS_TIMEOUT = False
+timeout_count = 0
+
 # initialize transceiver parameters
 transceiver = Transceiver()
 transceiver.model_number = 2  # Avidrone
@@ -133,23 +136,15 @@ transceiver.curr_search_strip_width = transceiver.search_strip_width[
     transceiver.model_number
 ][model]
 
-
-
-
-IS_TEST = True  # set to true to use mock transceiver simulation
-
 uav_pos = [140, 145, 980]  # Example
-beacon_pos = transceiver.position  # Example
-
-IS_TIMEOUT = False
-timeout_count = 0
-
-# SIMULATION PARAMETERS
+beacon_pos = transceiver.position
 
 # Mock beacon
 mock_beacon = transceiver.mock_transceiver(uav_pos, beacon_pos)
 
 while True:
+    timeout_count += 1
+
     if IS_TEST:
         transceiver.direction = mock_beacon[0]
         transceiver.distance = mock_beacon[1]
@@ -158,7 +153,6 @@ while True:
         print("Too bad!!")
         # transceiver.direction = int(transceiver.theta[timeout_count])
         # transceiver.distance = mock_transceiver[1]  # TODO replace with real values
-        timeout_count += 1
 
     if timeout_count == transceiver.battery:
         IS_TIMEOUT = True
@@ -173,7 +167,8 @@ while True:
             uav_pos[2] -= 1
             
             if uav_pos[2] == 0:
-                current_time = datetime.datetime.now().strftime("%c")
+                curr_t = datetime.datetime.now()
+                current_time = curr_t.strftime("%c")
                 mission_end_time = datetime.datetime.now()
                 mission_time = mission_end_time - mission_begin_time
                 transceiver.position = uav_pos
