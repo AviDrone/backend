@@ -2,7 +2,7 @@ import datetime
 import logging
 import time
 
-from transceiver import util, EM_field
+from transceiver import EM_field, util
 
 # logging
 log = logging.getLogger(__name__)

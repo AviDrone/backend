@@ -6,7 +6,7 @@ import numpy as np
 
 # logging
 log = logging.getLogger(__name__)
-log.setLevel(logging.INFO)  # Set to loging.DEBUG to see individual parameter values
+log.setLevel(logging.INFO)  # Set to logging.DEBUG to see individual parameter values
 formatter = logging.Formatter("%(asctime)s  [%(levelname)s]  %(message)s")
 file_handler = logging.FileHandler("util.log")
 file_handler.setFormatter(formatter)
