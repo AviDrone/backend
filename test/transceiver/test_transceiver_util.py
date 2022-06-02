@@ -16,7 +16,7 @@ class TestTransceiver(TestCase):
     displacement = util.get_displacement(
         uav[0], beacon[0], uav[1], beacon[1], uav[2], beacon[2]
     )
-    theta = util.get_unique_theta(displacement)
+    theta = util.get_theta(displacement)
     print(theta)
 
     def test_get_displacement(self):

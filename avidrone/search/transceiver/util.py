@@ -38,7 +38,7 @@ def normalize(disp):
     return d_v_normal
 
 
-def get_unique_theta(disp):
+def get_theta(disp):
     fwd = [1, 0]  # UAV's forward vector.
     v_d = [disp[0], disp[1]]
     d_xy = get_distance_xy(disp)

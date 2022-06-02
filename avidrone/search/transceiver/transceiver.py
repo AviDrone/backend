@@ -12,7 +12,7 @@ from transceiver import EM_field, util
 
 # logging
 log = logging.getLogger(__name__)
-log.setLevel(logging.INFO)
+log.setLevel(logging.DEBUG)
 formatter = logging.Formatter("%(asctime)s  [%(levelname)s]  %(message)s")
 file_handler = logging.FileHandler("transceiver.log")
 file_handler.setFormatter(formatter)
@@ -123,7 +123,7 @@ class Transceiver:
         displacement = util.get_displacement(x_1, x_2, y_1, y_2, z_1, z_2)
         disp_n = util.normalize(displacement)
         dist = util.get_distance_xy(displacement)
-        theta = util.get_unique_theta(disp_n)
+        theta = util.get_theta(disp_n)
         direction = util.get_direction(theta)
         return direction, dist
 
