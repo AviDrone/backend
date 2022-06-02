@@ -64,8 +64,8 @@ class GpsData:
 
 class Search:
     def __init__(self):
-        aviDrone = drone.vehicle
-        self.global_frame = aviDrone.location.global_frame
+        avidrone = drone.vehicle
+        self.global_frame = avidrone.location.global_frame
         # TODO what is this ?
         # self.global_location = LocationGlobal(new_lat, new_lon, original_location.alt)
         # self.distance = (
@@ -253,16 +253,16 @@ class Mission:
     # Any condition we want to break the primary search can be done in this command.
     # This will be called repeatedly and return true when the break condition is true.
     def break_condition(self):
-        next_waypoint = self.aviDrone.commands.next
+        next_waypoint = self.avidrone.commands.next
         if next_waypoint == 40:
-            self.aviDrone.mode = VehicleMode("GUIDED")
+            self.avidrone.mode = VehicleMode("GUIDED")
             print("breaking...")
             return True
         return False
 
     def condition_yaw(self):
         heading = self.heading
-        original_yaw = self.aviDrone.attitude.yaw
+        original_yaw = self.avidrone.attitude.yaw
         if self.relative:
             is_relative = 1  # yaw relative to direction of travel
         else:
@@ -274,7 +274,7 @@ class Mission:
         else:
             self.cw = 1
 
-        msg = self.aviDrone.message_factory.command_long_encode(
+        msg = self.avidrone.message_factory.command_long_encode(
             0,  # target system
             0,  # target component
             self.mavutil.mavlink.MAV_CMD_CONDITION_YAW,  # command
@@ -287,7 +287,7 @@ class Mission:
             0,
             0,
         )  # param 5 ~ 7 not used
-        self.aviDrone.send_mavlink(msg)  # send command to vehicle
+        self.avidrone.send_mavlink(msg)  # send command to vehicle
 
     @staticmethod
     def forward_calculation():
@@ -301,14 +301,14 @@ class Mission:
         return flight_direction
 
     def go_to_location(self, distance, angle):
-        current_location = self.aviDrone.location.global_frame
+        current_location = self.avidrone.location.global_frame
         target_location = Search.get_location(current_location, distance, angle)
-        self.aviDrone.simple_goto(target_location)
+        self.avidrone.simple_goto(target_location)
 
         loop_count = 0
-        while self.aviDrone.mode.name == "GUIDED":
+        while self.avidrone.mode.name == "GUIDED":
             remaining_distance = Search.get_distance(
-                self.aviDrone.location.global_frame, target_location
+                self.avidrone.location.global_frame, target_location
             )
             print("Distance to target: ", remaining_distance)
             loop_count += 1
@@ -321,51 +321,51 @@ class Mission:
             time.sleep(2)
 
     def simple_goto_wait(self, go_to_checkpoint):
-        self.aviDrone.simple_goto(go_to_checkpoint)
-        global_frame = self.aviDrone.location.global_frame
+        self.avidrone.simple_goto(go_to_checkpoint)
+        global_frame = self.avidrone.location.global_frame
         distance = get_distance_metres(
             Search.get_global_pos(global_frame), go_to_checkpoint
         )
 
-        while distance >= DISTANCE_ERROR and self.aviDrone.mode.name == "GUIDED":
+        while distance >= DISTANCE_ERROR and self.avidrone.mode.name == "GUIDED":
             print(distance)
             distance = get_distance_metres(
                 Search.get_global_pos(global_frame), go_to_checkpoint
             )
             time.sleep(1)
 
-        if self.aviDrone.mode.name != "GUIDED":
-            self.aviDrone.simple_goto(self.aviDrone.location.global_frame)
+        if self.avidrone.mode.name != "GUIDED":
+            self.avidrone.simple_goto(self.avidrone.location.global_frame)
             print("Halting simple_go_to")
 
         print("Checkpoint reached")
 
     def start(self):
         log.info("-- Waiting for vehicle to start...")
-        while not self.aviDrone.is_armable:
+        while not self.avidrone.is_armable:
             time.sleep(1)
 
-        self.aviDrone.mode = VehicleMode("GUIDED")
-        self.aviDrone.armed = True
+        self.avidrone.mode = VehicleMode("GUIDED")
+        self.avidrone.armed = True
 
         log.info("-- Arming...")
-        while not self.aviDrone.is_armable:
+        while not self.avidrone.is_armable:
             time.sleep(1)
 
-        if self.aviDrone.armed:
-            log.info(f"-- Is armed: {self.aviDrone.armed}")
+        if self.avidrone.armed:
+            log.info(f"-- Is armed: {self.avidrone.armed}")
             self.takeoff_to_altitude()
 
         log.info("-- Waiting for GUIDED mode...")
-        while self.aviDrone.mode.name != "GUIDED":
+        while self.avidrone.mode.name != "GUIDED":
             time.sleep(1)
 
     def takeoff_to_altitude(self):
-        self.aviDrone.simple_takeoff(ALTITUDE)
+        self.avidrone.simple_takeoff(ALTITUDE)
         log.info(f"-- Taking off to altitude (m): {ALTITUDE} \n")
 
         while True:
-            current_alt = self.aviDrone.location.global_relative_frame.alt
+            current_alt = self.avidrone.location.global_relative_frame.alt
             if current_alt >= ALTITUDE * 0.95:
                 log.info(f"-- Reached {ALTITUDE}m")
                 break

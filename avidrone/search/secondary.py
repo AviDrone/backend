@@ -8,7 +8,7 @@ from __future__ import print_function
 
 # Set up option parsing to get connection string
 import argparse
-import ctypes   # TODO import C++ code from archive
+import ctypes
 import datetime
 import logging
 import math

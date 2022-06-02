@@ -69,8 +69,9 @@ class Transceiver:
         self.coil_current_ = 750  # AAA Battery power source
         self.coil_angle_offset_ = 45  # degrees
 
+    @staticmethod
     def read_transceiver():
-        shared_ctypes_lib = pathlib.Path().absolute() / "read_transceiver.lib" # TODO implement this too
+        shared_ctypes_lib = pathlib.Path().absolute() / "read_transceiver.lib" # TODO implement this
         c_lib = ctypes.CDLL(shared_ctypes_lib)
         output_array = (ctypes.c_double * 2)()
         print("output_array before:", output_array[0], " ", output_array[1])
