@@ -34,7 +34,7 @@ Application settings -> Comm links -> connect using "sim" (which is setup using 
 
 - Open a third terminal
 - Navigate to your mission's directory
-- run the following command bellow
+- run the following command below
   
 ```{bash}
 python3 <insertScriptHere.py> --connect udp:127.0.0.1:14551

@@ -53,12 +53,12 @@ class EM_field:
         B_y = self.B[:, :, 1]
         # B_z = B[:, :, 2]  # currently not used for 2D model
 
-        theta_grid = [None,None]  # empty list
+        theta_grid = []
         theta_val = np.arctan2(B_y, B_x)
 
         for i in range(len(theta_val)):
             for j in range(len(theta_val[i])):
                 theta_grid.append(theta_val[i][j])
-        
+
         # TODO test flight with this new theta value
         return theta_grid

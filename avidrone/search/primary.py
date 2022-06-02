@@ -12,8 +12,8 @@ import time
 import drone
 import numpy as np
 import primary_functions as pf
-from primary_functions import set_FS_BATT
 from dronekit import LocationGlobalRelative, VehicleMode
+from primary_functions import set_FS_BATT
 from pymavlink import mavutil
 from util import get_range
 
