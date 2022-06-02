@@ -72,7 +72,9 @@ def run(beacon):
         avidrone.location.global_frame.lon,
         avidrone.location.global_frame.alt,
     ]
-    theta = -1  # TODO replace with correct value (from direction_distance [last year's code])
+    theta = (
+        -1
+    )  # TODO replace with correct value (from direction_distance [last year's code])
 
     IS_TIMEOUT = False
     timeout_counter = 0
@@ -87,11 +89,10 @@ def run(beacon):
     while avidrone.mode.name != "GUIDED":
         log.debug("Waiting for GUIDED mode")
         time.sleep(1)
-        
+
     while avidrone.mode.name == "GUIDED":
         gps_window = gps_data.GPSData(WINDOW_SIZE)
-        
-        
+
         if IS_TIMEOUT:  # return to landing
             log.critical("Return to launch site")
             avidrone.mode = VehicleMode("RTL")
@@ -105,14 +106,13 @@ def run(beacon):
         elif transceiver.util.get_direction(mock_theta) == 2.0:  # Keep straight
             gps_window.add_point(search.get_global_pos(), beacon.distance)
 
-
         if (
             gps_window.get_minimum_index() == ((gps_window.window_size - 1) / 2)
             and len(gps_window.gps_points) == gps_window.window_size
         ):
-            # If the minimum is the center point of the gps_window, 
+            # If the minimum is the center point of the gps_window,
             # we need to go back to that location
-        
+
             mission.simple_goto_wait(
                 gps_window.gps_points[int((gps_window.window_size - 1) / 2)]
             )
@@ -137,13 +137,11 @@ def run(beacon):
             gps_window.get_minimum_index() == (gps_window.window_size - 1)
             and len(gps_window.gps_points) == gps_window.window_size
         ):
-        # If the minimum data point is the last one in the array we have gone
-        # too far and in the wrong direction
-                mission.condition_yaw(180, True)
-                mission.simple_goto_wait(
-                    gps_window.gps_points[gps_window.window_size - 1]
-                )
-                gps_window.purge_gps_window()
+            # If the minimum data point is the last one in the array we have gone
+            # too far and in the wrong direction
+            mission.condition_yaw(180, True)
+            mission.simple_goto_wait(gps_window.gps_points[gps_window.window_size - 1])
+            gps_window.purge_gps_window()
 
         elif gps_window.get_minimum_index() == 0:
             # If the minimum data point is in the first index,
