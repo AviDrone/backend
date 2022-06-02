@@ -14,19 +14,19 @@ import numpy as np
 class EM_field:
     def __init__(self):
         # create grid
-        self.ts = np.linspace(-140, 140, 140)
+        self.ts = np.linspace(-200, 200, 200)
         self.grid = np.array([[(x, 0, z) for x in self.ts] for z in self.ts])
 
         # coil 1
         ts = np.linspace(-6, 6, 500)
         vertices_1 = np.c_[5 * np.cos(ts * 2 * np.pi), 5 * np.sin(ts * 2 * np.pi), ts]
-        coil_1 = magpy.current.Line(current=7500, vertices=vertices_1)  # AAA battery
+        coil_1 = magpy.current.Line(current=750, vertices=vertices_1)  # AAA battery
         self.coil_1 = coil_1.rotate_from_angax(45, "y")  # Front coil
 
         # coil 2
         ts = np.linspace(-6, 6, 500)
         vertices_2 = np.c_[5 * np.cos(ts * 2 * np.pi), 5 * np.sin(ts * 2 * np.pi), ts]
-        coil_2 = magpy.current.Line(current=7500, vertices=vertices_2)  # AAA battery
+        coil_2 = magpy.current.Line(current=750, vertices=vertices_2)  # AAA battery
         self.coil_2 = coil_2.rotate_from_angax(-45, "y")  # Back coil
 
         # compute field of coil 1
@@ -48,18 +48,11 @@ class EM_field:
 
     def get_theta_at_pos(self, uav_pos):
         self.B
-
-        uav_pos_x = uav_pos[0]
-
         B_x = self.B[:, :, 0]
         B_y = self.B[:, :, 1]
         # B_z = B[:, :, 2]  # currently not used for 2D model
 
-        theta_grid = [None,None]  # empty list
-        theta_val = np.arctan2(B_y, B_x)
+        theta_grid = list(np.arctan2(B_y, B_x))
+        theta_val = theta_grid[int(uav_pos[0])][int(uav_pos[1])]  # UAV_xy coordinates
 
-        for i in range(len(theta_val)):
-            for j in range(len(theta_val[i])):
-                theta_grid.append(theta_val[i][j])
-
-        return theta_grid
+        return theta_val

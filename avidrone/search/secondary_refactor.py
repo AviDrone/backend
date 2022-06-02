@@ -76,8 +76,6 @@ def run(beacon):
     mock_theta = EM_field.EM_field.get_theta_at_pos(mock_EM_field, uav_pos)
         
     if IS_TEST:
-        # Mock EM_field
-        theta = mock_theta
         beacon = search.mock_transceiver(uav_pos, beacon.position)
 
     while avidrone.mode.name == "GUIDED":
@@ -92,13 +90,13 @@ def run(beacon):
             gps_window.get_minimum_index() == ((gps_window.window_size - 1) / 2)
             and len(gps_window.gps_points) == gps_window.window_size
         ):  # TODO add comment to explain what this means
-            if transceiver.util.get_direction(theta[theta_counter]) < 2:  # Turn left
+            if transceiver.util.get_direction(mock_theta) < 2.0:  # Turn left
                 mission.condition_yaw(-DEGREES, True)
 
-            elif transceiver.util.get_direction(theta[theta_counter]) > 2:  # turn right
+            elif transceiver.util.get_direction(mock_theta) > 2.0:  # turn right
                 mission.condition_yaw(DEGREES, True)
 
-            elif transceiver.util.get_direction(theta[theta_counter]) == 2:  # keep straight
+            elif transceiver.util.get_direction(mock_theta) == 2.0:  # keep straight
                 print("keep flying straight")
                 gps_window.add_point(search.get_global_pos(), beacon.distance)
 

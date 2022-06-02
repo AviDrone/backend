@@ -5,6 +5,7 @@ import numpy as np
 
 beacon_EM_field = beacon.EM_field()
 
+
 def plot_coil_em_field():
     # Plot
     fig, [ax1, ax2] = plt.subplots(1, 2, figsize=(9, 4))

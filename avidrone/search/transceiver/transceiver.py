@@ -141,7 +141,7 @@ transceiver.curr_search_strip_width = transceiver.search_strip_width[
 ][model]
 
 
-uav_pos = [140, 145, 980]  # Example
+uav_pos = [10, 10, 20]  # Example
 beacon_pos = transceiver.position
 
 
@@ -208,7 +208,7 @@ while True:
 
         if IS_TIMEOUT:
             log.warning("\n reached timeout \n")
-            current_time = datetime.datetime.now("%c")
+            current_time = datetime.datetime.now()
             mission_end_time = datetime.datetime.now()
             m_t = mission_end_time - mission_begin_time
             mission_time = m_t.strftime("%H:%M:%S")
