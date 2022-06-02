@@ -209,8 +209,7 @@ while True:
 
         if IS_TIMEOUT:
             log.warning("\n reached timeout \n")
-            c_t = datetime.datetime.now()
-            current_time = c_t.strftime("%c")
+            current_time = datetime.datetime.now("%c")
             mission_end_time = datetime.datetime.now()
             m_t = mission_end_time - mission_begin_time
             mission_time = m_t.strftime("%H:%M:%S")
