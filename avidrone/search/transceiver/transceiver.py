@@ -11,6 +11,7 @@ formatter = logging.Formatter("%(asctime)s  [%(levelname)s]  %(message)s")
 file_handler = logging.FileHandler("transceiver.log")
 file_handler.setFormatter(formatter)
 log.addHandler(file_handler)
+log.info("*********** TRANSCEIVER ***********")
 
 
 class Transceiver:
@@ -20,7 +21,6 @@ class Transceiver:
         
         self.signal_detected = False  # not detected
         self.position = [0, 0, 0]  # Default example (1 meter underground)
-
         self.mode = "transmit"  # or detect
         self.model_number = 0  # Avidrone (default)
 
@@ -136,8 +136,10 @@ transceiver.curr_search_strip_width = transceiver.search_strip_width[
     transceiver.model_number
 ][model]
 
+
 uav_pos = [140, 145, 980]  # Example
 beacon_pos = transceiver.position
+
 
 # Mock beacon
 mock_beacon = transceiver.mock_transceiver(uav_pos, beacon_pos)
@@ -169,6 +171,7 @@ while True:
             if uav_pos[2] == 0:
                 curr_t = datetime.datetime.now()
                 current_time = curr_t.strftime("%c")
+
                 mission_end_time = datetime.datetime.now()
                 mission_time = mission_end_time - mission_begin_time
                 transceiver.position = uav_pos

@@ -68,6 +68,7 @@ def run(beacon):
         ]
     theta = 90  # TODO replace with correct value
 
+
     IS_TIMEOUT = False
     timeout_counter = 0
 
