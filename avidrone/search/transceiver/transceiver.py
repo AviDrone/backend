@@ -1,3 +1,9 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+    TRANSCEIVER
+"""
+
 import datetime
 import logging
 import time
@@ -11,7 +17,6 @@ formatter = logging.Formatter("%(asctime)s  [%(levelname)s]  %(message)s")
 file_handler = logging.FileHandler("transceiver.log")
 file_handler.setFormatter(formatter)
 log.addHandler(file_handler)
-log.info("*********** TRANSCEIVER ***********")
 
 
 class Transceiver:
@@ -20,8 +25,6 @@ class Transceiver:
         self.distance = -1  # initially not detected
         self.signal_detected = False  # not detected
         self.position = [0, 0, 0]  # Default example (1 meter underground)
-        self.EM_field = EM_field.EM_field()
-        # settings
         self.mode = "transmit"  # or detect
         self.model_number = 0  # Avidrone (default)
 
@@ -125,6 +128,10 @@ class Transceiver:
         return direction, dist
 
 
+IS_TEST = True  # set to true to use mock transceiver simulation
+IS_TIMEOUT = False
+timeout_count = 0
+
 # initialize transceiver parameters
 transceiver = Transceiver()
 transceiver.model_number = 2  # Avidrone
@@ -134,22 +141,16 @@ transceiver.curr_search_strip_width = transceiver.search_strip_width[
 ][model]
 
 
+uav_pos = [10, 10, 20]  # Example
+beacon_pos = transceiver.position
 
-
-IS_TEST = True  # set to true to use mock transceiver simulation
-
-uav_pos = [140, 145, 980]  # Example
-beacon_pos = transceiver.position  # Example
-
-IS_TIMEOUT = False
-timeout_count = 0
-
-# SIMULATION PARAMETERS
 
 # Mock beacon
 mock_beacon = transceiver.mock_transceiver(uav_pos, beacon_pos)
 
 while True:
+    timeout_count += 1
+
     if IS_TEST:
         transceiver.direction = mock_beacon[0]
         transceiver.distance = mock_beacon[1]
@@ -158,7 +159,6 @@ while True:
         print("Too bad!!")
         # transceiver.direction = int(transceiver.theta[timeout_count])
         # transceiver.distance = mock_transceiver[1]  # TODO replace with real values
-        timeout_count += 1
 
     if timeout_count == transceiver.battery:
         IS_TIMEOUT = True
@@ -171,16 +171,18 @@ while True:
 
         if transceiver.signal_detected:
             uav_pos[2] -= 1
-            
+
             if uav_pos[2] == 0:
-                current_time = datetime.datetime.now().strftime("%c")
+                curr_t = datetime.datetime.now()
+                current_time = curr_t.strftime("%c")
+
                 mission_end_time = datetime.datetime.now()
                 mission_time = mission_end_time - mission_begin_time
                 transceiver.position = uav_pos
                 transceiver.victim_found_msg()
                 break
 
-# TODO this should happen in secondary
+    # TODO this should happen in secondary
     # Navigation algorithm
     if uav_pos[0] < beacon_pos[0]:  # x
         uav_pos[0] += 1
@@ -193,7 +195,7 @@ while True:
     if uav_pos[0] > beacon_pos[0]:  # y
         uav_pos[0] -= 1
         log.debug("y_uav > y_beacon")
-        
+
     elif uav_pos[1] > beacon_pos[1]:  # x
         uav_pos[1] -= 1
         log.debug("x_uav > x_beacon")
@@ -206,11 +208,9 @@ while True:
 
         if IS_TIMEOUT:
             log.warning("\n reached timeout \n")
-            c_t = datetime.datetime.now()
-            current_time = c_t.strftime("%c")
-            mission_end_time = datetime.datetime.now()
-            m_t = mission_end_time - mission_begin_time
-            mission_time = m_t.strftime("%H:%M:%S")
-            transceiver.victim_not_found_msg()
+            # current_time = datetime.datetime.now()
+            # mission_end_time = datetime.datetime.now()
+            # mission_time = mission_end_time - mission_begin_time
+            # transceiver.victim_not_found_msg()
             IS_TIMEOUT = True
             break

@@ -19,19 +19,14 @@ import dronekit_sitl
 import gps_data
 import transceiver.util
 from dronekit import LocationGlobal, VehicleMode, connect
-from transceiver.transceiver import Transceiver, EM_field
+from transceiver.transceiver import EM_field, Transceiver
 from util import (
     ALTITUDE,
     DEGREES,
     LAND_THRESHOLD,
     MAGNITUDE,
     WINDOW_SIZE,
-    Mission,
     Search,
-    get_distance_metres,
-    get_location_metres,
-    get_location_metres_with_alt,
-    get_range,
 )
 
 log = logging.getLogger(__name__)
@@ -67,23 +62,26 @@ if IS_VERBOSE:
 def run(beacon):
     # Initialize values
     SIGNAL_FOUND = False
-    theta = transceiver.util.something()
-    uav_pos = [130, 920, 20]
+    uav_pos = [
+        avidrone.location.global_frame.lat,
+        avidrone.location.global_frame.lon,
+        avidrone.location.global_frame.alt,
+    ]
+    theta = 90  # TODO replace with correct value (from direction_distance [last year's code])
 
     IS_TIMEOUT = False
     timeout_counter = 0
 
     mock_EM_field = EM_field.EM_field()
     mock_theta = EM_field.EM_field.get_theta_at_pos(mock_EM_field, uav_pos)
-        
+
     if IS_TEST:
-        # Mock EM_field
-        theta = mock_theta
+        # TODO use mock beacon
         beacon = search.mock_transceiver(uav_pos, beacon.position)
 
     while avidrone.mode.name == "GUIDED":
-        theta_counter = 0   # to iterate over theta values continuously
-        
+        theta_counter = 0  # to iterate over theta values continuously
+
         gps_window = gps_data.GPSData(WINDOW_SIZE)
         if IS_TIMEOUT:  # return to landing
             log.critical("Return to launch site")
@@ -93,13 +91,13 @@ def run(beacon):
             gps_window.get_minimum_index() == ((gps_window.window_size - 1) / 2)
             and len(gps_window.gps_points) == gps_window.window_size
         ):  # TODO add comment to explain what this means
-            if transceiver.util.get_direction(theta[theta_counter]) < 2:  # Turn left
+            if transceiver.util.get_direction(mock_theta) < 2.0:  # Turn left
                 mission.condition_yaw(-DEGREES, True)
 
-            elif transceiver.util.get_direction(theta[theta_counter]) > 2:  # turn right
+            elif transceiver.util.get_direction(mock_theta) > 2.0:  # turn right
                 mission.condition_yaw(DEGREES, True)
 
-            elif transceiver.util.get_direction(theta[theta_counter]) == 2:  # keep straight
+            elif transceiver.util.get_direction(mock_theta) == 2.0:  # keep straight
                 print("keep flying straight")
                 gps_window.add_point(search.get_global_pos(), beacon.distance)
 
