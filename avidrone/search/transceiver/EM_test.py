@@ -1,5 +1,4 @@
 from EM_field import EM_field
-
 from util import get_direction
 
 uav_pos = [0, 5, 5]

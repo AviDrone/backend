@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+
 """
     SECONDARY SEARCH
 """
-
 from __future__ import print_function
 
 # Set up option parsing to get connection string
@@ -18,11 +18,10 @@ from re import S
 
 import drone
 import dronekit_sitl
-
 import transceiver.util
 from dronekit import LocationGlobal, VehicleMode
-from transceiver.transceiver import Transceiver
 from transceiver import EM_field, util
+from transceiver.transceiver import Transceiver
 from util import (
     ALTITUDE,
     DEGREES,
