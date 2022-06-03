@@ -70,7 +70,9 @@ else:
     )
 
 # take off, going to desired altitude (GUIDED mode)
-mission.arm_and_takeoff(20 + totalAlt)   # Note: At low (<10) altitudes, vehicle may crash.
+mission.arm_and_takeoff(
+    20 + totalAlt
+)  # Note: At low (<10) altitudes, vehicle may crash.
 
 # Start mission
 # ------------------------------------------------------------

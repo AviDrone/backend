@@ -71,7 +71,9 @@ class Transceiver:
 
     @staticmethod
     def read_transceiver():
-        shared_ctypes_lib = pathlib.Path().absolute() / "read_transceiver.lib" # TODO implement this
+        shared_ctypes_lib = (
+            pathlib.Path().absolute() / "read_transceiver.lib"
+        )  # TODO implement this
         c_lib = ctypes.CDLL(shared_ctypes_lib)
         output_array = (ctypes.c_double * 2)()
         print("output_array before:", output_array[0], " ", output_array[1])
@@ -82,8 +84,8 @@ class Transceiver:
             "Distance: ",
             output_array[1],
         )
-        
-        transceiver_output = [output_array[0],output_array[1]]
+
+        transceiver_output = [output_array[0], output_array[1]]
         return transceiver_output
 
     def get_model(self):

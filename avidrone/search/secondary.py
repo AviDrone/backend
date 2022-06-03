@@ -16,11 +16,12 @@ import pathlib
 import time
 from re import S
 
-import drone
 import dronekit_sitl
+from dronekit import LocationGlobal, VehicleMode
+
+import drone
 import gps_data
 import transceiver.util
-from dronekit import LocationGlobal, VehicleMode
 from transceiver.transceiver import EM_field, Transceiver
 from util import (
     ALTITUDE,
@@ -83,10 +84,14 @@ def run(beacon):
     mock_theta = EM_field.EM_field.get_theta_at_pos(mock_EM_field, uav_pos)
 
     if IS_TEST:
-        beacon = search.mock_transceiver(beacon_pos, uav_pos)  # Direction, distance tuple from simulated transceiver
+        beacon = search.mock_transceiver(
+            beacon_pos, uav_pos
+        )  # Direction, distance tuple from simulated transceiver
 
     else:
-        beacon = Transceiver.read_transceiver() # Direction, distance tuple from real transceiver
+        beacon = (
+            Transceiver.read_transceiver()
+        )  # Direction, distance tuple from real transceiver
 
     gps_window = gps_data.GPSData(WINDOW_SIZE)
     while avidrone.mode.name == "GUIDED":
@@ -155,11 +160,10 @@ def run(beacon):
 
 
 if __name__ == "__main__":
-    
+
     # shared_ctypes_lib = pathlib.Path().absolute() / "read_transceiver.lib"    # TODO create read_transceiver
     # c_lib = ctypes.CDLL(shared_ctypes_lib)
-    
-    
+
     uav_pos = [20, 200, 2]  # Example
     beacon_pos = [1, 1, 1]  # Example
     mock_transceiver = Search.mock_transceiver(uav_pos, beacon_pos)

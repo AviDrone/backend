@@ -14,7 +14,6 @@ file_handler.setFormatter(formatter)
 log.addHandler(file_handler)
 
 
-
 def get_displacement(x_1, x_2, y_1, y_2, z_1=0, z_2=0):
     displacement = [x_2 - x_1, y_2 - y_1, z_2 - z_1]
     log.debug(f"displacement: {displacement}")

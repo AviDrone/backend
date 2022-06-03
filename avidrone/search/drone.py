@@ -4,7 +4,14 @@ import argparse
 import logging as log
 
 from dronekit import connect
-from util import WINDOW_SIZE, GpsData, Mission, Search, Vector
+
+from util import (
+    WINDOW_SIZE,
+    GpsData,
+    Mission,
+    Search,
+    Vector,
+)
 
 # init vehicle
 
