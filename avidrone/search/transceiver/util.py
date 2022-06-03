@@ -1,3 +1,9 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+    TRANSCEIVER UTIL
+"""
+
 # For interfacing with the C code
 import logging
 import math

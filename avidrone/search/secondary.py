@@ -16,11 +16,11 @@ import pathlib
 import time
 from re import S
 
-import dronekit_sitl
-from dronekit import LocationGlobal, VehicleMode
-
 import drone
+import dronekit_sitl
+
 import transceiver.util
+from dronekit import LocationGlobal, VehicleMode
 from transceiver.transceiver import EM_field, Transceiver
 from util import (
     ALTITUDE,

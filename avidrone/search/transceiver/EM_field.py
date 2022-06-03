@@ -1,7 +1,7 @@
 from re import S
 
-import magpylib as magpy
 import math
+import magpylib as magpy
 import numpy as np
 
 """

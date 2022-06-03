@@ -1,5 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+"""
+    SEARCH UTIL
+"""
 
 from __future__ import print_function
 
@@ -10,6 +13,7 @@ import logging as log
 import math
 import time
 
+import drone
 import numpy as np
 from dronekit import (
     Command,
@@ -18,7 +22,6 @@ from dronekit import (
     VehicleMode,
 )
 
-import drone
 
 WITH_TRANSCEIVER = True  # set to false for quicker primary search only operation
 if WITH_TRANSCEIVER:
