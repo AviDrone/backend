@@ -1,6 +1,6 @@
 from unittest import TestCase
 
-from avidrone.search import util
+# from avidrone.search import util
 
 class TestGPSData(TestCase):
     assert True
