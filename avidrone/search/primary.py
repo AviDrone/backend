@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+
 """
     PRIMARY SEARCH
 """
-
 from __future__ import print_function
 
 # Set up option parsing to get connection string
@@ -12,16 +12,17 @@ import time
 import drone
 import numpy as np
 import primary_functions as pf
-from avidrone.search.primary_functions import set_FS_BATT
 from dronekit import LocationGlobalRelative, VehicleMode
 from pymavlink import mavutil
 from util import get_range
-
 
 aviDrone = drone.vehicle
 sitl = drone.sitl
 vector = drone.vector
 mission = drone.mission
+
+# Switch to secondary search mode
+EN_SECONDARY_SWITCH = False
 
 # width of the search
 width = 50
@@ -67,7 +68,9 @@ else:
     )
 
 # take off, going to desired altitude (GUIDED mode)
-pf.arm_and_takeoff(10 + totalAlt)
+mission.arm_and_takeoff(
+    20 + totalAlt
+)  # Note: At low (<10) altitudes, vehicle may crash.
 
 # Start mission
 # ------------------------------------------------------------
@@ -148,15 +151,16 @@ if not reached_end:
 if reached_end or reached_end_again:
     print("Return to launch")
     aviDrone.mode = VehicleMode("RTL")
+    EN_SECONDARY_SWITCH = True
     pf.save_mission("mission.txt")
 
-# Switch to secondary search mode
-EN_SECONDARY_SWITCH = False
+
 print("Switch to secondary:")
 if EN_SECONDARY_SWITCH and not reached_end:
-    import secondary
-
-    secondary.run()
+    # import secondary
+    aviDrone.mode = VehicleMode("ALT_HOLD")
+    print("-- Switch to secondary successful -- ")
+    # secondary.run()
 
 
 pf.battery_information()

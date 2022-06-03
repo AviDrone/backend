@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 """
-    PRIMARY SEARCH
+    PRIMARY FUNCTIONS
 """
 from __future__ import print_function
 
@@ -13,7 +13,7 @@ import time
 
 import drone
 import numpy as np
-from dronekit import Command, LocationGlobalRelative, VehicleMode, connect
+from dronekit import Command, LocationGlobalRelative, VehicleMode
 from pymavlink import mavutil
 from util import (
     ALTITUDE,

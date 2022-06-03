@@ -1,10 +1,15 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+"""
+    DRONE
+"""
 from __future__ import print_function
 
 import argparse
 import logging as log
 
 from dronekit import connect
-from pymavlink import mavutil
 from util import WINDOW_SIZE, GpsData, Mission, Search, Vector
 
 # init vehicle

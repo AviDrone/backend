@@ -4,11 +4,13 @@
     TRANSCEIVER
 """
 
+import ctypes
 import datetime
 import logging
+import pathlib
 import time
 
-from transceiver import EM_field, util
+from transceiver import util
 
 # logging
 log = logging.getLogger(__name__)
@@ -21,10 +23,10 @@ log.addHandler(file_handler)
 
 class Transceiver:
     def __init__(self):
-        self.direction = -1  # initially not detected
-        self.distance = -1  # initially not detected
-        self.signal_detected = False  # not detected
-        self.position = [0, 0, 0]  # Default example (1 meter underground)
+        self.direction = -1  # initially not detected (default)
+        self.distance = -1  # initially not detected (default)
+        self.signal_detected = False  # not detected (default)
+        self.position = [46.045030, -118.3911911, 0]  # Ground level (default)
         self.mode = "transmit"  # or detect
         self.model_number = 0  # Avidrone (default)
 
@@ -61,11 +63,30 @@ class Transceiver:
         self.curr_search_strip_width = 6  # Avidrone (default)
 
         # Simulation
-        self.frequency_ = 457  # mHz
-        self.coil_number_ = 2  # Avidrone (default)
-        self.coil_length_ = 120  # mm
-        self.coil_current_ = 750  # AAA Battery power source
-        self.coil_angle_offset_ = 45  # degrees
+        self._frequency = 457  # mHz
+        self._coil_number = 2  # Avidrone (default)
+        self._coil_length = 120  # mm
+        self._coil_current = 750  # AAA Battery power source
+        self._coil_angle_offset = 45  # degrees
+
+    @staticmethod
+    def read_transceiver():
+        shared_ctypes_lib = (
+            pathlib.Path().absolute() / "read_transceiver.lib"
+        )  # TODO implement this
+        c_lib = ctypes.CDLL(shared_ctypes_lib)
+        output_array = (ctypes.c_double * 2)()
+        print("output_array before:", output_array[0], " ", output_array[1])
+        c_lib._Z11get_dir_digPd(ctypes.byref(output_array))
+        print(
+            "Direction: ",
+            output_array[0],
+            "Distance: ",
+            output_array[1],
+        )
+
+        transceiver_output = [output_array[0], output_array[1]]
+        return transceiver_output
 
     def get_model(self):
         return transceiver.model[self.model_number]

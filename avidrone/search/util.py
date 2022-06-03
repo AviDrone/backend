@@ -1,5 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+"""
+    SEARCH UTIL
+"""
 
 from __future__ import print_function
 
@@ -27,7 +30,7 @@ IS_VERBOSE = False  # for verbose command-line interface output
 IS_TEST = False  # for running simulations
 
 # DEFAULT PARAMETERS
-MAGNITUDE = 1  # Distance the vehicle goes
+MAGNITUDE = 1  # Distance the vehicle goes forward per command
 ALTITUDE = 15  # Altitude of the flight path
 DEGREES = 10  # Amount to rotate in yaw
 DEGREE_ERROR = 2  # Number of degrees error for rotation
@@ -64,22 +67,8 @@ class GpsData:
 
 class Search:
     def __init__(self):
-        aviDrone = drone.vehicle
-        self.global_frame = aviDrone.location.global_frame
-        # TODO what is this ?
-        # self.global_location = LocationGlobal(new_lat, new_lon, original_location.alt)
-        # self.distance = (
-        #     2
-        #     * math.asin(
-        #         math.sqrt(
-        #             (math.sin((lat_a - lat_b) / 2)) ** 2
-        #             + math.cos(lat_a)
-        #             * math.cos(lat_b)
-        #             * (math.sin((lon_a - lon_b) / 2)) ** 2
-        #         )
-        #     )
-        #     * 1.113195e5
-        # )
+        avidrone = drone.vehicle
+        self.global_frame = avidrone.location.global_frame
 
     @staticmethod
     def get_distance(location_a, location_b):
@@ -124,16 +113,45 @@ class Mission:
     def __init__(self):
         from pymavlink import mavutil
 
-        self.aviDrone = drone.vehicle
+        self.avidrone = drone.vehicle
         self.mavutil = mavutil
-        self.global_frame = self.aviDrone.location.global_frame
-        self.original_yaw = self.aviDrone.attitude.yaw
+        self.global_frame = self.avidrone.location.global_frame
+        self.original_yaw = self.avidrone.attitude.yaw
         self.heading = -1  # TODO get correct value
         self.relative = False
         self.cw = -1  # TODO get correct value
 
-    @staticmethod
-    def better_get_distance_meters(a_location1, a_location2):
+    def arm_and_takeoff(self, target_altitude):
+        log.debug("Basic pre-arm checks")
+        # Don not let the user try to arm until autopilot is ready
+        while not self.avidrone.is_armable:
+            print(" Waiting for vehicle to initialize...")
+            time.sleep(1)
+
+            log.debug("Arming motors")  # Copter should arm in GUIDED mode
+            self.avidrone.mode = VehicleMode("GUIDED")
+            self.avidrone.armed = True
+
+        while not self.avidrone.armed:
+            log.info(" Waiting for arming...")
+            time.sleep(1)
+
+        log.warning("Taking off!")
+        self.avidrone.simple_takeoff(target_altitude)  # Take off to target altitude
+
+        # Wait until the vehicle reaches a safe height before processing the goto (otherwise the command
+        #  after Vehicle.simple_takeoff will execute immediately).
+        while True:
+            print(" Altitude: ", self.avidrone.location.global_relative_frame.alt)
+            time.sleep(1)
+            if (
+                self.avidrone.location.global_relative_frame.alt
+                >= target_altitude * 0.95
+            ):  # Trigger just below target alt.
+                print("Reached target altitude")
+                break
+
+    def better_get_distance_meters(self, a_location1, a_location2):
         lat1, lat2 = a_location1.lat, a_location2.lat
         lon1, lon2 = a_location1.lon, a_location2.lon
 
@@ -155,8 +173,7 @@ class Mission:
         )
         return distance
 
-    @staticmethod
-    def better_get_location_meters(original_location, distance, angle):
+    def better_get_location_meters(self, original_location, distance, angle):
         lat = math.asin(
             math.sin(original_location.lat) * math.cos(distance)
             + math.cos(original_location.lat) * math.sin(distance) * math.cos(angle)
@@ -171,8 +188,7 @@ class Mission:
 
         return LocationGlobal(lat, lon, original_location.alt)
 
-    @staticmethod
-    def better_goto(distance, angle, vehicle):
+    def better_goto(self, distance, angle):
         """
         Moves the vehicle to a position d_north metres North and d_east metres East of the current position.
         The method takes a function pointer argument with a single `dronekit.lib.LocationGlobal` parameter for
@@ -184,25 +200,22 @@ class Mission:
         https://dronekit-python.readthedocs.io/en/latest/examples/guided-set-speed-yaw-demo.html
         """
 
-        vehicle = drone.vehicle
-        currentLocation = vehicle.location.global_frame  # was global_relative_frame
-        targetLocation = Mission.better_get_location_meters(
+        currentLocation = (
+            self.avidrone.location.global_frame
+        )  # was global_relative_frame
+        targetLocation = self.better_get_location_meters(
             currentLocation, distance, angle
         )
-        # targetDistance = better_get_distance_meters(currentLocation, targetLocation)
-        # targetDistance = get_distance_meters(currentLocation, targetLocation)
-        vehicle.simple_goto(targetLocation)
 
-        # print "DEBUG: targetLocation: %s" % targetLocation
-        # print "DEBUG: targetLocation: %s" % targetDistance
+        self.avidrone.simple_goto(targetLocation)
 
         loop_count = 0
         while (
-            vehicle.mode.name == "GUIDED"
+            self.avidrone.mode.name == "GUIDED"
         ):  # Stop action if we are no longer in guided mode.
             # print "DEBUG: mode: %s" % vehicle.mode.name
-            remainingDistance = Mission.better_get_distance_meters(
-                vehicle.location.global_frame, targetLocation
+            remainingDistance = self.better_get_distance_meters(
+                self.avidrone.location.global_frame, targetLocation
             )
             # global_frame was global_relative_frame
             # remainingDistance=get_distance_meters(vehicle.location.global_frame, targetLocation)
@@ -223,41 +236,39 @@ class Mission:
     # Any condition we want to break the primary search can be done in this command.
     # This will be called repeatedly and return true when the break condition is true.
     def break_condition(self):
-        next_waypoint = self.aviDrone.commands.next
+        next_waypoint = self.avidrone.commands.next
         if next_waypoint == 40:
-            self.aviDrone.mode = VehicleMode("GUIDED")
+            self.avidrone.mode = VehicleMode("GUIDED")
             print("breaking...")
             return True
         return False
 
-    def condition_yaw(self):
-        heading = self.heading
-        original_yaw = self.aviDrone.attitude.yaw
-        if self.relative:
-            is_relative = 1  # yaw relative to direction of travel
+    def condition_yaw(self, heading, relative):
+        if relative:
+            is_relative = True  # yaw relative to direction of travel
         else:
-            is_relative = 0  # yaw is an absolute angle
+            is_relative = False  # yaw is an absolute angle
 
-        if self.heading < 0:
+        if heading < 0:
             heading = abs(heading)
-            self.cw = -1
+            cw = -1
         else:
-            self.cw = 1
+            cw = 1
 
-        msg = self.aviDrone.message_factory.command_long_encode(
+        msg = self.avidrone.message_factory.command_long_encode(
             0,  # target system
             0,  # target component
             self.mavutil.mavlink.MAV_CMD_CONDITION_YAW,  # command
             0,  # confirmation
             heading,  # param 1, yaw in degrees
             0,  # param 2, yaw speed deg/s
-            self.cw,  # param 3, direction -1 ccw, 1 cw
+            cw,  # param 3, direction -1 ccw, 1 cw
             is_relative,  # param 4, relative offset 1, absolute angle 0
             0,
             0,
             0,
         )  # param 5 ~ 7 not used
-        self.aviDrone.send_mavlink(msg)  # send command to vehicle
+        self.avidrone.send_mavlink(msg)  # send command to vehicle
 
     @staticmethod
     def forward_calculation():
@@ -270,72 +281,52 @@ class Mission:
 
         return flight_direction
 
-    def go_to_location(self, distance, angle):
-        current_location = self.aviDrone.location.global_frame
-        target_location = Search.get_location(current_location, distance, angle)
-        self.aviDrone.simple_goto(target_location)
-
-        loop_count = 0
-        while self.aviDrone.mode.name == "GUIDED":
-            remaining_distance = Search.get_distance(
-                self.aviDrone.location.global_frame, target_location
-            )
-            print("Distance to target: ", remaining_distance)
-            loop_count += 1
-            if remaining_distance <= 0.35:
-                print("Reached target")
-                break
-            elif loop_count >= 10:
-                print("Stuck, skipping target")
-                break
-            time.sleep(2)
-
     def simple_goto_wait(self, go_to_checkpoint):
-        self.aviDrone.simple_goto(go_to_checkpoint)
-        global_frame = self.aviDrone.location.global_frame
+        self.avidrone.simple_goto(go_to_checkpoint)
+        global_frame = self.avidrone.location.global_frame
         distance = get_distance_metres(
             Search.get_global_pos(global_frame), go_to_checkpoint
         )
 
-        while distance >= DISTANCE_ERROR and self.aviDrone.mode.name == "GUIDED":
+        while distance >= DISTANCE_ERROR and self.avidrone.mode.name == "GUIDED":
             print(distance)
             distance = get_distance_metres(
                 Search.get_global_pos(global_frame), go_to_checkpoint
             )
             time.sleep(1)
 
-        if self.aviDrone.mode.name != "GUIDED":
-            self.aviDrone.simple_goto(self.aviDrone.location.global_frame)
+        if self.avidrone.mode.name != "GUIDED":
+            self.avidrone.simple_goto(self.avidrone.location.global_frame)
             print("Halting simple_go_to")
 
         print("Checkpoint reached")
 
     def start(self):
         log.info("-- Waiting for vehicle to start...")
-        while not self.aviDrone.is_armable:
+        while not self.avidrone.is_armable:
             time.sleep(1)
 
-        self.aviDrone.mode = VehicleMode("GUIDED")
-        self.aviDrone.armed = True
+        self.avidrone.mode = VehicleMode("GUIDED")
+        self.avidrone.armed = True
 
         log.info("-- Arming...")
-        while not self.aviDrone.is_armable:
+        while not self.avidrone.is_armable:
             time.sleep(1)
 
-        if self.aviDrone.armed:
-            log.info(f"-- Is armed: {self.aviDrone.armed}")
+        if self.avidrone.armed:
+            log.info(f"-- Is armed: {self.avidrone.armed}")
             self.takeoff_to_altitude()
 
         log.info("-- Waiting for GUIDED mode...")
-        while self.aviDrone.mode.name != "GUIDED":
+        while self.avidrone.mode.name != "GUIDED":
             time.sleep(1)
 
     def takeoff_to_altitude(self):
-        self.aviDrone.simple_takeoff(ALTITUDE)
+        self.avidrone.simple_takeoff(ALTITUDE)
         log.info(f"-- Taking off to altitude (m): {ALTITUDE} \n")
 
         while True:
-            current_alt = self.aviDrone.location.global_relative_frame.alt
+            current_alt = self.avidrone.location.global_relative_frame.alt
             if current_alt >= ALTITUDE * 0.95:
                 log.info(f"-- Reached {ALTITUDE}m")
                 break

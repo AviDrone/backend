@@ -1,238 +1,171 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+
 """
     SECONDARY SEARCH
 """
-
 from __future__ import print_function
 
 # Set up option parsing to get connection string
 import argparse
+import ctypes
 import datetime
 import logging
 import math
+import pathlib
 import time
+from re import S
 
 import drone
 import dronekit_sitl
-import transceiver
 import transceiver.util
-from dronekit import LocationGlobal, VehicleMode, connect
+from dronekit import LocationGlobal, VehicleMode
+from transceiver import EM_field, util
+from transceiver.transceiver import Transceiver
 from util import (
     ALTITUDE,
     DEGREES,
     LAND_THRESHOLD,
     MAGNITUDE,
     WINDOW_SIZE,
+    GpsData,
     Mission,
     Search,
-    get_distance_metres,
-    get_location_metres,
-    get_location_metres_with_alt,
-    get_range,
 )
 
 log = logging.getLogger(__name__)
 log.setLevel(logging.INFO)
-formatter = logging.Formatter("%(asctime)s:%(levelname)s:%(message)s")
+formatter = logging.Formatter("%(asctime)s [%(levelname)s] %(message)s")
 file_handler = logging.FileHandler("secondary.log")
 file_handler.setFormatter(formatter)
 log.addHandler(file_handler)
 
-# initialization
-aviDrone = drone.vehicle
-sitl = drone.sitl
-vector = drone.vector
+log.info("**************** SECONDARY SEARCH ****************")
+# Initialization
+avidrone = drone.vehicle
 mission = drone.mission
 search = drone.search
-
-# If test, use the following command to run
-IS_TEST = True  # set to False for real flight
-
-# TODO add timeout like with transceiver
-
-"""
-            log.info("Return to launch")
-            Avidrone.mode = VehicleMode("RTL)"
-"""
+sitl = drone.sitl
+vector = drone.vector
 
 
-def run(transceiver):
-    log.info("-- SECONDARY SEARCH --")
-    signal_found = False
-    uav_pos = [0, 0, 0]
-    beacon_pos = [0, 0, 0]
-    if IS_TEST:
-        beacon = search.mock_transceiver(uav_pos, beacon_pos)  # mock transceiver
-    else:
-        beacon = transceiver.Transceiver()
-    search.start()
-    gps_window = WINDOW_SIZE
-    while aviDrone.mode.name == "GUIDED":
-        log.info(transceiver.direction, ", ", transceiver.distance)
+# CLI conditions
+IS_TEST = True
+IS_VERBOSE = False
 
-        if beacon.direction < 2:  # Turn left
-            log.info("-- Turning left")
-            mission.condition_yaw(-DEGREES, True)
-
-        elif beacon.direction > 2:  # Turn right
-            log.info("-- Turning right")
-            mission.condition_yaw(DEGREES, True)
-
-        elif beacon.direction == 2:  # Continue forward
-            log.info("-- Continuing forward")
-            gps_window.add_point(search.get_global_pos(), transceiver.distance)
-            if (
-                gps_window.get_minimum_index() == ((gps_window.window_size - 1) / 2)
-                and len(gps_window.gps_points) == gps_window.window_size
-            ):
-
-                # If the minimum is the center point of the gps_window we need to go
-                # back to that location, Min index = middle
-
-                mission.simple_goto_wait(
-                    gps_window.gps_points[int((gps_window.window_size - 1) / 2)]
-                )
-
-                if gps_window.distance[2] <= LAND_THRESHOLD:
-                    log.info("-- Landing")
-                    aviDrone.mode = VehicleMode("LAND")
-                    signal_found = True
-
-                if signal_found:
-                    current_time = datetime.datetime.now()
-                    print(
-                        f"\n-------- VICTIM FOUND: {transceiver.signal_detected} -------- "
-                    )
-                    print(f"-- Time: {current_time}")
-                    print(f"-- Location: {aviDrone.location.global_frame}\n")
-
-                else:
-                    log.info("Not close, continuing")
-                    gps_window.purge_gps_window()
-
-            elif (
-                gps_window.get_minimum_index() == (gps_window.window_size - 1)
-                and len(gps_window.gps_points) == gps_window.window_size
-            ):
-
-                # If the minimum data point is the last one in the array,
-                log.info("too far in the wrong direction")
-
-                mission.condition_yaw(180, True)
-                mission.simple_goto_wait(
-                    gps_window.gps_points[gps_window.window_size - 1]
-                )
-                gps_window.purge_gps_window()
-
-            elif gps_window.get_minimum_index() == 0:
-                # If the minimum data point is in the first index,
-                log.info("continue forward")
-                mission.go_to_location(MAGNITUDE, aviDrone.attitude.yaw, aviDrone)
-
-            else:
-                log.info(f"Did not find signal at altitude: {ALTITUDE}")
-                log.info("Climbing...")
-                mission.go_to_location(MAGNITUDE, aviDrone.attitude.yaw, aviDrone)
-        time.sleep(2)
+if IS_VERBOSE:
+    log.info(f"- SEARCH PARAMETERS")
+    log.info(f"-- altitude: {ALTITUDE}")
+    log.info(f"-- degrees: {DEGREES}")
+    log.info(f"-- land threshold: {LAND_THRESHOLD}")
+    log.info(f"-- magnitude: {MAGNITUDE}")
+    log.info(f"-- window size: {WINDOW_SIZE}")
 
 
-# A version much closer to the previous version to serve as a better reference
-def run_prev_sec_search():
-    # Initialize the gps_window to be WINDOW_SIZE long
-    import gps_data
-    import transceiver.read_transceiver as rt
-
-    gps_window = gps_data.GPSData(WINDOW_SIZE)
-
-    while aviDrone.mode.name != "GUIDED":
-        print("Waiting for GUIDED mode")
+def run(beacon):
+    while avidrone.mode.name != "GUIDED":
+        # if avidrone.mode.name == "ALT_HOLD":  # mode state after Primary search handoff
+        avidrone.mode = VehicleMode("GUIDED")
+        log.info("Waiting for GUIDED mode...")
         time.sleep(1)
 
-    while aviDrone.mode.name == "GUIDED":
-        direction_distance = rt.read_transceiver()
+    # Initialize values
+    SIGNAL_FOUND = False
+    uav_pos = [
+        avidrone.location.global_frame.lat,
+        avidrone.location.global_frame.lon,
+        avidrone.location.global_frame.alt,
+    ]
 
-        print(
-            "Direction: ",
-            direction_distance.direction,
-            "Distance: ",
-            direction_distance.distance,
-        )
+    IS_TIMEOUT = False
+    timeout_counter = 0
 
-        if direction_distance.direction < 2:
-            # Turn left
+    mock_EM_field = EM_field.EM_field()
+    mock_theta = mock_EM_field.get_theta_at_pos(uav_pos)
+
+    if IS_TEST:
+        beacon = search.mock_transceiver(
+            beacon_pos, uav_pos
+        )  # Direction, distance tuple from simulated transceiver
+
+    else:
+        beacon = (
+            Transceiver.read_transceiver()
+        )  # Direction, distance tuple from real transceiver
+
+    gps_window = GpsData(WINDOW_SIZE)
+    while avidrone.mode.name == "GUIDED":
+        if IS_TIMEOUT:  # return to landing
+            log.critical("Return to launch site")
+            avidrone.mode = VehicleMode("RTL")
+
+        if transceiver.util.get_direction(mock_theta) < 2.0:  # Turn left
             mission.condition_yaw(-DEGREES, True)
 
-        elif direction_distance.direction > 2:
-            # Turn right
+        elif transceiver.util.get_direction(mock_theta) > 2.0:  # Turn right
             mission.condition_yaw(DEGREES, True)
 
-        elif direction_distance.direction == 2:
-            print("Fly forward")
-            flight_dir = mission.forward_calculation()
-            print("Flight dir[0]: ", flight_dir[0])
-            print("Flight dir[1]: ", flight_dir[1])
+        elif transceiver.util.get_direction(mock_theta) == 2.0:  # Keep straight
+            gps_window.add_point(search.get_global_pos(), beacon.distance)
 
-            gps_window.add_point(search.get_global_pos(), direction_distance.distance)
+        if (
+            gps_window.get_minimum_index() == ((gps_window.window_size - 1) / 2)
+            and len(gps_window.gps_points) == gps_window.window_size
+        ):
+            # If the minimum is the center point of the gps_window,
+            # we need to go back to that location
 
-            if (
-                gps_window.get_minimum_index() == ((gps_window.window_size - 1) / 2)
-                and len(gps_window.gps_points) == gps_window.window_size
-            ):
+            mission.simple_goto_wait(
+                gps_window.gps_points[int((gps_window.window_size - 1) / 2)]
+            )
 
-                # If the minimum is the center point of the gps_window we need to go
-                # back to that location
-                print("Min index = middle")
+            if gps_window.distance[2] <= LAND_THRESHOLD:
+                log.warn("-- Landing")
+                SIGNAL_FOUND = True
 
-                mission.simple_goto_wait(
-                    gps_window.gps_points[int((gps_window.window_size - 1) / 2)]
+            if SIGNAL_FOUND:
+                avidrone.mode = VehicleMode("LAND")
+                current_time = datetime.datetime.now()
+                log.info(
+                    f"\n-------- VICTIM FOUND: {transceiver.signal_detected} -------- "
                 )
-
-                if gps_window.distance[2] <= LAND_THRESHOLD:
-                    print("Close, landing")
-                    aviDrone.mode = VehicleMode("LAND")
-                else:
-                    print("Not close, continuing")
-                    gps_window.purge_gps_window()
-
-            elif (
-                gps_window.get_minimum_index() == (gps_window.window_size - 1)
-                and len(gps_window.gps_points) == gps_window.window_size
-            ):
-
-                # If the minimum data point is the last one in the array we have gone
-                # too far and in the wrong direction
-                print("Min index = window_size - 1")
-
-                mission.condition_yaw(180, True)
-                mission.simple_goto_wait(
-                    gps_window.gps_points[gps_window.window_size - 1]
-                )
-                gps_window.purge_gps_window()
-
-            elif gps_window.get_minimum_index() == 0:
-                # If the minimum data point is in the first index, continue forward
-                print("Min index = 0")
-
-                # goto(flight_dir[0], flight_dir[1])
-                search.better_goto(MAGNITUDE, aviDrone.attitude.yaw, aviDrone)
+                log.info(f"-- Time: {current_time}")
+                log.info(f"-- Location: {avidrone.location.global_frame}\n")
 
             else:
-                # Possibly going in the wrong direction.... But we still need to keep
-                # going to make sure
+                gps_window.purge_gps_window()
 
-                print("Goin' on up")
-                # goto(flight_dir[0], flight_dir[1])
-                mission.better_goto(MAGNITUDE, aviDrone.attitude.yaw, aviDrone)
+        elif (
+            gps_window.get_minimum_index() == (gps_window.window_size - 1)
+            and len(gps_window.gps_points) == gps_window.window_size
+        ):
+            # If the minimum data point is the last one in the array we have gone
+            # too far and in the wrong direction
+            mission.condition_yaw(180, True)
+            mission.simple_goto_wait(gps_window.gps_points[gps_window.window_size - 1])
+            gps_window.purge_gps_window()
 
-            # send_ned_velocity(flight_dir[0], flight_dir[1], 0, 1)
+        elif gps_window.get_minimum_index() == 0:
+            # If the minimum data point is in the first index,
+            log.info("continue forward")
+            mission.better_goto(MAGNITUDE, avidrone.attitude.yaw)
 
+        else:
+            timeout_counter += 1
+            mission.better_goto(MAGNITUDE, avidrone.attitude.yaw)
+
+        if timeout_counter == 100:
+            IS_TIMEOUT = True
         time.sleep(2)
 
 
 if __name__ == "__main__":
-    uav_pos = [20, 20, 2]  # Example
+
+    # shared_ctypes_lib = pathlib.Path().absolute() / "read_transceiver.lib"    # TODO create read_transceiver
+    # c_lib = ctypes.CDLL(shared_ctypes_lib)
+
+    uav_pos = [20, 200, 2]  # Example
     beacon_pos = [1, 1, 1]  # Example
-    search = drone.search
     mock_transceiver = Search.mock_transceiver(uav_pos, beacon_pos)
     run(mock_transceiver)
+    log.info("----- secondary search ran successfully -----")

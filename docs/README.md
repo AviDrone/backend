@@ -1,32 +1,103 @@
-# Avidrone Autonomous Avalanche Rescue 🏔⛑
+# Avidrone Avalanche Rescue 🏔⛑
 
+<!-- BADGE:START - Do not remove or modify this section -->
+[![All Contributors](https://img.shields.io/badge/all_contributors-4-orange.svg?style=flat-square)](#contributors-)
 ![license](https://img.shields.io/github/license/AviDrone/AviDrone)
 ![stars](https://img.shields.io/github/stars/AviDrone/AviDrone?style=social)
 
-Avalanches kill over 150 people worldwide every year.[^1] After getting caught in an avalanche, your chances of survival in the first 15 minutes are around 90%. After 30 minutes, your chances drop to 30%. Rescue teams must get to avalanche victims in the fastest time possible.
-[^1]: [National Geographic](https://www.nationalgeographic.org/encyclopedia/avalanche/)
+<!-- BADGE:END -->
 
-Our goal is to create an Unmanned Aerial System (UAS) that can search for and detect signals emitted from avalanche transceivers and mark the victim's locations autonomously to reduce search time of avalanche victims.
+## Table of Contents
 
-## Getting started
+- [Avidrone Avalanche Rescue 🏔⛑](#avidrone-avalanche-rescue-)
+  - [Table of Contents](#table-of-contents)
+  - [Getting Started](#getting-started)
+    - [Set up](#set-up)
+  - [How to use](#how-to-use)
+    - [Examples](#examples)
+    - [Search](#search)
+    - [Simulation](#simulation)
+  - [How to contribute](#how-to-contribute)
+  - [Contributors](#contributors)
+  - [License](#license)
+  - [Contact](#contact)
 
-### Prerequisites
+## Getting Started
 
-To get started with the basic drone control you will need [QGroundControl](https://docs.qgroundcontrol.com/master/en/getting_started/download_and_install.html).
+To clone this repository, run the following command on your terminal.
 
-### Installation
+```{bash}
+git clone https://github.com/AviDrone/backend.git --single-branch --branch main
+```
 
-<!-- TODO create setup.py -->
+### Set up
 
-Here's a [walkthrough video](https://youtu.be/glC99FwFnAc) of how to connect once you have all the software ready.
+Before getting started, you will need to install a few libraries by running **install.sh**.
+
+  ```{bash)
+chmod -x scripts/install.sh && bash scripts/install.sh
+  ```
+
+This will take care of installing the libraries used in the backend of this project.
+
+It is possible to run a search mission using our command-line arguments (CLI) arguments, but using our frontend will definitely speed things up. To install QGroundControl for Avidrone, see the [frontend repository](https://github.com/AviDrone/frontend).
+
+## How to use
+
+### Examples
+
+Go through a few examples so you can learn to
+
+- Run a basic mission
+- Run a transceiver simulation
+- Run a search mission simulation
+
+ You can find the examples in [EXAMPLE.md](avidrone/example/EXAMPLE.md).
+
+### Search
+
+To run a full search mission using CLI arguments, run
+
+  ```{bash)
+  avidrone-search --run
+  ```
+  
+ To run primary search only, use
+
+  ```{bash)
+  avidrone-search --primary
+  ```
+  
+ To run secondary search only, use
+
+  ```{bash)
+  avidrone-search --secondary
+  ```
+  
+If you'd like to learn more, run the following command to see what other things you can do with avidrone-search.
+  
+  ```{bash)
+  avidrone-search --help
+  ```
+  
+### Simulation
+
+To run a simulated search mission, follow the guide in [SIMULATION.md](avidrone/example/simulation/SIMULATION.md).
+
+## How to contribute
+
+To contribute, carefully read the [CONTRIBUTING.md](CONTRIBUTING.md) file.
 
 ## Contributors
 
-* Samuel Hernandez
-* Nathaniel Price
-* Jeffrey Grange
+Thanks goes to these wonderful people
 
- See the **2020-2021** team's [repository](https://github.com/AviDrone/AvidroneProject) here.
+<!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
+- [Samuel Hernandez](https://github.com/SamuelSHernandez)
+- [Nate Price](https://github.com/pricna)
+- [Stefan Hess](https://github.com/btw-ILTG)
+- [Matthew Harter](https://github.com/matthartpi)
+<!-- ALL-CONTRIBUTORS-LIST:END -->
 
 ## License
 
@@ -34,8 +105,6 @@ Licensed under the [LGPL-2.1](https://www.gnu.org/licenses/lgpl-3.0.html) Licens
 
 ## Contact
 
-If you have any questions on how or why something was done, feel free to contact me
+For any questions, feel free to contact me at any time through email
 
-### Email
-
-* [Samuel H.](mailto:samuel.hernandez@wallawalla.edu)
+- [Samuel S. Hernandez](mailto:samuel.hernandez@wallawalla.edu)
