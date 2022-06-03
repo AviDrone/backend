@@ -2,6 +2,7 @@ from unittest import TestCase
 
 # from avidrone.search import util
 
+
 class TestGPSData(TestCase):
     assert True
     # def __init__(self):
@@ -10,7 +11,7 @@ class TestGPSData(TestCase):
     #     self.gps_point = [1, 2]
     #     self.distance = [2, 3]
     #     self.min_index = 0
-        
+
     # def test_add_point(self):
     #     self.gps_data.add_point(self.gps_point, self.distance)
     #     assert self.gps_data.gps_points is not None
