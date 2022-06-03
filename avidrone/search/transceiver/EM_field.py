@@ -14,17 +14,17 @@ import numpy as np
 class EM_field:
     def __init__(self):
         # create grid
-        self.ts = np.linspace(-140, 140, 140)
+        self.ts = np.linspace(-256, 256, 256)
         self.grid = np.array([[(x, 0, z) for x in self.ts] for z in self.ts])
 
         # coil 1
-        ts = np.linspace(-60, 60, 500)
+        ts = np.linspace(-60, 60, 1200)
         vertices_1 = np.c_[5 * np.cos(ts * 2 * np.pi), 5 * np.sin(ts * 2 * np.pi), ts]
         coil_1 = magpy.current.Line(current=7500, vertices=vertices_1)  # AAA battery
         self.coil_1 = coil_1.rotate_from_angax(45, "y")  # Front coil
 
         # coil 2
-        ts = np.linspace(-60, 60, 500)
+        ts = np.linspace(-60, 60, 1200)
         vertices_2 = np.c_[5 * np.cos(ts * 2 * np.pi), 5 * np.sin(ts * 2 * np.pi), ts]
         coil_2 = magpy.current.Line(current=7500, vertices=vertices_2)  # AAA battery
         self.coil_2 = coil_2.rotate_from_angax(-45, "y")  # Back coil
@@ -49,16 +49,15 @@ class EM_field:
     def get_theta_at_pos(self, uav_pos):
         self.B
 
+        uav_x = uav_pos[0]
+        uav_y = uav_pos[1]
+        
         B_x = self.B[:, :, 0]
         B_y = self.B[:, :, 1]
         # B_z = B[:, :, 2]  # currently not used for 2D model
 
-        theta_grid = []
-        theta_val = np.arctan2(B_y, B_x)
+        theta_grid_xy = np.arctan2(B_y, B_x)
+        theta = []
+        theta.append(math.degrees(theta_grid_xy[uav_x][uav_y]))
 
-        for i in range(len(theta_val)):
-            for j in range(len(theta_val[i])):
-                theta_grid.append(math.degrees(theta_val[i][j]))
-            print(theta_grid[i])
-
-        return theta_grid
+        return theta

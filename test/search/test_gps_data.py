@@ -1,6 +1,6 @@
 from unittest import TestCase
 
-from backend.avidrone.search.util import GpsData
+from avidrone.search.util import GpsData
 
 
 class TestGPSData(TestCase):
