@@ -28,7 +28,7 @@ IS_VERBOSE = False  # for verbose command-line interface output
 IS_TEST = False  # for running simulations
 
 # DEFAULT PARAMETERS
-MAGNITUDE = 1  # Distance the vehicle goes
+MAGNITUDE = 1  # Distance the vehicle goes forward per command
 ALTITUDE = 15  # Altitude of the flight path
 DEGREES = 10  # Amount to rotate in yaw
 DEGREE_ERROR = 2  # Number of degrees error for rotation
@@ -67,20 +67,6 @@ class Search:
     def __init__(self):
         avidrone = drone.vehicle
         self.global_frame = avidrone.location.global_frame
-        # TODO what is this ?
-        # self.global_location = LocationGlobal(new_lat, new_lon, original_location.alt)
-        # self.distance = (
-        #     2
-        #     * math.asin(
-        #         math.sqrt(
-        #             (math.sin((lat_a - lat_b) / 2)) ** 2
-        #             + math.cos(lat_a)
-        #             * math.cos(lat_b)
-        #             * (math.sin((lon_a - lon_b) / 2)) ** 2
-        #         )
-        #     )
-        #     * 1.113195e5
-        # )
 
     @staticmethod
     def get_distance(location_a, location_b):
@@ -202,8 +188,7 @@ class Mission:
 
         return LocationGlobal(lat, lon, original_location.alt)
 
-    @staticmethod
-    def better_goto(distance, angle, vehicle):
+    def better_goto(self, distance, angle, vehicle):
         """
         Moves the vehicle to a position d_north metres North and d_east metres East of the current position.
         The method takes a function pointer argument with a single `dronekit.lib.LocationGlobal` parameter for
@@ -217,7 +202,7 @@ class Mission:
 
         vehicle = drone.vehicle
         currentLocation = vehicle.location.global_frame  # was global_relative_frame
-        targetLocation = Mission.better_get_location_meters(
+        targetLocation = self.better_get_location_meters(
             currentLocation, distance, angle
         )
         # targetDistance = better_get_distance_meters(currentLocation, targetLocation)
@@ -261,19 +246,17 @@ class Mission:
             return True
         return False
 
-    def condition_yaw(self):
-        heading = self.heading
-        original_yaw = self.avidrone.attitude.yaw
-        if self.relative:
-            is_relative = 1  # yaw relative to direction of travel
+    def condition_yaw(self, heading, relative):
+        if relative:
+            is_relative = True  # yaw relative to direction of travel
         else:
-            is_relative = 0  # yaw is an absolute angle
+            is_relative = False  # yaw is an absolute angle
 
-        if self.heading < 0:
+        if heading < 0:
             heading = abs(heading)
-            self.cw = -1
+            cw = -1
         else:
-            self.cw = 1
+            cw = 1
 
         msg = self.avidrone.message_factory.command_long_encode(
             0,  # target system
@@ -282,7 +265,7 @@ class Mission:
             0,  # confirmation
             heading,  # param 1, yaw in degrees
             0,  # param 2, yaw speed deg/s
-            self.cw,  # param 3, direction -1 ccw, 1 cw
+            cw,  # param 3, direction -1 ccw, 1 cw
             is_relative,  # param 4, relative offset 1, absolute angle 0
             0,
             0,
@@ -301,25 +284,6 @@ class Mission:
 
         return flight_direction
 
-    def go_to_location(self, distance, angle):
-        current_location = self.avidrone.location.global_frame
-        target_location = Search.get_location(current_location, distance, angle)
-        self.avidrone.simple_goto(target_location)
-
-        loop_count = 0
-        while self.avidrone.mode.name == "GUIDED":
-            remaining_distance = Search.get_distance(
-                self.avidrone.location.global_frame, target_location
-            )
-            print("Distance to target: ", remaining_distance)
-            loop_count += 1
-            if remaining_distance <= 0.35:
-                print("Reached target")
-                break
-            elif loop_count >= 10:
-                print("Stuck, skipping target")
-                break
-            time.sleep(2)
 
     def simple_goto_wait(self, go_to_checkpoint):
         self.avidrone.simple_goto(go_to_checkpoint)

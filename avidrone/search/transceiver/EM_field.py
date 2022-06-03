@@ -1,7 +1,7 @@
 from re import S
 
 import magpylib as magpy
-import matplotlib.pyplot as plt
+import math
 import numpy as np
 
 """
@@ -58,7 +58,7 @@ class EM_field:
 
         for i in range(len(theta_val)):
             for j in range(len(theta_val[i])):
-                theta_grid.append(theta_val[i][j])
+                theta_grid.append(math.degrees(theta_val[i][j]))
+            print(theta_grid[i])
 
-        # TODO test flight with this new theta value
         return theta_grid

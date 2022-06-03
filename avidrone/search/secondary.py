@@ -20,7 +20,6 @@ import dronekit_sitl
 from dronekit import LocationGlobal, VehicleMode
 
 import drone
-import gps_data
 import transceiver.util
 from transceiver.transceiver import EM_field, Transceiver
 from util import (
@@ -29,6 +28,7 @@ from util import (
     LAND_THRESHOLD,
     MAGNITUDE,
     WINDOW_SIZE,
+    GpsData,
     Mission,
     Search,
 )
@@ -64,8 +64,8 @@ if IS_VERBOSE:
 
 def run(beacon):
     while avidrone.mode.name != "GUIDED":
-        if avidrone.mode.name == "ALT_HOLD":  # mode state after Primary search handoff
-            avidrone.mode = VehicleMode("GUIDED")
+        # if avidrone.mode.name == "ALT_HOLD":  # mode state after Primary search handoff
+        avidrone.mode = VehicleMode("GUIDED")
         log.info("Waiting for GUIDED mode...")
         time.sleep(1)
 
@@ -93,20 +93,23 @@ def run(beacon):
             Transceiver.read_transceiver()
         )  # Direction, distance tuple from real transceiver
 
-    gps_window = gps_data.GPSData(WINDOW_SIZE)
+    gps_window = GpsData(WINDOW_SIZE)
+    temp_counter = -1
     while avidrone.mode.name == "GUIDED":
+        temp_counter += 1
         if IS_TIMEOUT:  # return to landing
             log.critical("Return to launch site")
             avidrone.mode = VehicleMode("RTL")
 
-        if transceiver.util.get_direction(mock_theta) < 2.0:  # Turn left
+        if transceiver.util.get_direction(mock_theta[temp_counter]) < 2.0:  # Turn left
             mission.condition_yaw(-DEGREES, True)
 
-        elif transceiver.util.get_direction(mock_theta) > 2.0:  # Turn right
+        elif transceiver.util.get_direction(mock_theta[temp_counter]) > 2.0:  # Turn right
             mission.condition_yaw(DEGREES, True)
 
-        elif transceiver.util.get_direction(mock_theta) == 2.0:  # Keep straight
+        elif transceiver.util.get_direction(mock_theta[temp_counter]) == 2.0:  # Keep straight
             gps_window.add_point(search.get_global_pos(), beacon.distance)
+
 
         if (
             gps_window.get_minimum_index() == ((gps_window.window_size - 1) / 2)
@@ -148,11 +151,11 @@ def run(beacon):
         elif gps_window.get_minimum_index() == 0:
             # If the minimum data point is in the first index,
             log.info("continue forward")
-            search.better_goto(MAGNITUDE, avidrone.attitude.yaw, avidrone)
+            mission.better_goto(MAGNITUDE, avidrone.attitude.yaw, avidrone)
 
         else:
             timeout_counter += 1
-            mission.go_to_location(MAGNITUDE, avidrone.attitude.yaw, avidrone)
+            mission.better_goto(MAGNITUDE, avidrone.attitude.yaw, avidrone)
 
         if timeout_counter == 100:
             IS_TIMEOUT = True
