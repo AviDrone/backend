@@ -5,6 +5,7 @@
 """
 
 import math
+
 import magpylib as magpy
 import numpy as np
 
@@ -53,11 +54,11 @@ class EM_field:
     def get_theta_at_pos(self, uav_pos):
         self.B
 
-        abs_uav_x = (uav_pos[0])
-        abs_uav_y = (uav_pos[1])
+        abs_uav_x = uav_pos[0]
+        abs_uav_y = uav_pos[1]
         rel_uav_x = int(abs_uav_x - 46)
         rel_uav_y = int(abs_uav_y + 118)
-        
+
         B_x = self.B[:, :, 0]
         B_y = self.B[:, :, 1]
         # B_z = B[:, :, 2]  # currently not used for 2D model

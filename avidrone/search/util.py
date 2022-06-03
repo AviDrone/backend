@@ -22,7 +22,6 @@ from dronekit import (
     VehicleMode,
 )
 
-
 WITH_TRANSCEIVER = True  # set to false for quicker primary search only operation
 if WITH_TRANSCEIVER:
     from transceiver.transceiver import Transceiver
@@ -201,7 +200,9 @@ class Mission:
         https://dronekit-python.readthedocs.io/en/latest/examples/guided-set-speed-yaw-demo.html
         """
 
-        currentLocation = self.avidrone.location.global_frame  # was global_relative_frame
+        currentLocation = (
+            self.avidrone.location.global_frame
+        )  # was global_relative_frame
         targetLocation = self.better_get_location_meters(
             currentLocation, distance, angle
         )
@@ -279,7 +280,6 @@ class Mission:
         flight_direction.append(MAGNITUDE * math.sin(yaw))
 
         return flight_direction
-
 
     def simple_goto_wait(self, go_to_checkpoint):
         self.avidrone.simple_goto(go_to_checkpoint)

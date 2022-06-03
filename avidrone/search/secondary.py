@@ -109,7 +109,6 @@ def run(beacon):
         elif transceiver.util.get_direction(mock_theta) == 2.0:  # Keep straight
             gps_window.add_point(search.get_global_pos(), beacon.distance)
 
-
         if (
             gps_window.get_minimum_index() == ((gps_window.window_size - 1) / 2)
             and len(gps_window.gps_points) == gps_window.window_size

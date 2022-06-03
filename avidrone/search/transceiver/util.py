@@ -63,8 +63,7 @@ def get_theta(disp):
     # wrong direction roughly a third of the time.
 
     theta_random = theta + random.uniform(-15, 15)
-    log.debug(
-        f"theta + random.uniform(-15, 15): {theta + random.uniform(-15, 15)}")
+    log.debug(f"theta + random.uniform(-15, 15): {theta + random.uniform(-15, 15)}")
     return theta_random
 
 
