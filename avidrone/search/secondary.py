@@ -62,8 +62,12 @@ if IS_VERBOSE:
 
 
 def run(beacon):
-    
-    Mission.arm_and_takeoff(mission, ALTITUDE)
+    while avidrone.mode.name != "GUIDED":
+        if avidrone.mode.name == "ALT_HOLD":  # mode state after Primary search handoff
+            avidrone.mode = VehicleMode("GUIDED")
+        log.info("Waiting for GUIDED mode...")
+        time.sleep(1)
+
     # Initialize values
     SIGNAL_FOUND = False
     uav_pos = [
@@ -72,26 +76,18 @@ def run(beacon):
         avidrone.location.global_frame.alt,
     ]
 
-    if IS_TEST:
-        beacon = search.mock_transceiver(beacon_pos, uav_pos)  # Direction, distance tuple from simulated transceiver
-
-    else:
-        beacon = Transceiver.read_transceiver() # Direction, distance tuple from real transceiver
-
-    while avidrone.mode.name != "GUIDED":
-        avidrone.mode = VehicleMode("GUIDED")
-        log.debug("Waiting for GUIDED mode")
-        time.sleep(1)
-
     IS_TIMEOUT = False
     timeout_counter = 0
 
     mock_EM_field = EM_field.EM_field()
     mock_theta = EM_field.EM_field.get_theta_at_pos(mock_EM_field, uav_pos)
 
-    
+    if IS_TEST:
+        beacon = search.mock_transceiver(beacon_pos, uav_pos)  # Direction, distance tuple from simulated transceiver
 
-    
+    else:
+        beacon = Transceiver.read_transceiver() # Direction, distance tuple from real transceiver
+
     gps_window = gps_data.GPSData(WINDOW_SIZE)
     while avidrone.mode.name == "GUIDED":
         if IS_TIMEOUT:  # return to landing

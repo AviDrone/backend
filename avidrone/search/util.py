@@ -137,10 +137,9 @@ class Mission:
         # Don not let the user try to arm until autopilot is ready
         while not self.avidrone.is_armable:
             print(" Waiting for vehicle to initialize...")
-            time.sleep(2)
+            time.sleep(1)
 
-            log.debug("Arming motors")
-            # Copter should arm in GUIDED mode
+            log.debug("Arming motors")  # Copter should arm in GUIDED mode
             self.avidrone.mode = VehicleMode("GUIDED")
             self.avidrone.armed = True
 
@@ -232,7 +231,7 @@ class Mission:
             vehicle.mode.name == "GUIDED"
         ):  # Stop action if we are no longer in guided mode.
             # print "DEBUG: mode: %s" % vehicle.mode.name
-            remainingDistance = Mission.get_distance_meters(
+            remainingDistance = Mission.better_get_distance_meters(
                 vehicle.location.global_frame, targetLocation
             )
             # global_frame was global_relative_frame
