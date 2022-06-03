@@ -16,8 +16,10 @@ from dronekit import LocationGlobalRelative, VehicleMode
 from pymavlink import mavutil
 
 
+
 from primary_functions import set_FS_BATT
 from util import get_range
+
 aviDrone = drone.vehicle
 sitl = drone.sitl
 vector = drone.vector
