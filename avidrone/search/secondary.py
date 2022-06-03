@@ -21,7 +21,8 @@ import dronekit_sitl
 
 import transceiver.util
 from dronekit import LocationGlobal, VehicleMode
-from transceiver.transceiver import EM_field, Transceiver
+from transceiver.transceiver import Transceiver
+from transceiver import EM_field, util
 from util import (
     ALTITUDE,
     DEGREES,
@@ -81,7 +82,7 @@ def run(beacon):
     timeout_counter = 0
 
     mock_EM_field = EM_field.EM_field()
-    mock_theta = EM_field.EM_field.get_theta_at_pos(mock_EM_field, uav_pos)
+    mock_theta = mock_EM_field.get_theta_at_pos(uav_pos)
 
     if IS_TEST:
         beacon = search.mock_transceiver(
@@ -94,20 +95,18 @@ def run(beacon):
         )  # Direction, distance tuple from real transceiver
 
     gps_window = GpsData(WINDOW_SIZE)
-    temp_counter = -1
     while avidrone.mode.name == "GUIDED":
-        temp_counter += 1
         if IS_TIMEOUT:  # return to landing
             log.critical("Return to launch site")
             avidrone.mode = VehicleMode("RTL")
 
-        if transceiver.util.get_direction(mock_theta[temp_counter]) < 2.0:  # Turn left
+        if transceiver.util.get_direction(mock_theta) < 2.0:  # Turn left
             mission.condition_yaw(-DEGREES, True)
 
-        elif transceiver.util.get_direction(mock_theta[temp_counter]) > 2.0:  # Turn right
+        elif transceiver.util.get_direction(mock_theta) > 2.0:  # Turn right
             mission.condition_yaw(DEGREES, True)
 
-        elif transceiver.util.get_direction(mock_theta[temp_counter]) == 2.0:  # Keep straight
+        elif transceiver.util.get_direction(mock_theta) == 2.0:  # Keep straight
             gps_window.add_point(search.get_global_pos(), beacon.distance)
 
 
@@ -151,11 +150,11 @@ def run(beacon):
         elif gps_window.get_minimum_index() == 0:
             # If the minimum data point is in the first index,
             log.info("continue forward")
-            mission.better_goto(MAGNITUDE, avidrone.attitude.yaw, avidrone)
+            mission.better_goto(MAGNITUDE, avidrone.attitude.yaw)
 
         else:
             timeout_counter += 1
-            mission.better_goto(MAGNITUDE, avidrone.attitude.yaw, avidrone)
+            mission.better_goto(MAGNITUDE, avidrone.attitude.yaw)
 
         if timeout_counter == 100:
             IS_TIMEOUT = True

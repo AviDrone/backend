@@ -1,4 +1,8 @@
-from re import S
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+    EM field
+"""
 
 import math
 import magpylib as magpy
@@ -14,7 +18,7 @@ import numpy as np
 class EM_field:
     def __init__(self):
         # create grid
-        self.ts = np.linspace(-256, 256, 256)
+        self.ts = np.linspace(-30, 30, 30)
         self.grid = np.array([[(x, 0, z) for x in self.ts] for z in self.ts])
 
         # coil 1
@@ -49,15 +53,16 @@ class EM_field:
     def get_theta_at_pos(self, uav_pos):
         self.B
 
-        uav_x = uav_pos[0]
-        uav_y = uav_pos[1]
+        abs_uav_x = (uav_pos[0])
+        abs_uav_y = (uav_pos[1])
+        rel_uav_x = int(abs_uav_x - 46)
+        rel_uav_y = int(abs_uav_y + 118)
         
         B_x = self.B[:, :, 0]
         B_y = self.B[:, :, 1]
         # B_z = B[:, :, 2]  # currently not used for 2D model
 
         theta_grid_xy = np.arctan2(B_y, B_x)
-        theta = []
-        theta.append(math.degrees(theta_grid_xy[uav_x][uav_y]))
+        theta = int(math.degrees(theta_grid_xy[abs_uav_x][abs_uav_y]))
 
         return theta

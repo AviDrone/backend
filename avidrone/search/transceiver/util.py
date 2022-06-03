@@ -13,7 +13,8 @@ import numpy as np
 
 # logging
 log = logging.getLogger(__name__)
-log.setLevel(logging.INFO)  # Set to logging.DEBUG to see individual parameter values
+# Set to logging.DEBUG to see individual parameter values
+log.setLevel(logging.INFO)
 formatter = logging.Formatter("%(asctime)s  [%(levelname)s]  %(message)s")
 file_handler = logging.FileHandler("util.log")
 file_handler.setFormatter(formatter)
@@ -62,7 +63,8 @@ def get_theta(disp):
     # wrong direction roughly a third of the time.
 
     theta_random = theta + random.uniform(-15, 15)
-    log.debug(f"theta + random.uniform(-15, 15): {theta + random.uniform(-15, 15)}")
+    log.debug(
+        f"theta + random.uniform(-15, 15): {theta + random.uniform(-15, 15)}")
     return theta_random
 
 
@@ -76,26 +78,29 @@ def get_direction(theta):
 
     """
 
-    direction = -1  # direction not acquired
+    direction = None  # direction not acquired
 
-    if -90 <= theta < -30:
+    if theta < -30:
         log.debug("Led 0")
+        log.info(direction)
         direction = 0
 
-    if -30 <= theta < -10:
-        log.debug("Led 1")
+    elif -30 <= theta < -10:
         direction = 1
 
-    if -10 <= theta < 10:
-        log.debug("Led 2")
+    elif -10 <= theta < 10:
+        direction = 1
+
+    elif 10 <= theta < 30:
         direction = 2
 
-    if 10 <= theta < 30:
-        log.debug("Led 3")
+    elif 30 <= theta < 90:
         direction = 3
 
-    if 30 <= theta <= 90:
-        log.debug("Led 0")
+    elif theta >= 90:
         direction = 4
+
+    else:
+        direction = -1  # Not acquired
 
     return direction

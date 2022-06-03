@@ -1,7 +1,9 @@
-import EM_field
+from EM_field import EM_field
+from util import get_direction
+uav_pos = [0,5,5]
 
-uav_pos = [128,20,69]
-
-test_field = EM_field.EM_field()
+test_field = EM_field()
 result = test_field.get_theta_at_pos(uav_pos)
-print(result)
+direction = get_direction(int(result[0]))
+print(int(result[0]))
+print(direction)

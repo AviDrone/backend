@@ -26,6 +26,12 @@ or, to test over WWU, use the following locations:
 dronekit-sitl copter --home=46.045577,-118.391351,584,353
 ```
 
+
+```{bash}
+dronekit-sitl copter --home=46.0452822,-118.3930353,584,180
+```
+
+
 or (with a different angle)
 
 ```{bash}
@@ -74,6 +80,3 @@ or
 
 "insertScriptHere.py" refers to the python file you wish to run. For example, **primary.py** in the directory
 ...\avidrone\search\primary.py
-
----
-Last updated: 6/3/2022

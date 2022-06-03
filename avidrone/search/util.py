@@ -152,31 +152,29 @@ class Mission:
                 print("Reached target altitude")
                 break
 
-        @staticmethod
-        def better_get_distance_meters(a_location1, a_location2):
-            lat1, lat2 = a_location1.lat, a_location2.lat
-            lon1, lon2 = a_location1.lon, a_location2.lon
+    def better_get_distance_meters(self, a_location1, a_location2):
+        lat1, lat2 = a_location1.lat, a_location2.lat
+        lon1, lon2 = a_location1.lon, a_location2.lon
 
-            # 6371.009e3 is the mean radius of the earth that gives us the distance
-            # (NOT USED)
-            #
-            # 1.113195e5 gives us meters
-            distance = (
-                2
-                * math.asin(
-                    math.sqrt(
-                        (math.sin((lat1 - lat2) / 2)) ** 2
-                        + math.cos(lat1)
-                        * math.cos(lat2)
-                        * (math.sin((lon1 - lon2) / 2)) ** 2
-                    )
+        # 6371.009e3 is the mean radius of the earth that gives us the distance
+        # (NOT USED)
+        #
+        # 1.113195e5 gives us meters
+        distance = (
+            2
+            * math.asin(
+                math.sqrt(
+                    (math.sin((lat1 - lat2) / 2)) ** 2
+                    + math.cos(lat1)
+                    * math.cos(lat2)
+                    * (math.sin((lon1 - lon2) / 2)) ** 2
                 )
-                * 1.113195e5
             )
-            return distance
+            * 1.113195e5
+        )
+        return distance
 
-    @staticmethod
-    def better_get_location_meters(original_location, distance, angle):
+    def better_get_location_meters(self, original_location, distance, angle):
         lat = math.asin(
             math.sin(original_location.lat) * math.cos(distance)
             + math.cos(original_location.lat) * math.sin(distance) * math.cos(angle)
@@ -191,7 +189,7 @@ class Mission:
 
         return LocationGlobal(lat, lon, original_location.alt)
 
-    def better_goto(self, distance, angle, vehicle):
+    def better_goto(self, distance, angle):
         """
         Moves the vehicle to a position d_north metres North and d_east metres East of the current position.
         The method takes a function pointer argument with a single `dronekit.lib.LocationGlobal` parameter for
@@ -203,25 +201,20 @@ class Mission:
         https://dronekit-python.readthedocs.io/en/latest/examples/guided-set-speed-yaw-demo.html
         """
 
-        vehicle = drone.vehicle
-        currentLocation = vehicle.location.global_frame  # was global_relative_frame
+        currentLocation = self.avidrone.location.global_frame  # was global_relative_frame
         targetLocation = self.better_get_location_meters(
             currentLocation, distance, angle
         )
-        # targetDistance = better_get_distance_meters(currentLocation, targetLocation)
-        # targetDistance = get_distance_meters(currentLocation, targetLocation)
-        vehicle.simple_goto(targetLocation)
 
-        # print "DEBUG: targetLocation: %s" % targetLocation
-        # print "DEBUG: targetLocation: %s" % targetDistance
+        self.avidrone.simple_goto(targetLocation)
 
         loop_count = 0
         while (
-            vehicle.mode.name == "GUIDED"
+            self.avidrone.mode.name == "GUIDED"
         ):  # Stop action if we are no longer in guided mode.
             # print "DEBUG: mode: %s" % vehicle.mode.name
-            remainingDistance = Mission.better_get_distance_meters(
-                vehicle.location.global_frame, targetLocation
+            remainingDistance = self.better_get_distance_meters(
+                self.avidrone.location.global_frame, targetLocation
             )
             # global_frame was global_relative_frame
             # remainingDistance=get_distance_meters(vehicle.location.global_frame, targetLocation)
