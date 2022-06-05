@@ -11,27 +11,33 @@ import numpy as np
 
 """
 # Simulation of electromagnetic field of transceiver coils
-# For more information about the coils, see: 
+# For more information about the coils and units used, see: 
 # https://magpylib.readthedocs.io/en/latest/examples/examples_30_coil_field_lines.html
+# https://numpy.org/doc/stable/reference/generated/numpy.linspace.html
 """
 
 
 class EM_field:
     def __init__(self):
+        self.position = [None, None, None] # TODO pass his to get theta to get correct coordinates
+        self.current = 750 # Amps
+        self.coil_length = 120  # Millimeters
+        
         # create grid
-        self.ts = np.linspace(-30, 30, 30)
+        # self.ts = np.linspace(-100000, 100000, 100)  # (DO NOT MODIFY)
+        self.ts = np.linspace(-1000, 100, 100) 
         self.grid = np.array([[(x, 0, z) for x in self.ts] for z in self.ts])
 
-        # coil 1
-        ts = np.linspace(-60, 60, 1200)
+        # create coil 1
+        ts = np.linspace(-self.coil_length/2, self.coil_length/2, 1200)
         vertices_1 = np.c_[5 * np.cos(ts * 2 * np.pi), 5 * np.sin(ts * 2 * np.pi), ts]
-        coil_1 = magpy.current.Line(current=7500, vertices=vertices_1)  # AAA battery
+        coil_1 = magpy.current.Line(current=self.current/2, vertices=vertices_1)
         self.coil_1 = coil_1.rotate_from_angax(45, "y")  # Front coil
 
-        # coil 2
-        ts = np.linspace(-60, 60, 1200)
+        # create coil 2
+        ts = np.linspace(-self.coil_length/2, self.coil_length/2, 1200)
         vertices_2 = np.c_[5 * np.cos(ts * 2 * np.pi), 5 * np.sin(ts * 2 * np.pi), ts]
-        coil_2 = magpy.current.Line(current=7500, vertices=vertices_2)  # AAA battery
+        coil_2 = magpy.current.Line(current=self.current/2, vertices=vertices_2)
         self.coil_2 = coil_2.rotate_from_angax(-45, "y")  # Back coil
 
         # compute field of coil 1
@@ -46,10 +52,10 @@ class EM_field:
         Bamp_2 /= np.amax(Bamp_2)
         self.Bamp_2 = Bamp_2
 
-        self.B = np.add(self.B_1, self.B_2)
+        self.B = np.add(self.B_1, self.B_2)   # Combined EM fields of coil 1 and coil 2
         B_amp = np.linalg.norm(self.B, axis=2)
         B_amp /= np.amax(B_amp)
-        self.B_amp = B_amp  # Combined EM fields of coil 1 and coil 2
+        self.B_amp = B_amp
 
     def get_theta_at_pos(self, uav_pos):
         self.B
