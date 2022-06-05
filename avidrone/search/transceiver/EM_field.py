@@ -51,7 +51,7 @@ class EM_field:
         Bamp_2 /= np.amax(Bamp_2)
         self.Bamp_2 = Bamp_2
 
-        self.B = np.add(self.B_1, self.B_2)   # Combined EM fields of coil 1 and coil 2
+        self.B = np.add(self.B_1, self.B_2)  # Combined EM fields of coil 1 and coil 2
         B_amp = np.linalg.norm(self.B, axis=2)
         B_amp /= np.amax(B_amp)
         self.B_amp = B_amp
