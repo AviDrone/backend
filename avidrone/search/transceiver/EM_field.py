@@ -24,8 +24,7 @@ class EM_field:
         self.coil_length = 120  # Millimeters
         
         # create grid
-        # self.ts = np.linspace(-100000, 100000, 100)  # (DO NOT MODIFY)
-        self.ts = np.linspace(-1000, 100, 100) 
+        self.ts = np.linspace(-100000, 100000, 100)  # (DO NOT MODIFY)
         self.grid = np.array([[(x, 0, z) for x in self.ts] for z in self.ts])
 
         # create coil 1
