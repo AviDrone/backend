@@ -58,6 +58,7 @@ if IS_VERBOSE:
     log.info(f"-- altitude: {ALTITUDE}")
     log.info(f"-- land threshold: {LAND_THRESHOLD}")
 
+
 def run(beacon):
     IS_TIMEOUT = False
     timeout_counter = 0
@@ -72,9 +73,8 @@ def run(beacon):
         avidrone.location.global_frame.alt,
     ]
 
-
     gps_window = GpsData(WINDOW_SIZE)
-    
+
     if IS_TEST:
         mock_EM_field = EM_field.EM_field()
         mock_theta = mock_EM_field.get_theta_at_pos(uav_pos)

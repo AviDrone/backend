@@ -16,7 +16,7 @@ log.addHandler(file_handler)
 log.info("**************** SEARCH ****************")
 
 
-class Search():
+class Search:
     def __init__(self):
         self.width = 50
         self.length = 100
