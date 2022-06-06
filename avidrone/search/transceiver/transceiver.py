@@ -200,7 +200,7 @@ while True:
                 mission_end_time = datetime.datetime.now()
                 mission_time = mission_end_time - mission_begin_time
                 transceiver.position = uav_pos
-                transceiver.victim_found_msg()
+                transceiver.signal_found_msg()
                 break
 
     # TODO this should happen in secondary
@@ -232,6 +232,6 @@ while True:
             # current_time = datetime.datetime.now()
             # mission_end_time = datetime.datetime.now()
             # mission_time = mission_end_time - mission_begin_time
-            # transceiver.victim_not_found_msg()
+            # transceiver.signal_not_found_msg()
             IS_TIMEOUT = True
             break

@@ -1,11 +1,10 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-import logging
-import enum
 
 """
     SEARCH
 """
+import logging
 
 log = logging.getLogger(__name__)
 log.setLevel(logging.INFO)

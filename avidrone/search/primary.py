@@ -14,8 +14,8 @@ import numpy as np
 import primary_functions as pf
 from dronekit import LocationGlobalRelative, VehicleMode
 from pymavlink import mavutil
-from util import get_range
 from search import Search
+from util import get_range
 
 aviDrone = drone.vehicle
 sitl = drone.sitl
