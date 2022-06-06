@@ -61,7 +61,8 @@ To run a full search mission using CLI arguments, run
   ```{bash)
   avidrone-search --run
   ```
-  
+  >Note: Under development
+<!--   
  To run primary search only, use
 
   ```{bash)
@@ -77,7 +78,7 @@ To run a full search mission using CLI arguments, run
 If you'd like to learn more, run the following command to see what other things you can do with avidrone-search.
   
   ```{bash)
-  avidrone-search --help
+  avidrone-search --help -->
   ```
   
 ### Simulation
