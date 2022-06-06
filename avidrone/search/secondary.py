@@ -48,26 +48,22 @@ search = drone.search
 sitl = drone.sitl
 vector = drone.vector
 
-
 # CLI conditions
 IS_TEST = True
 IS_VERBOSE = False
 
 if IS_VERBOSE:
+    log.debug(f"Verbose: {IS_VERBOSE}")
     log.info(f"- SEARCH PARAMETERS")
     log.info(f"-- altitude: {ALTITUDE}")
-    log.info(f"-- degrees: {DEGREES}")
     log.info(f"-- land threshold: {LAND_THRESHOLD}")
-    log.info(f"-- magnitude: {MAGNITUDE}")
-    log.info(f"-- window size: {WINDOW_SIZE}")
 
 
 def run(beacon):
-    while avidrone.mode.name != "GUIDED":
-        # if avidrone.mode.name == "ALT_HOLD":  # mode state after Primary search handoff
-        avidrone.mode = VehicleMode("GUIDED")
-        log.info("Waiting for GUIDED mode...")
-        time.sleep(1)
+    IS_TIMEOUT = False
+    timeout_counter = 0
+
+    # TODO write handoff sequence (from state model)
 
     # Initialize values
     SIGNAL_FOUND = False
@@ -77,26 +73,25 @@ def run(beacon):
         avidrone.location.global_frame.alt,
     ]
 
-    IS_TIMEOUT = False
-    timeout_counter = 0
-
-    mock_EM_field = EM_field.EM_field()
-    mock_theta = mock_EM_field.get_theta_at_pos(uav_pos)
+    gps_window = GpsData(WINDOW_SIZE)
 
     if IS_TEST:
-        beacon = search.mock_transceiver(
-            beacon_pos, uav_pos
-        )  # Direction, distance tuple from simulated transceiver
+        mock_EM_field = EM_field.EM_field()
+        mock_theta = mock_EM_field.get_theta_at_pos(uav_pos)
+        beacon = search.mock_transceiver(beacon_pos, uav_pos)
 
     else:
-        beacon = (
-            Transceiver.read_transceiver()
-        )  # Direction, distance tuple from real transceiver
+        beacon = Transceiver.read_transceiver()
 
-    gps_window = GpsData(WINDOW_SIZE)
+    # Confirm we are in GUIDED mode
+    while avidrone.mode.name != "GUIDED":
+        avidrone.mode = VehicleMode("GUIDED")
+        log.info("Waiting for GUIDED mode...")
+        time.sleep(1)
+
     while avidrone.mode.name == "GUIDED":
         if IS_TIMEOUT:  # return to landing
-            log.critical("Return to launch site")
+            log.critical("Reached timeout. Returning to launch site.")
             avidrone.mode = VehicleMode("RTL")
 
         if transceiver.util.get_direction(mock_theta) < 2.0:  # Turn left
@@ -108,24 +103,24 @@ def run(beacon):
         elif transceiver.util.get_direction(mock_theta) == 2.0:  # Keep straight
             gps_window.add_point(search.get_global_pos(), beacon.distance)
 
+        # If the minimum is the center point of the gps_window,
+        # we need to go back to that location
         if (
             gps_window.get_minimum_index() == ((gps_window.window_size - 1) / 2)
             and len(gps_window.gps_points) == gps_window.window_size
         ):
-            # If the minimum is the center point of the gps_window,
-            # we need to go back to that location
-
             mission.simple_goto_wait(
                 gps_window.gps_points[int((gps_window.window_size - 1) / 2)]
             )
 
             if gps_window.distance[2] <= LAND_THRESHOLD:
-                log.warn("-- Landing")
                 SIGNAL_FOUND = True
 
             if SIGNAL_FOUND:
                 avidrone.mode = VehicleMode("LAND")
+                log.warning("-- Landing")
                 current_time = datetime.datetime.now()
+                beacon.signal_found_msg()
                 log.info(
                     f"\n-------- VICTIM FOUND: {transceiver.signal_detected} -------- "
                 )

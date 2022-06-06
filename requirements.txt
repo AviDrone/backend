@@ -13,3 +13,4 @@ pathlib~=1.0.1
 datetime
 dronekit-sitl
 mavproxy
+utm

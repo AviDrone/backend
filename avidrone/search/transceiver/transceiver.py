@@ -26,7 +26,7 @@ class Transceiver:
         self.direction = -1  # initially not detected (default)
         self.distance = -1  # initially not detected (default)
         self.signal_detected = False  # not detected (default)
-        self.position = [46.045030, -118.3911911, 0]  # Ground level (default)
+        self.position = [46.045030, -118.3911911, 343]  # Ground level (default)
         self.mode = "transmit"  # or detect
         self.model_number = 0  # Avidrone (default)
 
@@ -48,7 +48,7 @@ class Transceiver:
         ]  # Model reference: https://beaconreviews.com/search_strip_widths.php
 
         self.search_strip_width = [
-            {"Avidrone": 6},
+            {"Avidrone": 20},
             {"Tracker DTS": 34},
             {"Orthovox Zoom+": 31},
             {"Orthovox 3+": 36},
@@ -60,7 +60,7 @@ class Transceiver:
             {"Orthovox S1": 50},
         ]
 
-        self.curr_search_strip_width = 6  # Avidrone (default)
+        self.curr_search_strip_width = 20  # Avidrone (default)
 
         # Simulation
         self._frequency = 457  # mHz
@@ -99,14 +99,14 @@ class Transceiver:
         else:
             log.warning("Unknown mode")
 
-    def victim_found_msg(self):
-        print(f"\n-------- VICTIM FOUND: {transceiver.signal_detected} -------- ")
+    def signal_found_msg(self):
+        print(f"\n-------- SIGNAL FOUND: {transceiver.signal_detected} -------- ")
         print(f"-- Current ime: {current_time}")
         print("-- Mission time: ", mission_time)
         print(f"-- Location: {transceiver.position}\n")
 
-    def victim_not_found_msg(self):
-        print(f"\n-------- VICTIM FOUND: {transceiver.signal_detected} -------- ")
+    def signal_not_found_msg(self):
+        print(f"\n-------- SIGNAL FOUND: {transceiver.signal_detected} -------- ")
         print(f"-- Current ime: {current_time}")
         print(f"-- Mission time: {mission_time}")
 
@@ -200,7 +200,7 @@ while True:
                 mission_end_time = datetime.datetime.now()
                 mission_time = mission_end_time - mission_begin_time
                 transceiver.position = uav_pos
-                transceiver.victim_found_msg()
+                transceiver.signal_found_msg()
                 break
 
     # TODO this should happen in secondary
@@ -232,6 +232,6 @@ while True:
             # current_time = datetime.datetime.now()
             # mission_end_time = datetime.datetime.now()
             # mission_time = mission_end_time - mission_begin_time
-            # transceiver.victim_not_found_msg()
+            # transceiver.signal_not_found_msg()
             IS_TIMEOUT = True
             break
