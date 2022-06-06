@@ -15,26 +15,30 @@ import primary_functions as pf
 from dronekit import LocationGlobalRelative, VehicleMode
 from pymavlink import mavutil
 from util import get_range
+from search import Search
 
 aviDrone = drone.vehicle
 sitl = drone.sitl
 vector = drone.vector
 mission = drone.mission
+search_mission = Search()
+
 
 # Switch to secondary search mode
 EN_SECONDARY_SWITCH = False
 
 # width of the search
-width = 50
+width = search_mission.width
 
 # length of the search
-totalLength = 100
-
-# search strip size
-dLength = 25
+totalLength = search_mission.length
 
 # height
-totalAlt = 0
+totalAlt = search_mission.height
+
+# search strip size
+dLength = 6  # meters
+
 
 # set RTL for battery low
 pf.set_FS_BATT()
