@@ -3,8 +3,8 @@ import random
 from cgi import test
 from re import S
 from unittest import TestCase
-import numpy as np
 
+import numpy as np
 from avidrone.search.transceiver import util
 
 

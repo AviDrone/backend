@@ -20,7 +20,6 @@ import drone
 import dronekit_sitl
 import transceiver.util
 from dronekit import LocationGlobal, VehicleMode
-
 from transceiver import EM_field, util
 from transceiver.transceiver import Transceiver
 from util import (
