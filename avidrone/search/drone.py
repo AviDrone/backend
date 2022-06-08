@@ -10,7 +10,8 @@ import argparse
 import logging as log
 
 from dronekit import connect
-from util import WINDOW_SIZE, GpsData, Mission, Search, Vector
+
+from util import GpsData, Mission, Search, Vector
 
 # init vehicle
 
@@ -38,5 +39,5 @@ if not connection_string:
 # init
 vector = Vector()
 mission = Mission()
-gps_data = GpsData(window_size=WINDOW_SIZE)
+gps_data = GpsData()
 search = Search()

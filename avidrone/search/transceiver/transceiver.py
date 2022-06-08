@@ -9,7 +9,8 @@ import datetime
 import logging
 import pathlib
 import time
-import util
+
+from util import get_direction, get_displacement, get_distance_xy, get_theta, normalize
 
 # logging
 log = logging.getLogger(__name__)
@@ -140,11 +141,11 @@ class Transceiver:
         y_2 = beacon_pos[1]
         z_2 = beacon_pos[2]
 
-        displacement = util.get_displacement(x_1, x_2, y_1, y_2, z_1, z_2)
-        disp_n = util.normalize(displacement)
-        dist = util.get_distance_xy(displacement)
-        theta = util.get_theta(disp_n)
-        direction = util.get_direction(theta)
+        displacement = get_displacement(x_1, x_2, y_1, y_2, z_1, z_2)
+        disp_n = normalize(displacement)
+        dist = get_distance_xy(displacement)
+        theta = get_theta(disp_n)
+        direction = get_direction(theta)
         return direction, dist
 
 

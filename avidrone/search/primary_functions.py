@@ -11,10 +11,11 @@ import argparse
 import logging as log
 import time
 
-import drone
 import numpy as np
 from dronekit import Command, LocationGlobalRelative, VehicleMode
 from pymavlink import mavutil
+
+import drone
 from util import (
     ALTITUDE,
     get_distance_metres,

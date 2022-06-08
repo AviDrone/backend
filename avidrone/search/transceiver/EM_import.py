@@ -1,5 +1,6 @@
 import utm
 from EM_field import EM_field
+
 from util import get_direction
 
 home = [46.0452822, -118.3930353, 584]  # test: where the beacon is
