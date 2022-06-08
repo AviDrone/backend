@@ -13,10 +13,11 @@ import logging
 import math
 import os
 import time
-from backend.avidrone.search.primary_functions import save_mission
-from backend.avidrone.search.uav import AVIDRONE
+
 import drone
 import numpy as np
+from backend.avidrone.search.primary_functions import save_mission
+from backend.avidrone.search.uav import AVIDRONE
 from dronekit import (
     Command,
     LocationGlobal,
@@ -122,9 +123,7 @@ class Search:
         return mock_beacon
 
 # Search subclasses
-
 class Primary(Search):
-# TODO Remove this comment: implement
     def __init__(self):
         self.commands = AVIDRONE.commands
         self.start_wp = Command(
@@ -144,6 +143,36 @@ class Primary(Search):
         10,
     )
         self.max_range = int(get_range(-1, -1))  # TODO get from parent search class
+
+    def search(self, len, d_len):
+        end_reached = False
+        stopping_point = 0
+        ENABLE_PRIMARY_SEARCH = True
+        
+        if  AVIDRONE.mode != "AUTO":
+            time.sleep(1)
+
+        while ENABLE_PRIMARY_SEARCH:
+            # TODO log battery info
+            next_wp = AVIDRONE.commands.next
+            # TODO log distance to waypoint
+            
+            if Mission.break_condition():
+                # print("Size of commands break", len(aviDrone.commands))
+                time.sleep(1)
+                AVIDRONE.commands.clear()
+                AVIDRONE.commands.upload()
+                time.sleep(1)
+                stopping_point = next_wp
+                break
+
+            if next_wp == get_range(len, d_len):
+                end_reached = True
+                # TODO log distance to waypoint
+                stopping_point = next_wp
+                break
+            time.sleep(1)
+        return end_reached, stopping_point
 
     def rectangular(self,angle, location, width, length, height=0):
         commands = []
@@ -242,26 +271,15 @@ class Primary(Search):
         log.info(" Upload new commands to vehicle")
         _commands.upload()
 
-# TODO Remove this comment: passes total length, dlength
-    def primary(self, len, d_len):
-        end_reached = False
-        stopping_point = 0
-        ENABLE_PRIMARY_SEARCH = True
-        
-        if  AVIDRONE.mode != "AUTO":
-            time.sleep(1)
-
-        while ENABLE_PRIMARY_SEARCH:
-            # TODO log battery info
-            next_wp = AVIDRONE.commands.next
-            # TODO log distance to waypoint
-        
-
 
 class Secondary(Search):
 # TODO Remove this comment: implement
     def __init__(self):
         pass
+    
+    def search(self):
+        pass
+
 
 class Mission:
     def __init__(self):
