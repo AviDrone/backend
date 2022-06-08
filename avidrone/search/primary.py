@@ -12,7 +12,7 @@ import time
 
 import drone
 import numpy as np
-import primary_functions as pf
+# import primary_functions as pf
 from dronekit import LocationGlobalRelative, VehicleMode
 from pymavlink import mavutil
 

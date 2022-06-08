@@ -41,6 +41,12 @@ class UAV:
         self.nickname = "Major Tom"
         self.connection_string = connection_str
         self.quad = connect(self.connection_string, wait_ready=True)
+        # Parameters
+        self.enable_battery_telemetry = self.quad.parameters.set("FS_BATT_ENABLE", 2)
+        self.battery = self.quad.battery
+        
 
 
 AVIDRONE = UAV()  # Singleton
+
+print(AVIDRONE.battery)

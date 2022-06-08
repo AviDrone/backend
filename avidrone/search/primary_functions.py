@@ -28,17 +28,18 @@ sitl = drone.sitl
 vector = drone.vector
 mission = drone.mission
 
+# TODO Remove this comment: moved to uav.py as self.enable_battery_telemetry
 # set to RTL mode if battery low (https://github.com/ArduPilot/ardupilot_wiki/issues/291)
 def set_FS_BATT():
     aviDrone.parameters.set("FS_BATT_ENABLE", 2)
 
-
+# TODO move to util
 def print_parameters():
     print("\nPrint all parameters (iterate `aviDrone.parameters`):")
     for key, value in aviDrone.parameters.items():
         print(" Key:%s Value:%s" % (key, value))
 
-
+# TODO move to util
 def battery_information():
     print("Level:", aviDrone.battery.level)
     print("Voltage:", aviDrone.battery.voltage)
@@ -367,7 +368,7 @@ def save_mission(aFileName):
     with open(aFileName, "w") as file_:
         file_.write(output)
 
-
+# TODO Remove this comment: duplicated in search/util.Mission
 def arm_and_takeoff(aTargetAltitude):
     """
     Arms vehicle and fly to aTargetAltitude.
