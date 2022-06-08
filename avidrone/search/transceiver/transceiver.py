@@ -9,12 +9,11 @@ import datetime
 import logging
 import pathlib
 import time
-
-from transceiver import util
+import util
 
 # logging
 log = logging.getLogger(__name__)
-log.setLevel(logging.DEBUG)
+log.setLevel(logging.INFO)
 formatter = logging.Formatter("%(asctime)s  [%(levelname)s]  %(message)s")
 file_handler = logging.FileHandler("transceiver.log")
 file_handler.setFormatter(formatter)
@@ -162,8 +161,9 @@ transceiver.curr_search_strip_width = transceiver.search_strip_width[
 ][model]
 
 
-uav_pos = [10, 10, 20]  # Example
-beacon_pos = transceiver.position
+uav_pos = [120, 10, 20]  # Example
+beacon_pos = [20, 20, 2]  # Example
+# beacon_pos = transceiver.position
 
 
 # Mock beacon
@@ -222,10 +222,7 @@ while True:
         log.debug("x_uav > x_beacon")
 
     else:
-        if IS_TEST:
-            time.sleep(0.0)  # To speed up search time during testing
-        else:
-            time.sleep(0.5)  # Beacon reads values every 0.5 seconds
+        time.sleep(0.5)  # Beacon reads values every 0.5 seconds
 
         if IS_TIMEOUT:
             log.warning("\n reached timeout \n")
