@@ -9,12 +9,15 @@ from __future__ import print_function
 import logging
 import os
 import time
+
+import drone
 import numpy as np
+import primary_functions as pf
 from dronekit import LocationGlobalRelative, VehicleMode
 from pymavlink import mavutil
 
-import drone
-import primary_functions as pf
+
+
 from search import Search
 from util import get_range
 

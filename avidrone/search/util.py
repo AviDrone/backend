@@ -13,7 +13,7 @@ import logging
 import math
 import os
 import time
-
+import drone
 import numpy as np
 from dronekit import (
     Command,
@@ -22,7 +22,6 @@ from dronekit import (
     VehicleMode,
 )
 
-import drone
 
 # logging
 log = logging.getLogger(__name__)
