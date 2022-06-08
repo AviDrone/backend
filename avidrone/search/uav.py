@@ -34,13 +34,13 @@ connection_string_sitl = sitl.connection_string()
 if not connection_string:
     connection_string = connection_string_sitl
 
+
 class UAV:
     def __init__(self):
         self.id = 0
-        self.nickname = 'Major Tom'
+        self.nickname = "Major Tom"
         self.connection_string = connection_string
         self.quad = connect(connection_string, wait_ready=True)
-
 
 AVIDRONE = UAV() # Singleton
 

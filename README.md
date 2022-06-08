@@ -58,29 +58,28 @@ Go through a few examples so you can learn to
 
 To run a full search mission using CLI arguments, run
 
-  ```{bash)
-  avidrone-search --run
-  ```
-  >Note: Under development
-<!--   
- To run primary search only, use
+```{bash)
+avidrone-search --run
+```
 
-  ```{bash)
-  avidrone-search --primary
-  ```
-  
- To run secondary search only, use
+To run primary search only, use
 
-  ```{bash)
-  avidrone-search --secondary
-  ```
-  
+```{bash)
+avidrone-search --primary
+```
+
+To run secondary search only, use
+
+```{bash)
+avidrone-search --secondary
+```
+
 If you'd like to learn more, run the following command to see what other things you can do with avidrone-search.
-  
-  ```{bash)
-  avidrone-search --help -->
-  ```
-  
+
+```{bash)
+avidrone-search --help
+```
+
 ### Simulation
 
 To run a simulated search mission, follow the guide in [SIMULATION.md](avidrone/example/simulation/SIMULATION.md).
