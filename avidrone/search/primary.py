@@ -15,9 +15,6 @@ import numpy as np
 import primary_functions as pf
 from dronekit import LocationGlobalRelative, VehicleMode
 from pymavlink import mavutil
-
-
-
 from search import Search
 from util import get_range
 

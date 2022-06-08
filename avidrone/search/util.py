@@ -157,8 +157,7 @@ class Primary(Search):
             next_wp = AVIDRONE.commands.next
             # TODO log distance to waypoint
             
-            if Mission.break_condition():
-                # print("Size of commands break", len(aviDrone.commands))
+            if mission.break_condition():
                 time.sleep(1)
                 AVIDRONE.commands.clear()
                 AVIDRONE.commands.upload()
@@ -208,7 +207,7 @@ class Primary(Search):
 
 
         for points in rotated_vector:
-            point = get_location_metres(location, points[1], points[0], points[2])
+            point = get_location_metres_with_alt(location, points[1], points[0], points[2])
             wp_command = Command(
                 0,
                 0,
@@ -279,7 +278,6 @@ class Secondary(Search):
     
     def search(self):
         pass
-
 
 class Mission:
     def __init__(self):
@@ -525,6 +523,8 @@ class Mission:
 
         self.save_mission(file)
         AVIDRONE.commands.clear()
+
+mission = Mission()  # TODO, move to right place
 
 class Vector:
     def __init__(self):
