@@ -9,11 +9,11 @@ from __future__ import print_function
 import argparse
 import asyncio
 import datetime
-import logging as log
+import logging
 import math
+import os
 import time
 
-import drone
 import numpy as np
 from dronekit import (
     Command,
@@ -21,6 +21,16 @@ from dronekit import (
     LocationGlobalRelative,
     VehicleMode,
 )
+
+import drone
+
+# logging
+log = logging.getLogger(__name__)
+log.setLevel(logging.INFO)
+msg = logging.Formatter("%(asctime)s [%(levelname)s] %(message)s")
+file_handler = logging.FileHandler(os.path.join("log", "util.log"))
+file_handler.setFormatter(msg)
+log.addHandler(file_handler)
 
 WITH_TRANSCEIVER = False  # set to false for quicker primary search only operation
 if WITH_TRANSCEIVER:

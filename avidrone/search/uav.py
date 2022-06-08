@@ -33,6 +33,8 @@ if not connection_str:
     connection_str = connection_string_sitl
 
 log.debug("Connecting to vehicle on: %s", connection_str)
+
+
 class UAV:
     def __init__(self):
         self.id = 0
