@@ -10,7 +10,6 @@ import argparse
 import logging as log
 
 from dronekit import connect
-
 from util import GpsData, Mission, Search, Vector
 
 # init vehicle

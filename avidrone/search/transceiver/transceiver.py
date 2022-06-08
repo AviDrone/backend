@@ -10,7 +10,13 @@ import logging
 import pathlib
 import time
 
-from util import get_direction, get_displacement, get_distance_xy, get_theta, normalize
+from util import (
+    get_direction,
+    get_displacement,
+    get_distance_xy,
+    get_theta,
+    normalize,
+)
 
 # logging
 log = logging.getLogger(__name__)
