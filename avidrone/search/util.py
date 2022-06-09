@@ -519,8 +519,8 @@ class Mission:
         angle = -1
         location = -1
         width = -1
-        Primary(Search).rectangular(angle, location, width, len, alt)
-        self.save_mission(text_file, alt, width, d_len, len)
+        # Primary(Search).rectangular(angle, location, width, len, alt)
+        # self.save_mission()
         AVIDRONE.commands.clear()
 
 
