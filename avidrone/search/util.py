@@ -315,7 +315,8 @@ class Mission:
 
     def save_mission(self, text_file):
         """
-        Save a mission in the Waypoint file format (http://qgroundcontrol.org/mavlink/waypoint_protocol#waypoint_file_format).
+        Save a mission in the Waypoint file format: 
+        (http://qgroundcontrol.org/mavlink/waypoint_protocol#waypoint_file_format).
         """
         missions = self.download_mission()
         output = "QGC WPL 110\n"
