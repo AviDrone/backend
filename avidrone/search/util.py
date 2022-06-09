@@ -483,22 +483,22 @@ class Mission:
                 break
             time.sleep(1)
 
-# TODO Remove this comment: implement
+    # TODO Remove this comment: implement
     def return_to_launch(self):
         pass
 
-# TODO Remove this comment: implement
+    # TODO Remove this comment: implement
     def download_mission(self):
         pass
-    
-# TODO Remove this comment: implement
+
+    # TODO Remove this comment: implement
     def save_mission(self, file):
         pass
 
-# TODO Remove this comment: implement
+    # TODO Remove this comment: implement
     def save_to_file(self, text_file, alt, width, d_len, len):
         AVIDRONE.commands.add(
-        Command(
+            Command(
                 0,
                 0,
                 0,
@@ -520,8 +520,9 @@ class Mission:
         location = -1
         width = -1
         Primary(Search).rectangular(angle, location, width, len, alt)
-        self.save_mission(text_file)
+        self.save_mission(text_file, alt, width, d_len, len)
         AVIDRONE.commands.clear()
+
 
 mission = Mission()  # TODO, move to right place
 
