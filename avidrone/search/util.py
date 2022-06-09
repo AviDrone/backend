@@ -126,28 +126,29 @@ class Primary(Search):
     def __init__(self):
         self.commands = AVIDRONE.commands
         self.start_wp = Command(
-        0,
-        0,
-        0,
-        mavutil.mavlink.MAV_FRAME_GLOBAL_RELATIVE_ALT,
-        mavutil.mavlink.MAV_CMD_NAV_TAKEOFF,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        10,
-    )
+            0,
+            0,
+            0,
+            mavutil.mavlink.MAV_FRAME_GLOBAL_RELATIVE_ALT,
+            mavutil.mavlink.MAV_CMD_NAV_TAKEOFF,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            ALTITUDE,
+        )
+
         self.max_range = int(get_range(-1, -1))  # TODO get from parent search class
 
     def search(self, len, d_len):
         end_reached = False
         stopping_point = 0
         ENABLE_PRIMARY_SEARCH = True
-        
+
         if  AVIDRONE.mode != "AUTO":
             time.sleep(1)
 
@@ -155,7 +156,7 @@ class Primary(Search):
             # TODO log battery info
             next_wp = AVIDRONE.commands.next
             # TODO log distance to waypoint
-            
+
             if mission.break_condition():
                 time.sleep(1)
                 AVIDRONE.commands.clear()
@@ -167,6 +168,7 @@ class Primary(Search):
             if next_wp == get_range(len, d_len):
                 end_reached = True
                 # TODO log distance to waypoint
+
                 stopping_point = next_wp
                 break
             time.sleep(1)
@@ -178,7 +180,7 @@ class Primary(Search):
         max_range = self.max_range
         v_dist  = h_dist = step = 0
         arr = []
-        
+
         _commands.clear()  # Clears any existing commands
         _commands.add(self.start_wp)
         for _ in range(1, max_range):
@@ -191,12 +193,12 @@ class Primary(Search):
             step += 1
             step = step % 4
             arr.append([h_dist, v_dist, 0])
-            
+
         # Rotation
         initial_vector = (arr[1][0], arr[1][1], 0)
         initial_vector = np.asarray(initial_vector)
         final_vector = Vector.rotate_vector(initial_vector, angle)
-        
+
         if np.array_equal(final_vector, initial_vector):
             # do not rotate if equal
             rotated_vector = np.array(arr)
@@ -208,20 +210,20 @@ class Primary(Search):
         for points in rotated_vector:
             point = get_location_metres_with_alt(location, points[1], points[0], points[2])
             wp_command = Command(
-                    0,
-                    0,
-                    0,
-                    mavutil.mavlink.MAV_FRAME_GLOBAL_RELATIVE_ALT,
-                    mavutil.mavlink.MAV_CMD_NAV_WAYPOINT,
-                    0,
-                    0,
-                    0,
-                    0,
-                    0,
-                    0,
-                    point.lat,
-                    point.lon,
-                    ALTITUDE,
+                0,
+                0,
+                0,
+                mavutil.mavlink.MAV_FRAME_GLOBAL_RELATIVE_ALT,
+                mavutil.mavlink.MAV_CMD_NAV_WAYPOINT,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                point.lat,
+                point.lon,
+                ALTITUDE,
             )
             _commands.add(wp_command)
             commands.append(_commands)
@@ -229,39 +231,39 @@ class Primary(Search):
         if height == 0:
             # add dummy waypoint at final point (lets us know when have reached destination)
             final_wp = Command(
-                    0,
-                    0,
-                    0,
-                    mavutil.mavlink.MAV_FRAME_GLOBAL_RELATIVE_ALT,
-                    mavutil.mavlink.MAV_CMD_NAV_WAYPOINT,
-                    0,
-                    0,
-                    0,
-                    0,
-                    0,
-                    0,
-                    point.lat,
-                    point.lon,
-                    point.alt,
+                0,
+                0,
+                0,
+                mavutil.mavlink.MAV_FRAME_GLOBAL_RELATIVE_ALT,
+                mavutil.mavlink.MAV_CMD_NAV_WAYPOINT,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                point.lat,
+                point.lon,
+                point.alt,
             )
-            
+
         else:
             # add dummy waypoint at final point (lets us know when have reached destination)
             final_wp = Command(
-                    0,
-                    0,
-                    0,
-                    mavutil.mavlink.MAV_FRAME_GLOBAL_RELATIVE_ALT,
-                    mavutil.mavlink.MAV_CMD_NAV_WAYPOINT,
-                    0,
-                    0,
-                    0,
-                    0,
-                    0,
-                    0,
-                    point.lat,
-                    point.lon,
-                    0,
+                0,
+                0,
+                0,
+                mavutil.mavlink.MAV_FRAME_GLOBAL_RELATIVE_ALT,
+                mavutil.mavlink.MAV_CMD_NAV_WAYPOINT,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                point.lat,
+                point.lon,
+                0,
             )
             
         _commands.add(final_wp)
