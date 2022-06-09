@@ -523,7 +523,9 @@ class Mission:
         self.save_mission(file)
         AVIDRONE.commands.clear()
 
+
 mission = Mission()  # TODO, move to right place
+
 
 class Vector:
     def __init__(self):
