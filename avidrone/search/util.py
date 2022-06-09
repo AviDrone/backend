@@ -496,23 +496,23 @@ class Mission:
         pass
 
 # TODO Remove this comment: implement
-    def save_to_file(self, file, alt, width, d_len, len):
+    def save_to_file(self, text_file, alt, width, d_len, len):
         AVIDRONE.commands.add(
         Command(
-            0,
-            0,
-            0,
-            mavutil.mavlink.MAV_FRAME_GLOBAL_RELATIVE_ALT,
-            mavutil.mavlink.MAV_CMD_NAV_TAKEOFF,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            ALTITUDE,
+                0,
+                0,
+                0,
+                mavutil.mavlink.MAV_FRAME_GLOBAL_RELATIVE_ALT,
+                mavutil.mavlink.MAV_CMD_NAV_TAKEOFF,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                ALTITUDE,
             )
         )
 
@@ -520,9 +520,8 @@ class Mission:
         location = -1
         width = -1
         Primary(Search).rectangular(angle, location, width, len, alt)
-        self.save_mission(file)
+        self.save_mission(text_file)
         AVIDRONE.commands.clear()
-
 
 mission = Mission()  # TODO, move to right place
 
