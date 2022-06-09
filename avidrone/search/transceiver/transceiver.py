@@ -29,15 +29,18 @@ log.addHandler(file_handler)
 IS_TEST = True  # set to true to use mock transceiver simulation
 IS_TIMEOUT = False
 timeout_count = 0
+
+
 class Transceiver:
     """
     # Transceiver model reference: https://beaconreviews.com/search_strip_widths.php
     # Battery life from: https://www.backcountry.com/backcountry-access-tracker-dts-beacon#
     """
+
     def __init__(self, id):
         # Settings
-        self.id = id # Avidrone
-        self.mode = "transmit" # or receive 
+        self.id = id  # Avidrone
+        self.mode = "transmit"  # or receive
         self.model = {
             0: "Avidrone",
             1: "Tracker DTS",
@@ -64,7 +67,7 @@ class Transceiver:
         }
         self.curr_model = self.model[self.id]
         self.curr_search_strip_width = self.search_strip_width[self.curr_model]
-        
+
         # Transceiver data
         self.direction = -1  # not detected
         self.distance = -1  # not detected
@@ -156,12 +159,11 @@ class Transceiver:
         return direction, distance
 
 
-TRANSCEIVER = Transceiver(1)    # Singleton
+TRANSCEIVER = Transceiver(0)  # Singleton
 
 
 uav_pos = [120, 10, 20]  # Example
 beacon_pos = [20, 20, 2]  # Example
-
 
 
 # Mock beacon
@@ -184,6 +186,7 @@ while True:
 
     log.info(f"-- direction, distance: {(TRANSCEIVER.direction, TRANSCEIVER.distance)}")
     mission_begin_time = datetime.datetime.now()
+
 
     if uav_pos[0] == beacon_pos[0] and uav_pos[1] == beacon_pos[1]:
         TRANSCEIVER.signal_detected = True
@@ -222,11 +225,10 @@ while True:
     else:
         time.sleep(0.0)  # Beacon reads values every 0.5 seconds
 
-        if IS_TIMEOUT:
-            log.warning("\n reached timeout \n")
-            current_time = datetime.datetime.now()
-            mission_end_time = datetime.datetime.now()
-            mission_time = mission_end_time - mission_begin_time
-            TRANSCEIVER.signal_not_found_msg()
-            IS_TIMEOUT = True
-            break
+    if IS_TIMEOUT:
+        log.warning("\n reached timeout \n")
+        current_time = datetime.datetime.now()
+        mission_end_time = datetime.datetime.now()
+        mission_time = mission_end_time - mission_begin_time
+        TRANSCEIVER.signal_not_found_msg()
+        break

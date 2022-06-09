@@ -282,22 +282,22 @@ class Mission:
 
     def return_to_launch(self):
         AVIDRONE.commands.add(
-        Command(
-            0,
-            0,
-            0,
-            mavutil.mavlink.MAV_FRAME_GLOBAL_RELATIVE_ALT,
-            mavutil.mavlink.MAV_CMD_NAV_RETURN_TO_LAUNCH,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-        )
+            Command(
+                0,
+                0,
+                0,
+                mavutil.mavlink.MAV_FRAME_GLOBAL_RELATIVE_ALT,
+                mavutil.mavlink.MAV_CMD_NAV_RETURN_TO_LAUNCH,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+            )
     )
 
     def download_mission(self):
@@ -315,8 +315,8 @@ class Mission:
 
     def save_mission(self, text_file):
         """
-        Save a mission in the Waypoint file format: 
-        (http://qgroundcontrol.org/mavlink/waypoint_protocol#waypoint_file_format).
+        Save a mission in the Waypoint file format:
+        (http://qgroundcontrol.org/mavlink/waypoint_protocol#waypoint_file
         """
         missions = self.download_mission()
         output = "QGC WPL 110\n"
@@ -597,7 +597,7 @@ class Primary(Search):
 class Secondary(Search):
     # TODO Remove this comment: implement
     def __init__(self):
-        self.beacon = -1 # Beacon Singleton (Implemented in transceiver.py)
+        pass
 
     def search(self):
         pass
