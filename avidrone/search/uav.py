@@ -44,9 +44,6 @@ class UAV:
         # Parameters
         self.enable_battery_telemetry = self.quad.parameters.set("FS_BATT_ENABLE", 2)
         self.battery = self.quad.battery
-        
 
 
 AVIDRONE = UAV()  # Singleton
-
-print(AVIDRONE.battery)

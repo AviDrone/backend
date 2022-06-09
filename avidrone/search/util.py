@@ -115,11 +115,11 @@ class Search:
 
     def get_global_pos(self):
         return self.global_frame
-    
-    
+
     def mock_transceiver(self, uav_pos, beacon_pos):
         mock_beacon = Transceiver.mock_transceiver(uav_pos, beacon_pos)
         return mock_beacon
+
 
 # Search subclasses
 class Primary(Search):
