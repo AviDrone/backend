@@ -492,7 +492,7 @@ class Mission:
         pass
     
 # TODO Remove this comment: implement
-    def save_mission(self):
+    def save_mission(self, file):
         pass
 
 # TODO Remove this comment: implement
@@ -516,9 +516,10 @@ class Mission:
             )
         )
 
-        Primary(Search).rectangular()
-
-
+        angle = -1
+        location = -1
+        width = -1
+        Primary(Search).rectangular(angle, location, width, len, alt)
         self.save_mission(file)
         AVIDRONE.commands.clear()
 
