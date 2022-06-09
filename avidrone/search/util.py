@@ -361,23 +361,23 @@ class Mission:
 def save_to_file(text_file, totalAlt, width, dLength, totalLength):
     print("adding takeoff to altitude ", ALTITUDE)
     AVIDRONE.commands.add(
-            Command(
-                0,
-                0,
-                0,
-                mavutil.mavlink.MAV_FRAME_GLOBAL_RELATIVE_ALT,
-                mavutil.mavlink.MAV_CMD_NAV_RETURN_TO_LAUNCH,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-            )
+        Command(
+            0,
+            0,
+            0,
+            mavutil.mavlink.MAV_FRAME_GLOBAL_RELATIVE_ALT,
+            mavutil.mavlink.MAV_CMD_NAV_RETURN_TO_LAUNCH,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
         )
+    )
     print("adding mission")
     my_angle = 360 - np.degrees(AVIDRONE.attitude.yaw)
     # TODO call Primary(search).rectangular
@@ -463,7 +463,6 @@ class Primary(Search):
             0,
             ALTITUDE,
         )
-
         self.max_range = int(get_range(-1, -1))  # TODO get from parent search class
 
     def search(self, len, d_len):
@@ -598,7 +597,7 @@ class Primary(Search):
 class Secondary(Search):
     # TODO Remove this comment: implement
     def __init__(self):
-        pass
+        self.beacon = -1 # Beacon Singleton (Implemented in transceiver.py)
 
     def search(self):
         pass
