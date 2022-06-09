@@ -12,9 +12,9 @@ def plot_coil_em_field():
 
     sp_1 = ax1.streamplot(
         beacon_EM_field.grid[:, :, 0],
-        beacon_EM_field.grid[:, :, 1],
+        beacon_EM_field.grid[:, :, 2],
         beacon_EM_field.B_1[:, :, 0],
-        beacon_EM_field.B_1[:, :, 1],
+        beacon_EM_field.B_1[:, :, 2],
         density=8,
         color=beacon_EM_field.Bamp_1,
         linewidth=np.sqrt(beacon_EM_field.Bamp_1) * 2,
@@ -82,7 +82,7 @@ if __name__ == "__main__":
     print(" - DISPLAY COIL TOGETHER")
 
     # DISPLAY COIL SEPARATELY
-    # plot_coil_em_field()
+    plot_coil_em_field()
 
     # DISPLAY COILS TOGETHER
     plot_transceiver_em_field()

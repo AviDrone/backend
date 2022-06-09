@@ -12,6 +12,7 @@ import ctypes
 import datetime
 import logging
 import math
+import os
 import pathlib
 import time
 from re import S
@@ -36,11 +37,10 @@ from util import (
 log = logging.getLogger(__name__)
 log.setLevel(logging.INFO)
 formatter = logging.Formatter("%(asctime)s [%(levelname)s] %(message)s")
-file_handler = logging.FileHandler("secondary.log")
+file_handler = logging.FileHandler(os.path.join("log", "secondary.log"))
 file_handler.setFormatter(formatter)
 log.addHandler(file_handler)
 
-log.info("**************** SECONDARY SEARCH ****************")
 # Initialization
 avidrone = drone.vehicle
 mission = drone.mission

@@ -3,31 +3,45 @@
 """
     SEARCH UTIL
 """
-
 from __future__ import print_function
 
 import argparse
 import asyncio
 import datetime
-import logging as log
+import logging
 import math
+import os
 import time
 
 import drone
 import numpy as np
+from backend.avidrone.search.primary_functions import save_mission
+from backend.avidrone.search.uav import AVIDRONE
 from dronekit import (
     Command,
     LocationGlobal,
     LocationGlobalRelative,
     VehicleMode,
 )
+from pymavlink import mavutil
 
-WITH_TRANSCEIVER = True  # set to false for quicker primary search only operation
+# logging
+log = logging.getLogger(__name__)
+log.setLevel(logging.INFO)
+msg = logging.Formatter("%(asctime)s [%(levelname)s] %(message)s")
+file_handler = logging.FileHandler(os.path.join("log", "util.log"))
+file_handler.setFormatter(msg)
+log.addHandler(file_handler)
+
+WITH_TRANSCEIVER = False  # set to false for quicker primary search only operation
 if WITH_TRANSCEIVER:
     from transceiver.transceiver import Transceiver
 
 IS_VERBOSE = False  # for verbose command-line interface output
 IS_TEST = False  # for running simulations
+
+ENABLE_PRIMARY_SEARCH = False
+ENABLE_SECONDARY_SEARCH = False
 
 # DEFAULT PARAMETERS
 MAGNITUDE = 1  # Distance the vehicle goes forward per command
@@ -65,13 +79,13 @@ class GpsData:
         self.distance.clear()
 
 
+# Search superclass
 class Search:
     def __init__(self):
         avidrone = drone.vehicle
         self.global_frame = avidrone.location.global_frame
 
-    @staticmethod
-    def get_distance(location_a, location_b):
+    def get_distance(self, location_a, location_b):
         lat_a, lat_b = location_a.lat, location_b.lat
         lon_a, lon_b = location_a.lat, location_b.lat
 
@@ -80,9 +94,9 @@ class Search:
 
         return math.sqrt(math.pow(d_lat, 2) + math.pow(d_lon, 2)) * 1.113195e5
 
-    @staticmethod
-    def get_location(original_location, d_north, d_east, d_alt=0):
+    # TODO add utm/lat-long conversion functions here
 
+    def get_location(self, original_location, d_north, d_east, d_alt=0):
         earth_radius = 6378137.0  # Radius of "spherical" earth
         # Coordinate offsets in radians
         d_lat = d_north / earth_radius
@@ -102,22 +116,180 @@ class Search:
     def get_global_pos(self):
         return self.global_frame
 
-    @staticmethod
-    def mock_transceiver(uav_pos, beacon_pos):
-        mock_beacon = Transceiver()
-        mock_beacon.mock_transceiver(uav_pos, beacon_pos)
+    def mock_transceiver(self, uav_pos, beacon_pos):
+        mock_beacon = Transceiver.mock_transceiver(uav_pos, beacon_pos)
         return mock_beacon
+
+
+# Search subclasses
+class Primary(Search):
+    def __init__(self):
+        self.commands = AVIDRONE.commands
+        self.start_wp = Command(
+            0,
+            0,
+            0,
+            mavutil.mavlink.MAV_FRAME_GLOBAL_RELATIVE_ALT,
+            mavutil.mavlink.MAV_CMD_NAV_TAKEOFF,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            ALTITUDE,
+        )
+
+        self.max_range = int(get_range(-1, -1))  # TODO get from parent search class
+
+    def search(self, len, d_len):
+        end_reached = False
+        stopping_point = 0
+        ENABLE_PRIMARY_SEARCH = True
+
+        if AVIDRONE.mode != "AUTO":
+            time.sleep(1)
+
+        while ENABLE_PRIMARY_SEARCH:
+            # TODO log battery info
+            next_wp = AVIDRONE.commands.next
+            # TODO log distance to waypoint
+
+            if mission.break_condition():
+                time.sleep(1)
+                AVIDRONE.commands.clear()
+                AVIDRONE.commands.upload()
+                time.sleep(1)
+                stopping_point = next_wp
+                break
+
+            if next_wp == get_range(len, d_len):
+                end_reached = True
+                # TODO log distance to waypoint
+
+                stopping_point = next_wp
+                break
+            time.sleep(1)
+        return end_reached, stopping_point
+
+    def rectangular(self, angle, location, width, length, height=0):
+        commands = []
+        _commands = self.commands
+        max_range = self.max_range
+        v_dist = h_dist = step = 0
+        arr = []
+
+        _commands.clear()  # Clears any existing commands
+        _commands.add(self.start_wp)
+        for _ in range(1, max_range):
+            if step == 0:
+                h_dist = 0
+            elif (step == 1) or (step == 3):
+                v_dist += length
+            else:
+                h_dist = width
+            step += 1
+            step = step % 4
+            arr.append([h_dist, v_dist, 0])
+
+        # Rotation
+        initial_vector = (arr[1][0], arr[1][1], 0)
+        initial_vector = np.asarray(initial_vector)
+        final_vector = Vector.rotate_vector(initial_vector, angle)
+
+        if np.array_equal(final_vector, initial_vector):
+            # do not rotate if equal
+            rotated_vector = np.array(arr)
+        else:
+            # otherwise, rotate
+            rotated_vector = Vector.rotate_cloud(arr, initial_vector, final_vector)
+
+        for points in rotated_vector:
+            point = get_location_metres_with_alt(
+                location, points[1], points[0], points[2]
+            )
+            wp_command = Command(
+                0,
+                0,
+                0,
+                mavutil.mavlink.MAV_FRAME_GLOBAL_RELATIVE_ALT,
+                mavutil.mavlink.MAV_CMD_NAV_WAYPOINT,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                point.lat,
+                point.lon,
+                ALTITUDE,
+            )
+            _commands.add(wp_command)
+            commands.append(_commands)
+
+        if height == 0:
+            # add dummy waypoint at final point (lets us know when have reached destination)
+            final_wp = Command(
+                0,
+                0,
+                0,
+                mavutil.mavlink.MAV_FRAME_GLOBAL_RELATIVE_ALT,
+                mavutil.mavlink.MAV_CMD_NAV_WAYPOINT,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                point.lat,
+                point.lon,
+                point.alt,
+            )
+
+        else:
+            # add dummy waypoint at final point (lets us know when have reached destination)
+            final_wp = Command(
+                0,
+                0,
+                0,
+                mavutil.mavlink.MAV_FRAME_GLOBAL_RELATIVE_ALT,
+                mavutil.mavlink.MAV_CMD_NAV_WAYPOINT,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                point.lat,
+                point.lon,
+                0,
+            )
+        _commands.add(final_wp)
+        commands.append(_commands)
+        log.info(" Upload new commands to vehicle")
+        _commands.upload()
+
+
+class Secondary(Search):
+    # TODO Remove this comment: implement
+    def __init__(self):
+        pass
+
+    def search(self):
+        pass
 
 
 class Mission:
     def __init__(self):
-        from pymavlink import mavutil
-
+        # TODO Remove this comment: replace with UAV singleton
         self.avidrone = drone.vehicle
         self.mavutil = mavutil
         self.global_frame = self.avidrone.location.global_frame
         self.original_yaw = self.avidrone.attitude.yaw
         self.heading = -1  # TODO get correct value
+        self.angle = 360 - np.degrees(self.avidrone.attitude.yaw)
         self.relative = False
         self.cw = -1  # TODO get correct value
 
@@ -270,8 +442,7 @@ class Mission:
         )  # param 5 ~ 7 not used
         self.avidrone.send_mavlink(msg)  # send command to vehicle
 
-    @staticmethod
-    def forward_calculation():
+    def forward_calculation(self):
         flight_direction = []
         yaw = drone.vehicle.attitude.yaw
 
@@ -301,26 +472,6 @@ class Mission:
 
         print("Checkpoint reached")
 
-    def start(self):
-        log.info("-- Waiting for vehicle to start...")
-        while not self.avidrone.is_armable:
-            time.sleep(1)
-
-        self.avidrone.mode = VehicleMode("GUIDED")
-        self.avidrone.armed = True
-
-        log.info("-- Arming...")
-        while not self.avidrone.is_armable:
-            time.sleep(1)
-
-        if self.avidrone.armed:
-            log.info(f"-- Is armed: {self.avidrone.armed}")
-            self.takeoff_to_altitude()
-
-        log.info("-- Waiting for GUIDED mode...")
-        while self.avidrone.mode.name != "GUIDED":
-            time.sleep(1)
-
     def takeoff_to_altitude(self):
         self.avidrone.simple_takeoff(ALTITUDE)
         log.info(f"-- Taking off to altitude (m): {ALTITUDE} \n")
@@ -331,6 +482,49 @@ class Mission:
                 log.info(f"-- Reached {ALTITUDE}m")
                 break
             time.sleep(1)
+
+    # TODO Remove this comment: implement
+    def return_to_launch(self):
+        pass
+
+    # TODO Remove this comment: implement
+    def download_mission(self):
+        pass
+
+    # TODO Remove this comment: implement
+    def save_mission(self, file):
+        pass
+
+    # TODO Remove this comment: implement
+    def save_to_file(self, text_file, alt, width, d_len, len):
+        AVIDRONE.commands.add(
+            Command(
+                0,
+                0,
+                0,
+                mavutil.mavlink.MAV_FRAME_GLOBAL_RELATIVE_ALT,
+                mavutil.mavlink.MAV_CMD_NAV_TAKEOFF,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                ALTITUDE,
+            )
+        )
+
+        angle = -1
+        location = -1
+        width = -1
+        # Primary(Search).rectangular(angle, location, width, len, alt)
+        # self.save_mission()
+        AVIDRONE.commands.clear()
+
+
+mission = Mission()  # TODO, move to right place
 
 
 class Vector:

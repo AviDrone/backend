@@ -6,7 +6,8 @@
 """
 from __future__ import print_function
 
-# Set up option parsing to get connection string
+import logging
+import os
 import time
 
 import drone
@@ -16,6 +17,14 @@ from dronekit import LocationGlobalRelative, VehicleMode
 from pymavlink import mavutil
 from search import Search
 from util import get_range
+
+# logging
+log = logging.getLogger(__name__)
+log.setLevel(logging.INFO)
+msg = logging.Formatter("%(asctime)s [%(levelname)s] %(message)s")
+file_handler = logging.FileHandler(os.path.join("log", "primary.log"))
+file_handler.setFormatter(msg)
+log.addHandler(file_handler)
 
 aviDrone = drone.vehicle
 sitl = drone.sitl
