@@ -206,9 +206,10 @@ class Primary(Search):
             # otherwise, rotate
             rotated_vector = Vector.rotate_cloud(arr, initial_vector, final_vector)
 
-
         for points in rotated_vector:
-            point = get_location_metres_with_alt(location, points[1], points[0], points[2])
+            point = get_location_metres_with_alt(
+                location, points[1], points[0], points[2]
+            )
             wp_command = Command(
                 0,
                 0,
@@ -265,7 +266,6 @@ class Primary(Search):
                 point.lon,
                 0,
             )
-            
         _commands.add(final_wp)
         commands.append(_commands)
         log.info(" Upload new commands to vehicle")
@@ -273,12 +273,13 @@ class Primary(Search):
 
 
 class Secondary(Search):
-# TODO Remove this comment: implement
+    # TODO Remove this comment: implement
     def __init__(self):
         pass
-    
+
     def search(self):
         pass
+
 
 class Mission:
     def __init__(self):
