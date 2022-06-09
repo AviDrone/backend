@@ -313,7 +313,7 @@ class Mission:
             missions.append(command)
         return missions
 
-    def save_mission(text_file):
+    def save_mission(self, text_file):
         """
         Save a mission in the Waypoint file format (http://qgroundcontrol.org/mavlink/waypoint_protocol#waypoint_file_format).
         """
@@ -356,26 +356,27 @@ class Mission:
         )
         return distance_to_point
 
+
 def save_to_file(text_file, totalAlt, width, dLength, totalLength):
     print("adding takeoff to altitude ", ALTITUDE)
     AVIDRONE.commands.add(
-        Command(
-            0,
-            0,
-            0,
-            mavutil.mavlink.MAV_FRAME_GLOBAL_RELATIVE_ALT,
-            mavutil.mavlink.MAV_CMD_NAV_TAKEOFF,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            ALTITUDE,
+            Command(
+                0,
+                0,
+                0,
+                mavutil.mavlink.MAV_FRAME_GLOBAL_RELATIVE_ALT,
+                mavutil.mavlink.MAV_CMD_NAV_RETURN_TO_LAUNCH,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+            )
         )
-    )
     print("adding mission")
     my_angle = 360 - np.degrees(AVIDRONE.attitude.yaw)
     # TODO call Primary(search).rectangular
@@ -397,6 +398,7 @@ def save_to_file(text_file, totalAlt, width, dLength, totalLength):
     save_mission(text_file)
     AVIDRONE.commands.clear()
     print("Mission saved")
+
 
 # Search superclass
 class Search:
@@ -755,10 +757,12 @@ def get_location_metres_with_alt(original_location, dNorth, dEast, newAlt):
 def get_range(totalLength, dLength):
     return (totalLength / dLength) * 2
 
+
 def print_parameters():
     print("\nPrint all parameters (iterate `aviDrone.parameters`):")
     for key, value in AVIDRONE.parameters.items():
         print(" Key:%s Value:%s" % (key, value))
+
 
 def battery_information():
     print("Level:", AVIDRONE.battery.level)
