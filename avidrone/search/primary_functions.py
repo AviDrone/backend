@@ -35,20 +35,23 @@ def set_FS_BATT():
     aviDrone.parameters.set("FS_BATT_ENABLE", 2)
 
 
-# TODO move to util
+# TODO Remove this comment: moved to search/util.py
 def print_parameters():
     print("\nPrint all parameters (iterate `aviDrone.parameters`):")
     for key, value in aviDrone.parameters.items():
         print(" Key:%s Value:%s" % (key, value))
 
 
-# TODO move to util
+# TODO Remove this comment: moved to search/util.py
 def battery_information():
     print("Level:", aviDrone.battery.level)
     print("Voltage:", aviDrone.battery.voltage)
     print("Current:", aviDrone.battery.current)
     print("Battery:", aviDrone.battery)
 
+
+# TODO Remove this comment: moved to search/util.py as Primary(Search).rectangle
+#            refactored both functions to work with an optional height parameter.
 
 # Rectangular search taking angle and altitude into account
 def rectangular_primary_search_with_alt(
@@ -187,7 +190,7 @@ def rectangular_primary_search_with_alt(
     print(" Upload new commands to vehicle")
     cmds.upload()
 
-
+# TODO Remove this comment: moved to search/util.py
 def reupload_commands(index):
     cmds = aviDrone.commands
     for command in aviDrone_commands_copy:
@@ -312,7 +315,7 @@ def rectangular_primary_search_basic(a_location, width, dLength, totalLength, an
     print(" Upload new commands to vehicle")
     cmds.upload()
 
-
+# TODO Remove this comment: moved to search/util.py
 def distance_to_current_waypoint():
     """
     Gets distance in metres to the current waypoint.
@@ -331,7 +334,7 @@ def distance_to_current_waypoint():
     )
     return distancetopoint
 
-
+# TODO Remove this comment: moved to search/util.py
 def download_mission():
     """
     Downloads the current mission and returns it in a list.
@@ -345,7 +348,7 @@ def download_mission():
         missionlist.append(cmd)
     return missionlist
 
-
+# TODO Remove this comment: moved to search/util.py
 def save_mission(aFileName):
     """
     Save a mission in the Waypoint file format (http://qgroundcontrol.org/mavlink/waypoint_protocol#waypoint_file_format).
@@ -407,7 +410,7 @@ def arm_and_takeoff(aTargetAltitude):
             break
         time.sleep(1)
 
-
+# TODO Remove this comment: moved to search/util.py
 def return_to_launch():
     aviDrone.commands.add(
         Command(
@@ -428,7 +431,7 @@ def return_to_launch():
         )
     )
 
-
+# TODO Remove this comment: moved to search/util.py
 def save_search_to_file(file, totalAlt, width, dLength, totalLength):
     # aviDrone.simple_takeoff(ALTITUDE)
     print("adding takeoff to altitude ", ALTITUDE)
@@ -471,7 +474,7 @@ def save_search_to_file(file, totalAlt, width, dLength, totalLength):
     aviDrone.commands.clear()
     print("Mission saved")
 
-
+# TODO Remove this comment: refactored into Primary.search()
 def follow_primary(totalLength, dLength):
     reached_end = False
     stopping_point = 0
