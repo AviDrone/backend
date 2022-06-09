@@ -149,7 +149,7 @@ class Primary(Search):
         stopping_point = 0
         ENABLE_PRIMARY_SEARCH = True
 
-        if  AVIDRONE.mode != "AUTO":
+        if AVIDRONE.mode != "AUTO":
             time.sleep(1)
 
         while ENABLE_PRIMARY_SEARCH:
@@ -174,11 +174,11 @@ class Primary(Search):
             time.sleep(1)
         return end_reached, stopping_point
 
-    def rectangular(self,angle, location, width, length, height=0):
+    def rectangular(self, angle, location, width, length, height=0):
         commands = []
         _commands = self.commands
         max_range = self.max_range
-        v_dist  = h_dist = step = 0
+        v_dist = h_dist = step = 0
         arr = []
 
         _commands.clear()  # Clears any existing commands

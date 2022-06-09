@@ -371,6 +371,7 @@ def save_mission(aFileName):
     with open(aFileName, "w") as file_:
         file_.write(output)
 
+
 # TODO Remove this comment: duplicated in search/util.Mission
 def arm_and_takeoff(aTargetAltitude):
     """
