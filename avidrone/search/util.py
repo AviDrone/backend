@@ -3,7 +3,6 @@
 """
     SEARCH UTIL
 """
-
 from __future__ import print_function
 
 import argparse
@@ -514,12 +513,8 @@ class Mission:
             )
         )
 
-        if alt == 0:
-            # TODO implement rectangular()
-            Primary(Search).rectangular()
-        else:
-            # TODO implement rectangular_with_alt()
-            Primary(Search).rectangular_with_alt()
+        Primary(Search).rectangular()
+
 
         self.save_mission(file)
         AVIDRONE.commands.clear()
