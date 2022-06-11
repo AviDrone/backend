@@ -14,26 +14,10 @@ import os
 import time
 
 import numpy as np
-
-from dronekit import (
-    Command,
-    LocationGlobal,
-    VehicleMode,
-)
-
+from dronekit import Command, LocationGlobal, VehicleMode
 from pymavlink import mavutil
 
-from params import (
-    ALTITUDE,
-    DEGREE_ERROR,
-    DEGREES,
-    DISTANCE_ERROR,
-    IS_TEST,
-    LAND_THRESHOLD,
-    MAGNITUDE,
-    WINDOW_SIZE,
-    WITH_TRANSCEIVER,
-)
+from params import WINDOW_SIZE, WITH_TRANSCEIVER
 
 # logging
 log = logging.getLogger(__name__)
@@ -44,8 +28,10 @@ file_handler.setFormatter(msg)
 log.addHandler(file_handler)
 
 from uav import AVIDRONE
+
 if WITH_TRANSCEIVER:
     from transceiver.transceiver import TRANSCEIVER
+
     log.debug(f"transceiver model: {TRANSCEIVER.curr_model}")
     log.debug(f"search strip width: {TRANSCEIVER.curr_search_strip_width}")
 
@@ -73,7 +59,9 @@ class GpsData:
         self.gps_points.clear()
         self.distance.clear()
 
-GPS_DATA = GpsData()    # singleton
+
+GPS_DATA = GpsData()  # singleton
+
 
 class Mission:
     def __init__(self):
@@ -83,7 +71,6 @@ class Mission:
         self.original_yaw = AVIDRONE.yaw
         self.angle = 360 - AVIDRONE.yaw
         self.relative = False
-
 
     def arm_and_takeoff(self, target_altitude):
         # Pre-arm check: Prevent user try to arm until autopilot is ready
@@ -104,13 +91,12 @@ class Mission:
         # Wait until the vehicle reaches a safe height before continuing
 
         # otherwise the command after Vehicle.simple_takeoff will execute immediately.
-        
+
         while True:
             print(" Altitude: ", AVIDRONE.altitude)
             time.sleep(1)
             if (
-                AVIDRONE.altitude
-                >= target_altitude * 0.95
+                AVIDRONE.altitude >= target_altitude * 0.95
             ):  # Trigger just below target alt.
                 print("Reached target altitude")
                 break
@@ -176,7 +162,9 @@ class Mission:
 
         return LocationGlobal(new_lat, new_lon, newAlt)
 
-MISSION =  Mission()
+
+MISSION = Mission()
+
 
 class Vector:
     def __init__(self):
@@ -345,15 +333,6 @@ class Vector:
 #                 break
 #             time.sleep(2)
 
-#     # Any condition we want to break the primary search can be done in this command.
-#     # This will be called repeatedly and return true when the break condition is true.
-#     def break_condition(self):
-#         next_waypoint = self.avidrone.commands.next
-#         if next_waypoint == 40:
-#             self.avidrone.mode = VehicleMode("GUIDED")
-#             print("breaking...")
-#             return True
-#         return False
 
 #     def condition_yaw(self, heading, relative):
 #         if relative:
@@ -413,12 +392,6 @@ class Vector:
 #         print("Checkpoint reached")
 
 
-
-
-
-
-
-
 # def get_distance_metres(a_location1, a_location2):
 #     """
 #     Returns the ground distance in metres between two LocationGlobal objects.
@@ -429,7 +402,6 @@ class Vector:
 #     d_lat = a_location2.lat - a_location1.lat
 #     d_long = a_location2.lon - a_location1.lon
 #     return math.sqrt((d_lat * d_lat) + (d_long * d_long)) * 1.113195e5
-
 
 
 # def print_parameters():

@@ -10,11 +10,11 @@ import logging
 import os
 import time
 
+import drone
 import numpy as np
 from dronekit import LocationGlobalRelative, VehicleMode
 from pymavlink import mavutil
 
-import drone
 import primary_functions as pf
 from search import Search
 from uav import AVIDRONE

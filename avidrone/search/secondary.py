@@ -17,15 +17,23 @@ import pathlib
 import time
 from re import S
 
+import drone
 import dronekit_sitl
 from dronekit import LocationGlobal, VehicleMode
 
-import drone
 import transceiver.util
 from transceiver import EM_field, util
 from transceiver.transceiver import Transceiver
-from util import (ALTITUDE, DEGREES, LAND_THRESHOLD, MAGNITUDE, WINDOW_SIZE,
-                  GpsData, Mission, Search)
+from util import (
+    ALTITUDE,
+    DEGREES,
+    LAND_THRESHOLD,
+    MAGNITUDE,
+    WINDOW_SIZE,
+    GpsData,
+    Mission,
+    Search,
+)
 
 log = logging.getLogger(__name__)
 log.setLevel(logging.INFO)

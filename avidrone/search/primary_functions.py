@@ -15,6 +15,7 @@ import drone
 import numpy as np
 from dronekit import Command, LocationGlobalRelative, VehicleMode
 from pymavlink import mavutil
+
 from util import (
     ALTITUDE,
     get_distance_metres,
@@ -190,6 +191,7 @@ def rectangular_primary_search_with_alt(
     print(" Upload new commands to vehicle")
     cmds.upload()
 
+
 # TODO Remove this comment: moved to search/util.py
 def reupload_commands(index):
     cmds = aviDrone.commands
@@ -315,6 +317,7 @@ def rectangular_primary_search_basic(a_location, width, dLength, totalLength, an
     print(" Upload new commands to vehicle")
     cmds.upload()
 
+
 # TODO Remove this comment: moved to search/util.py
 def distance_to_current_waypoint():
     """
@@ -334,6 +337,7 @@ def distance_to_current_waypoint():
     )
     return distancetopoint
 
+
 # TODO Remove this comment: moved to search/util.py
 def download_mission():
     """
@@ -347,6 +351,7 @@ def download_mission():
     for cmd in cmds:
         missionlist.append(cmd)
     return missionlist
+
 
 # TODO Remove this comment: moved to search/util.py
 def save_mission(aFileName):
@@ -410,6 +415,7 @@ def arm_and_takeoff(aTargetAltitude):
             break
         time.sleep(1)
 
+
 # TODO Remove this comment: moved to search/util.py
 def return_to_launch():
     aviDrone.commands.add(
@@ -430,6 +436,7 @@ def return_to_launch():
             0,
         )
     )
+
 
 # TODO Remove this comment: moved to search/util.py
 def save_search_to_file(file, totalAlt, width, dLength, totalLength):
@@ -473,6 +480,7 @@ def save_search_to_file(file, totalAlt, width, dLength, totalLength):
     save_mission(file)
     aviDrone.commands.clear()
     print("Mission saved")
+
 
 # TODO Remove this comment: refactored into Primary.search()
 def follow_primary(totalLength, dLength):

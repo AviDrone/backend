@@ -14,12 +14,10 @@ import numpy as np
 from dronekit import LocationGlobalRelative, VehicleMode
 from pymavlink import mavutil
 
-from search import SEARCH, PRIMARY, SECONDARY
+from search import PRIMARY, SEARCH, SECONDARY
 from transceiver.transceiver import TRANSCEIVER
 from uav import AVIDRONE
-
 from util import MISSION
-
 
 # logging
 log = logging.getLogger(__name__)

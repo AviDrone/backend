@@ -41,13 +41,13 @@ class UAV:
         self.nickname = "Major Tom"
         self.connection_string = connection_str
         self.quad = connect(self.connection_string, wait_ready=True)
-        
+
         # Navigation
         self.location = self.quad.location.global_frame
         self.altitude = self.quad.location.global_relative_frame.alt
         self.yaw = self.quad.attitude.yaw
-        
-        #Missions
+
+        # Missions
         self.mode = self.quad.mode
         self.commands = self.quad.commands
 

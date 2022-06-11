@@ -4,21 +4,21 @@
 """
     SEARCH
 """
-from operator import le
-from params import ALTITUDE
-import time
 import logging
 import os
-from uav import AVIDRONE
-from transceiver.transceiver import TRANSCEIVER
-from params import ALTITUDE
-from pymavlink import mavutil
-from dronekit import Command, VehicleMode
-import shortuuid
-import numpy as np
+import time
+from operator import le
 
-from util import MISSION
-from util import Vector
+import numpy as np
+import shortuuid
+from dronekit import Command, VehicleMode
+from pymavlink import mavutil
+
+from params import ALTITUDE
+from transceiver.transceiver import TRANSCEIVER
+from uav import AVIDRONE
+from util import MISSION, Vector
+
 # Logging
 log = logging.getLogger(__name__)
 log.setLevel(logging.INFO)
@@ -28,6 +28,8 @@ file_handler.setFormatter(formatter)
 log.addHandler(file_handler)
 
 log.info("**************** SEARCH ****************")
+
+
 class Search:
     def __init__(self):
         self.commands = AVIDRONE.commands
@@ -44,11 +46,11 @@ class Search:
         self.file_name = "Primary-"
         self.file_type = ".txt"
         self.dir_path = "missions/"
-        
-#    TODO add utm/lat-long conversion functions here
+
+    #    TODO add utm/lat-long conversion functions here
     def get_range(self, totalLength, dLength):
         return (totalLength / dLength) * 2
-    
+
     # Any condition we want to break the primary search can be done in this command.
     # This will be called repeatedly and return true when the break condition is true.
     def break_condition(self):
@@ -77,10 +79,11 @@ class Search:
                 0,
                 0,
             )
-    )
+        )
 
 
 SEARCH = Search()
+
 
 class Primary(Search):
     def __init__(self):
@@ -107,7 +110,7 @@ class Primary(Search):
 
     def run(self, length, search_strip_width):
         self.is_enabled = True
-        
+
         if AVIDRONE.mode != "AUTO":
             time.sleep(1)
 
@@ -128,7 +131,7 @@ class Primary(Search):
             time.sleep(1)
         return self.reached_end, self.stopping_point
 
-    def rectangular(self, place_h1, place_h2, location, width,length, angle, height=0):
+    def rectangular(self, place_h1, place_h2, location, width, length, angle, height=0):
         max_range = TRANSCEIVER.curr_search_strip_width
         _commands = AVIDRONE.commands
         commands = []
@@ -138,7 +141,7 @@ class Primary(Search):
 
         _commands.clear()  # Clears any existing commands
         _commands.add(self.start_waypoint)
-        
+
         for _ in range(1, max_range):
             if step == 0:
                 h_dist = 0
@@ -161,10 +164,10 @@ class Primary(Search):
             # otherwise, rotate
             rotated_vector = Vector.rotate_cloud(arr, initial_vector, final_vector)
 
-    # def get_location_meters_with_alt(self, original_location, dNorth, dEast, newAlt):
+        # def get_location_meters_with_alt(self, original_location, dNorth, dEast, newAlt):
         for points in rotated_vector:
-            point = MISSION.get_location_meters_with_alt( AVIDRONE.location,
-                points[1], points[0], points[2]
+            point = MISSION.get_location_meters_with_alt(
+                AVIDRONE.location, points[1], points[0], points[2]
             )
             wp_command = Command(
                 0,
@@ -249,7 +252,7 @@ class Primary(Search):
         )
         print("adding mission")
         angle = 360 - np.degrees(AVIDRONE.yaw)
-        
+
         PRIMARY.rectangular(AVIDRONE.location, width, length, angle, angle, height)
 
         print("returning to launch")
@@ -263,9 +266,11 @@ class Primary(Search):
 
 PRIMARY = Primary()
 
+
 class Secondary(Search):
     def __init__(self):
         pass
+
 
 SECONDARY = Secondary()
 

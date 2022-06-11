@@ -11,8 +11,13 @@ import logging
 import pathlib
 import time
 
-from transceiver.util import (get_direction, get_displacement, get_distance_xy,
-                              get_theta, normalize)
+from transceiver.util import (
+    get_direction,
+    get_displacement,
+    get_distance_xy,
+    get_theta,
+    normalize,
+)
 
 # logging
 log = logging.getLogger(__name__)
@@ -162,7 +167,6 @@ uav_pos = [120, 10, 20]  # Example
 beacon_pos = [20, 20, 2]  # Example
 
 
-
 # Mock beacon
 mock_beacon = TRANSCEIVER.mock_transceiver(uav_pos, beacon_pos)
 run = False
@@ -183,7 +187,6 @@ while run:
 
     log.info(f"-- direction, distance: {(TRANSCEIVER.direction, TRANSCEIVER.distance)}")
     mission_begin_time = datetime.datetime.now()
-
 
     if uav_pos[0] == beacon_pos[0] and uav_pos[1] == beacon_pos[1]:
         TRANSCEIVER.signal_detected = True
