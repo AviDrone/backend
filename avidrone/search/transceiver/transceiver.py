@@ -93,12 +93,7 @@ class Transceiver:
         c_lib = ctypes.CDLL(shared_ctypes_lib)
         output_array = (ctypes.c_double * 2)()
         c_lib._Z11get_dir_digPd(ctypes.byref(output_array))
-        log.debug(
-            "Direction: ",
-            output_array[0],
-            "Distance: ",
-            output_array[1],
-        )
+        log.debug(f"direction, distance: {output_array[0],output_array[1]}")
 
         transceiver_output = [output_array[0], output_array[1]]
         return transceiver_output

@@ -12,10 +12,9 @@ import time
 
 import drone
 import numpy as np
+import primary_functions as pf
 from dronekit import LocationGlobalRelative, VehicleMode
 from pymavlink import mavutil
-
-import primary_functions as pf
 from search import Search
 from uav import AVIDRONE
 from util import get_range, save_mission

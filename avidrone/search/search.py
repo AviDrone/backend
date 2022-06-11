@@ -12,9 +12,8 @@ from operator import le
 import numpy as np
 import shortuuid
 from dronekit import Command, VehicleMode
-from pymavlink import mavutil
-
 from params import ALTITUDE
+from pymavlink import mavutil
 from transceiver.transceiver import TRANSCEIVER
 from uav import AVIDRONE
 from util import MISSION, Vector
@@ -54,7 +53,7 @@ class Search:
     # Any condition we want to break the primary search can be done in this command.
     # This will be called repeatedly and return true when the break condition is true.
     def break_condition(self):
-        next_waypoint = self.avidrone.commands.next
+        next_waypoint = AVIDRONE.commands.next
         if next_waypoint == 40:
             AVIDRONE.mode = VehicleMode("GUIDED")
             print("breaking...")

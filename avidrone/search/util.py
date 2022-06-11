@@ -18,7 +18,6 @@ from dronekit import Command, LocationGlobal, VehicleMode
 from params import WINDOW_SIZE, WITH_TRANSCEIVER
 from pymavlink import mavutil
 
-
 # logging
 log = logging.getLogger(__name__)
 log.setLevel(logging.INFO)
@@ -378,16 +377,3 @@ class Vector:
 #             print("Halting simple_go_to")
 
 #         print("Checkpoint reached")
-
-
-# def get_distance_metres(a_location1, a_location2):
-#     """
-#     Returns the ground distance in metres between two LocationGlobal objects.
-#     This method is an approximation, and will not be accurate over large distances and close to the
-#     earth's poles. It comes from the ArduPilot test code:
-#     https://github.com/diydrones/ardupilot/blob/master/Tools/autotest/common.py
-#     """
-#     d_lat = a_location2.lat - a_location1.lat
-#     d_long = a_location2.lon - a_location1.lon
-#     return math.sqrt((d_lat * d_lat) + (d_long * d_long)) * 1.113195e5
-
