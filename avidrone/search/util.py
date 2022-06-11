@@ -15,7 +15,7 @@ import time
 
 import numpy as np
 from dronekit import Command, LocationGlobal, VehicleMode
-from params import WINDOW_SIZE, WITH_TRANSCEIVER
+from params import WINDOW_SIZE, WITH_TRANSCEIVER, MAGNITUDE, DEGREE_ERROR, DISTANCE_ERROR
 from pymavlink import mavutil
 
 # logging
@@ -179,12 +179,12 @@ class Mission:
         https://dronekit-python.readthedocs.io/en/latest/examples/guided-set-speed-yaw-demo.html
         """
 
-        curr_location = (AVIDRONE.location.global_frame)
+        curr_location = AVIDRONE.location.global_frame
         targetLocation = self.get_location_meters(curr_location, distance, angle)
         AVIDRONE.simple_goto(targetLocation)
 
         counter = 0
-        while (AVIDRONE.mode.name == "GUIDED"):  
+        while AVIDRONE.mode.name == "GUIDED":  
             remainingDistance = self.get_distance_meters(
                 AVIDRONE.location.global_frame, targetLocation
             )
@@ -198,6 +198,26 @@ class Mission:
                 print("Stuck, skipping target")
                 break
             time.sleep(2)
+
+    def simple_goto_wait(self, go_to_checkpoint):
+        self.avidrone.simple_goto(go_to_checkpoint)
+        global_frame = self.avidrone.location.global_frame
+        distance = self.get_distance_meters(
+            AVIDRONE.get_global_pos(global_frame), go_to_checkpoint
+        )
+
+        while distance >= DISTANCE_ERROR and self.avidrone.mode.name == "GUIDED":
+            print(distance)
+            distance = self.get_distance_meters(
+                AVIDRONE.get_global_pos(global_frame), go_to_checkpoint
+            )
+            time.sleep(1)
+
+        if self.avidrone.mode.name != "GUIDED":
+            self.avidrone.simple_goto(self.avidrone.location.global_frame)
+            print("Halting simple_go_to")
+
+        print("Checkpoint reached")
 
     def get_distance_meters(self, a, b):
         lat_a, lat_b = a.lat, b.lat
@@ -215,6 +235,39 @@ class Mission:
             * 1.113195e5
         )
         return distance  # in meters
+
+    def condition_yaw(self, heading, relative):
+        if relative:
+            is_relative = True  # yaw relative to direction of travel
+        else:
+            is_relative = False  # yaw is an absolute angle
+
+        if heading < 0:
+            heading = abs(heading)
+            cw = -1
+        else:
+            cw = 1
+
+        msg = AVIDRONE.message_factory.command_long_encode(
+            0,  # target system
+            0,  # target component
+            self.mavutil.mavlink.MAV_CMD_CONDITION_YAW,  # command
+            0,  # confirmation
+            heading,  # param 1, yaw in degrees
+            0,  # param 2, yaw speed deg/s
+            cw,  # param 3, direction -1 ccw, 1 cw
+            is_relative,  # param 4, relative offset 1, absolute angle 0
+            0,
+            0,
+            0,
+        )  # param 5 ~ 7 not used
+        AVIDRONE.send_mavlink(msg)  # send command to vehicle
+
+    def forward_calculation(self):
+        flight_direction = []
+        flight_direction.append(MAGNITUDE * math.cos(AVIDRONE.yaw))
+        flight_direction.append(MAGNITUDE * math.sin(AVIDRONE.yaw))
+        return flight_direction
 
 
 MISSION = Mission()
@@ -303,65 +356,3 @@ class Vector:
         NewVector = (rotated[0], rotated[1], vector[2])
 
         return NewVector
-
-
-
-#
-
-
-#     def condition_yaw(self, heading, relative):
-#         if relative:
-#             is_relative = True  # yaw relative to direction of travel
-#         else:
-#             is_relative = False  # yaw is an absolute angle
-
-#         if heading < 0:
-#             heading = abs(heading)
-#             cw = -1
-#         else:
-#             cw = 1
-
-#         msg = self.avidrone.message_factory.command_long_encode(
-#             0,  # target system
-#             0,  # target component
-#             self.mavutil.mavlink.MAV_CMD_CONDITION_YAW,  # command
-#             0,  # confirmation
-#             heading,  # param 1, yaw in degrees
-#             0,  # param 2, yaw speed deg/s
-#             cw,  # param 3, direction -1 ccw, 1 cw
-#             is_relative,  # param 4, relative offset 1, absolute angle 0
-#             0,
-#             0,
-#             0,
-#         )  # param 5 ~ 7 not used
-#         self.avidrone.send_mavlink(msg)  # send command to vehicle
-
-#     def forward_calculation(self):
-#         flight_direction = []
-#         yaw = drone.vehicle.attitude.yaw
-
-#         print(yaw)
-#         flight_direction.append(MAGNITUDE * math.cos(yaw))
-#         flight_direction.append(MAGNITUDE * math.sin(yaw))
-
-#         return flight_direction
-
-#     def simple_goto_wait(self, go_to_checkpoint):
-#         self.avidrone.simple_goto(go_to_checkpoint)
-#         global_frame = self.avidrone.location.global_frame
-#         distance = get_distance_metres(
-#             Search.get_global_pos(global_frame), go_to_checkpoint
-#         )
-
-#         while distance >= DISTANCE_ERROR and self.avidrone.mode.name == "GUIDED":
-#             print(distance)
-#             distance = get_distance_metres(
-#                 Search.get_global_pos(global_frame), go_to_checkpoint
-#             )
-#             time.sleep(1)
-
-#         if self.avidrone.mode.name != "GUIDED":
-#             self.avidrone.simple_goto(self.avidrone.location.global_frame)
-#             print("Halting simple_go_to")
-
-#         print("Checkpoint reached")
