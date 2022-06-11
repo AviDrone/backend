@@ -15,9 +15,9 @@ import time
 
 import numpy as np
 from dronekit import Command, LocationGlobal, VehicleMode
+from params import WINDOW_SIZE, WITH_TRANSCEIVER
 from pymavlink import mavutil
 
-from params import WINDOW_SIZE, WITH_TRANSCEIVER
 
 # logging
 log = logging.getLogger(__name__)
@@ -183,7 +183,7 @@ class Mission:
         currentLocation = (
             AVIDRONE.location.global_frame
         )  # was global_relative_frame
-        targetLocation = self.better_get_location_meters(
+        targetLocation = self.get_location_meters(
             currentLocation, distance, angle
         )
 
@@ -194,8 +194,8 @@ class Mission:
             AVIDRONE.mode.name == "GUIDED"
         ):  # Stop action if we are no longer in guided mode.
             # print "DEBUG: mode: %s" % vehicle.mode.name
-            remainingDistance = self.better_get_distance_meters(
-                self.avidrone.location.global_frame, targetLocation
+            remainingDistance = self.get_distance_meters(
+                AVIDRONE.location.global_frame, targetLocation
             )
             # global_frame was global_relative_frame
             # remainingDistance=get_distance_meters(vehicle.location.global_frame, targetLocation)

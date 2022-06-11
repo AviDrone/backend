@@ -85,6 +85,18 @@ class Search:
 SEARCH = Search()
 
 
+if SEARCH.phase == "primary":
+    SEARCH.ENABLE_PRIMARY_SEARCH = True
+    log.debug(f"ENABLE_PRIMARY_SEARCH: {SEARCH.ENABLE_PRIMARY_SEARCH}")
+
+elif SEARCH.phase == "secondary":
+    SEARCH.ENABLE_SECONDARY_SEARCH = True
+    log.debug(f"ENABLE_SECONDARY_SEARCH{SEARCH.ENABLE_PRIMARY_SEARCH}")
+
+else:
+    log.error("Unknown mode")
+
+
 class Primary(Search):
     def __init__(self):
         self.is_enabled = False
@@ -269,19 +281,7 @@ PRIMARY = Primary()
 
 class Secondary(Search):
     def __init__(self):
-        pass
+        self.is_enabled = False
 
 
 SECONDARY = Secondary()
-
-# TODO INSERT STATE MACHINE HERE
-if SEARCH.phase == "primary":
-    SEARCH.ENABLE_PRIMARY_SEARCH = True
-    log.debug(f"ENABLE_PRIMARY_SEARCH{SEARCH.ENABLE_PRIMARY_SEARCH}")
-
-elif SEARCH.phase == "secondary":
-    SEARCH.ENABLE_SECONDARY_SEARCH = True
-    log.debug(f"ENABLE_SECONDARY_SEARCH{SEARCH.ENABLE_PRIMARY_SEARCH}")
-
-else:
-    log.error("Unknown mode")

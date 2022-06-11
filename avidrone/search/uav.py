@@ -21,7 +21,7 @@ file_handler = logging.FileHandler(os.path.join("log", "uav.log"))
 file_handler.setFormatter(msg)
 log.addHandler(file_handler)
 
-# Connection string
+# Connect to UAV
 parser = argparse.ArgumentParser(description="Connect to  a vehicle.")
 parser.add_argument("--connect", help="Connection string to vehicle.")
 args = parser.parse_args()
@@ -55,12 +55,12 @@ class UAV:
         self.enable_battery_telemetry = self.quad.parameters.set("FS_BATT_ENABLE", 2)
         self.battery = self.quad.battery
 
-    def print_parameters():
+    def print_parameters(self):
         print("\nPrint all parameters (iterate `aviDrone.parameters`):")
         for key, value in AVIDRONE.parameters.items():
             print(" Key:%s Value:%s" % (key, value))
 
-    def battery_information():
+    def battery_information(self):
         print("Level:", AVIDRONE.battery.level)
         print("Voltage:", AVIDRONE.battery.voltage)
         print("Current:", AVIDRONE.battery.current)
