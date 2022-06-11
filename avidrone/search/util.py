@@ -18,7 +18,6 @@ import numpy as np
 from dronekit import (
     Command,
     LocationGlobal,
-    LocationGlobalRelative,
     VehicleMode,
 )
 
@@ -82,10 +81,8 @@ class Mission:
         self.mavutil = mavutil
         self.global_frame = AVIDRONE.altitude
         self.original_yaw = AVIDRONE.yaw
-        self.heading = -1  # TODO get correct value
         self.angle = 360 - AVIDRONE.yaw
         self.relative = False
-        self.cw = -1  # TODO get correct value
 
 
     def arm_and_takeoff(self, target_altitude):
@@ -157,7 +154,27 @@ class Mission:
         with open(text_file, "w") as file_:
             file_.write(output)
 
+    def get_location_meters_with_alt(self, original_location, dNorth, dEast, newAlt):
+        """
+        Returns a LocationGlobal object containing the latitude/longitude `dNorth` and `dEast` metres from the
+        specified `original_location`. The returned Location has the same `alt` value
+        as `original_location`.
+        The function is useful when you want to move the vehicle around specifying locations relative to
+        the current vehicle position.
+        The algorithm is relatively accurate over small distances (10m within 1km) except close to the poles.
+        For more information see:
+        http://gis.stackexchange.com/questions/2951/algorithm-for-offsetting-a-latitude-longitude-by-some-amount-of-meters
+        """
+        earth_radius = 6378137.0  # Radius of "spherical" earth
+        # Coordinate offsets in radians
+        dLat = dNorth / earth_radius
+        dLon = dEast / (earth_radius * math.cos(math.pi * original_location.lat / 180))
 
+        # New position in decimal degrees
+        new_lat = original_location.lat + (dLat * 180 / math.pi)
+        new_lon = original_location.lon + (dLon * 180 / math.pi)
+
+        return LocationGlobal(new_lat, new_lon, newAlt)
 
 MISSION =  Mission()
 
@@ -168,8 +185,7 @@ class Vector:
         self.vector_1 = np.asarray(vector_1)
         self.vector_2 = np.asarray(vector_2)
 
-    @staticmethod
-    def rotate_cloud(Points, V1, V2):
+    def rotate_cloud(self, Points, V1, V2):
         # V1 is the current vector which the coordinate system is aligned to
         # V2 is the vector we want the system aligned to
         # Points is an (n,3) array of n points (x,y,z)
@@ -218,8 +234,7 @@ class Vector:
                 pts_rotated[i] = p_rotated
         return pts_rotated
 
-    @staticmethod
-    def rotate_vector(vector, angle):
+    def rotate_vector(self, vector, angle):
         # vector is the vector being rotated
         # angle is used to rotate vector and is given in degrees
 

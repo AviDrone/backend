@@ -9,7 +9,6 @@ from params import ALTITUDE
 import time
 import logging
 import os
-from datetime import datetime
 from uav import AVIDRONE
 from transceiver.transceiver import TRANSCEIVER
 from params import ALTITUDE
@@ -44,6 +43,7 @@ class Search:
         self.ID = str(shortuuid.uuid())
         self.file_name = "Primary-"
         self.file_type = ".txt"
+        self.dir_path = "missions/"
         
     def get_range(self, totalLength, dLength):
         return (totalLength / dLength) * 2
@@ -86,6 +86,7 @@ class Primary(Search):
         self.is_enabled = False
         self.reached_end = False
         self.stopping_point = None
+        self.next_waypoint = None
         self.start_waypoint = Command(
             0,
             0,
@@ -102,8 +103,6 @@ class Primary(Search):
             0,
             ALTITUDE,
         )
-        self.next_waypoint = None
-        self.max_range = TRANSCEIVER.curr_search_strip_width
 
     def run(self, length, search_strip_width):
         self.is_enabled = True
@@ -113,7 +112,6 @@ class Primary(Search):
 
         while self.is_enabled:
             self.next_waypoint = AVIDRONE.commands.next
-
 
             if SEARCH.break_condition:
                 time.sleep(1)
@@ -129,12 +127,12 @@ class Primary(Search):
             time.sleep(1)
         return self.reached_end, self.stopping_point
 
-    def rectangular(self,location, width,length, angle, height=0):
+    def rectangular(self, place_h1, place_h2, location, width,length, angle, height=0):
+        max_range = TRANSCEIVER.curr_search_strip_width
         _commands = AVIDRONE.commands
         commands = []
         arr = []
 
-        max_range = self.max_range
         v_dist = h_dist = step = 0
 
         _commands.clear()  # Clears any existing commands
@@ -152,9 +150,8 @@ class Primary(Search):
             arr.append([h_dist, v_dist, 0])
 
         # Rotation
-        initial_vector = (arr[1][0], arr[1][1], 0)
-        initial_vector = np.asarray(initial_vector)
-        final_vector = Vector.rotate_vector(initial_vector, angle)
+        initial_vector = np.asarray((arr[1][0], arr[1][1], 0))
+        final_vector = Vector.rotate_vector(self, initial_vector, angle)
 
         if np.array_equal(final_vector, initial_vector):
             # do not rotate if equal
@@ -163,9 +160,10 @@ class Primary(Search):
             # otherwise, rotate
             rotated_vector = Vector.rotate_cloud(arr, initial_vector, final_vector)
 
+    # def get_location_meters_with_alt(self, original_location, dNorth, dEast, newAlt):
         for points in rotated_vector:
-            point = MISSION.get_location_metres_with_alt(
-                location, points[1], points[0], points[2]
+            point = MISSION.get_location_meters_with_alt( AVIDRONE.location,
+                points[1], points[0], points[2]
             )
             wp_command = Command(
                 0,
@@ -228,7 +226,7 @@ class Primary(Search):
         log.info(" Upload new commands to vehicle")
         _commands.upload()
 
-    def save_to_file(self, text_file, width, length, strip_width):
+    def save_to_file(self, text_file, width, length, height):
         print("adding takeoff to altitude ", ALTITUDE)
         AVIDRONE.commands.add(
             Command(
@@ -251,13 +249,16 @@ class Primary(Search):
         print("adding mission")
         angle = 360 - np.degrees(AVIDRONE.yaw)
         
-        PRIMARY.rectangular(AVIDRONE.location, width, strip_width, length, angle)
+        PRIMARY.rectangular(AVIDRONE.location, width, length, angle, angle, height)
 
         print("returning to launch")
         self.return_to_launch()
-        self.save_mission(text_file)
+        if SEARCH.SAVE:
+            mission_file = SEARCH.file_name + SEARCH.ID + SEARCH.file_type
+            print(f"Saving to file: {mission_file}")
         AVIDRONE.commands.clear()
         print("Mission saved")
+
 
 PRIMARY = Primary()
 
@@ -278,19 +279,3 @@ elif SEARCH.phase == "secondary":
 
 else:
     log.error("Unknown mode")
-
-# class Primary(Search):
-
-
-
-
-
-# #  Primary Search subclass
-# class Secondary(Search):
-#     # TODO Remove this comment: implement
-#     def __init__(self):
-#         pass
-
-#     def search(self):
-#         pass
-

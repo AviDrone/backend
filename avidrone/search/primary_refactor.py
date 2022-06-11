@@ -42,14 +42,6 @@ AVIDRONE.enable_battery_telemetry = True
 assert SEARCH.ENABLE_PRIMARY_SEARCH  # STOP if primary search is not enabled
 
 
-if SEARCH.SAVE:
-    mission_file = SEARCH.file_name + SEARCH.ID + SEARCH.file_type
-    MISSION.save_mission(mission_file)
-    PRIMARY.save_to_file(mission_file, width, length, strip_width)
-    print(f"Saving to file: {mission_file}")
-
-
-# print(width, height, length, strip_width)
 
 # Start in Guided mode
 print("Set GUIDED mode")
@@ -59,5 +51,3 @@ AVIDRONE.mode = VehicleMode("GUIDED")
 print(f"Create a new mission (for current location)")
 my_angle = 360 - np.degrees(AVIDRONE.yaw)
 print(f"Drone angle: {my_angle}")
-
-print(PRIMARY.max_range)
