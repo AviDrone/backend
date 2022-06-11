@@ -190,14 +190,14 @@ class Mission:
         AVIDRONE.simple_goto(targetLocation)
 
         counter = 0
-        while AVIDRONE.mode.name == "GUIDED":  
-            remainingDistance = self.get_distance_meters(
+        while AVIDRONE.mode == "GUIDED":
+            remaining_distance = self.get_distance_meters(
                 AVIDRONE.location.global_frame, targetLocation
             )
-            print("Distance to target: ", remainingDistance)
+            print("Distance to target: ", remaining_distance)
             counter += 1
 
-            if remainingDistance <= 0.35:
+            if remaining_distance <= 0.35:
                 print("Reached target")
                 break
             elif counter >= 10:
