@@ -45,6 +45,7 @@ class Search:
         self.file_type = ".txt"
         self.dir_path = "missions/"
         
+#    TODO add utm/lat-long conversion functions here
     def get_range(self, totalLength, dLength):
         return (totalLength / dLength) * 2
     
@@ -274,7 +275,7 @@ if SEARCH.phase == "primary":
     log.debug(f"ENABLE_PRIMARY_SEARCH{SEARCH.ENABLE_PRIMARY_SEARCH}")
 
 elif SEARCH.phase == "secondary":
-    SEARCH.EN_SECONDARY_SWITCH = True
+    SEARCH.ENABLE_SECONDARY_SEARCH = True
     log.debug(f"ENABLE_SECONDARY_SEARCH{SEARCH.ENABLE_PRIMARY_SEARCH}")
 
 else:

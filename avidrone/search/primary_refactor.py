@@ -29,9 +29,6 @@ file_handler = logging.FileHandler(os.path.join("log", "primary_trial.log"))
 file_handler.setFormatter(msg)
 log.addHandler(file_handler)
 
-AVIDRONE.enable_battery_telemetry = True
-
-
 # Primary search parameters
 width = SEARCH.width
 height = SEARCH.height
@@ -40,8 +37,6 @@ strip_width = TRANSCEIVER.curr_search_strip_width
 AVIDRONE.enable_battery_telemetry = True
 
 assert SEARCH.ENABLE_PRIMARY_SEARCH  # STOP if primary search is not enabled
-
-
 
 # Start in Guided mode
 print("Set GUIDED mode")

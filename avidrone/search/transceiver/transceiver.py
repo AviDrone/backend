@@ -224,7 +224,7 @@ while run:
 
     if IS_TIMEOUT:
         log.warning("\n reached timeout \n")
-        current_time = datetime.datetime.now()
+        current_time = str(datetime.datetime.now())
         mission_end_time = datetime.datetime.now()
         mission_time = mission_end_time - mission_begin_time
         TRANSCEIVER.signal_not_found_msg()
