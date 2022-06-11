@@ -65,7 +65,6 @@ GPS_DATA = GpsData()  # singleton
 
 class Mission:
     def __init__(self):
-        # TODO Remove this comment: replace with UAV singleton
         self.mavutil = mavutil
         self.global_frame = AVIDRONE.altitude
         self.original_yaw = AVIDRONE.yaw
@@ -89,9 +88,7 @@ class Mission:
         AVIDRONE.simple_takeoff(target_altitude)  # Take off to target altitude
 
         # Wait until the vehicle reaches a safe height before continuing
-
         # otherwise the command after Vehicle.simple_takeoff will execute immediately.
-
         while True:
             print(" Altitude: ", AVIDRONE.altitude)
             time.sleep(1)
@@ -140,6 +137,21 @@ class Mission:
         with open(text_file, "w") as file_:
             file_.write(output)
 
+    def get_location_meters(self, original_location, distance, angle):
+        lat = math.asin(
+            math.sin(original_location.lat) * math.cos(distance)
+            + math.cos(original_location.lat) * math.sin(distance) * math.cos(angle)
+        )
+
+        d_lon = math.atan2(
+            math.sin(angle) * math.sin(distance) * math.cos(original_location.lat),
+            math.cos(distance) - math.sin(original_location.lat) * math.sin(lat),
+        )
+
+        lon = (original_location.lon - d_lon + math.pi) % (2 * math.pi) - math.pi
+
+        return LocationGlobal(lat, lon, original_location.alt)
+
     def get_location_meters_with_alt(self, original_location, dNorth, dEast, newAlt):
         """
         Returns a LocationGlobal object containing the latitude/longitude `dNorth` and `dEast` metres from the
@@ -162,6 +174,61 @@ class Mission:
 
         return LocationGlobal(new_lat, new_lon, newAlt)
 
+    def go_to(self, distance, angle):
+        """
+        Reference:
+        https://dronekit-python.readthedocs.io/en/latest/examples/guided-set-speed-yaw-demo.html
+        """
+
+        currentLocation = (
+            AVIDRONE.location.global_frame
+        )  # was global_relative_frame
+        targetLocation = self.better_get_location_meters(
+            currentLocation, distance, angle
+        )
+
+        AVIDRONE.simple_goto(targetLocation)
+
+        loop_count = 0
+        while (
+            AVIDRONE.mode.name == "GUIDED"
+        ):  # Stop action if we are no longer in guided mode.
+            # print "DEBUG: mode: %s" % vehicle.mode.name
+            remainingDistance = self.better_get_distance_meters(
+                self.avidrone.location.global_frame, targetLocation
+            )
+            # global_frame was global_relative_frame
+            # remainingDistance=get_distance_meters(vehicle.location.global_frame, targetLocation)
+            # #global_frame was global_relative_frame
+            print("Distance to target: ", remainingDistance)
+            # if remainingDistance<=targetDistance*0.01: #Just below target, in case of undershoot.
+
+            loop_count += 1
+
+            if remainingDistance <= 0.35:
+                print("Reached target")
+                break
+            elif loop_count >= 10:
+                print("Stuck, skipping target")
+                break
+            time.sleep(2)
+
+    def get_distance_meters(self, a, b):
+        lat_a, lat_b = a.lat, b.lat
+        lon_a, lon_b = a.lon, b.lon
+        distance = (
+            2
+            * math.asin(
+                math.sqrt(
+                    (math.sin((lat_a - lat_b) / 2)) ** 2
+                    + math.cos(lat_a)
+                    * math.cos(lat_b)
+                    * (math.sin((lon_a - lon_b) / 2)) ** 2
+                )
+            )
+            * 1.113195e5
+        )
+        return distance  # in meters
 
 MISSION = Mission()
 
@@ -251,87 +318,8 @@ class Vector:
         return NewVector
 
 
-#     def better_get_distance_meters(self, a_location1, a_location2):
-#         lat1, lat2 = a_location1.lat, a_location2.lat
-#         lon1, lon2 = a_location1.lon, a_location2.lon
 
-#         # 6371.009e3 is the mean radius of the earth that gives us the distance
-#         # (NOT USED)
-#         #
-#         # 1.113195e5 gives us meters
-#         distance = (
-#             2
-#             * math.asin(
-#                 math.sqrt(
-#                     (math.sin((lat1 - lat2) / 2)) ** 2
-#                     + math.cos(lat1)
-#                     * math.cos(lat2)
-#                     * (math.sin((lon1 - lon2) / 2)) ** 2
-#                 )
-#             )
-#             * 1.113195e5
-#         )
-#         return distance
-
-#     def better_get_location_meters(self, original_location, distance, angle):
-#         lat = math.asin(
-#             math.sin(original_location.lat) * math.cos(distance)
-#             + math.cos(original_location.lat) * math.sin(distance) * math.cos(angle)
-#         )
-
-#         d_lon = math.atan2(
-#             math.sin(angle) * math.sin(distance) * math.cos(original_location.lat),
-#             math.cos(distance) - math.sin(original_location.lat) * math.sin(lat),
-#         )
-
-#         lon = (original_location.lon - d_lon + math.pi) % (2 * math.pi) - math.pi
-
-#         return LocationGlobal(lat, lon, original_location.alt)
-
-#     def better_goto(self, distance, angle):
-#         """
-#         Moves the vehicle to a position d_north metres North and d_east metres East of the current position.
-#         The method takes a function pointer argument with a single `dronekit.lib.LocationGlobal` parameter for
-#         the target position. This allows it to be called with different position-setting commands.
-#         By default it uses the standard method: dronekit.lib.Vehicle.simple_goto().
-#         The method reports the distance to target every two seconds.
-
-#         Retrieved from this link:
-#         https://dronekit-python.readthedocs.io/en/latest/examples/guided-set-speed-yaw-demo.html
-#         """
-
-#         currentLocation = (
-#             self.avidrone.location.global_frame
-#         )  # was global_relative_frame
-#         targetLocation = self.better_get_location_meters(
-#             currentLocation, distance, angle
-#         )
-
-#         self.avidrone.simple_goto(targetLocation)
-
-#         loop_count = 0
-#         while (
-#             self.avidrone.mode.name == "GUIDED"
-#         ):  # Stop action if we are no longer in guided mode.
-#             # print "DEBUG: mode: %s" % vehicle.mode.name
-#             remainingDistance = self.better_get_distance_meters(
-#                 self.avidrone.location.global_frame, targetLocation
-#             )
-#             # global_frame was global_relative_frame
-#             # remainingDistance=get_distance_meters(vehicle.location.global_frame, targetLocation)
-#             # #global_frame was global_relative_frame
-#             print("Distance to target: ", remainingDistance)
-#             # if remainingDistance<=targetDistance*0.01: #Just below target, in case of undershoot.
-
-#             loop_count += 1
-
-#             if remainingDistance <= 0.35:
-#                 print("Reached target")
-#                 break
-#             elif loop_count >= 10:
-#                 print("Stuck, skipping target")
-#                 break
-#             time.sleep(2)
+#
 
 
 #     def condition_yaw(self, heading, relative):
@@ -403,15 +391,3 @@ class Vector:
 #     d_long = a_location2.lon - a_location1.lon
 #     return math.sqrt((d_lat * d_lat) + (d_long * d_long)) * 1.113195e5
 
-
-# def print_parameters():
-#     print("\nPrint all parameters (iterate `aviDrone.parameters`):")
-#     for key, value in AVIDRONE.parameters.items():
-#         print(" Key:%s Value:%s" % (key, value))
-
-
-# def battery_information():
-#     print("Level:", AVIDRONE.battery.level)
-#     print("Voltage:", AVIDRONE.battery.voltage)
-#     print("Current:", AVIDRONE.battery.current)
-#     print("Battery:", AVIDRONE.battery)

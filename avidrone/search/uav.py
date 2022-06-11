@@ -55,5 +55,19 @@ class UAV:
         self.enable_battery_telemetry = self.quad.parameters.set("FS_BATT_ENABLE", 2)
         self.battery = self.quad.battery
 
+    def print_parameters():
+        print("\nPrint all parameters (iterate `aviDrone.parameters`):")
+        for key, value in AVIDRONE.parameters.items():
+            print(" Key:%s Value:%s" % (key, value))
+
+    def battery_information():
+        print("Level:", AVIDRONE.battery.level)
+        print("Voltage:", AVIDRONE.battery.voltage)
+        print("Current:", AVIDRONE.battery.current)
+        print("Battery:", AVIDRONE.battery)
 
 AVIDRONE = UAV()  # Singleton
+
+
+
+
