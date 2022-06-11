@@ -67,4 +67,5 @@ class UAV:
         print("Current:", AVIDRONE.battery.current)
         print("Battery:", AVIDRONE.battery)
 
+
 AVIDRONE = UAV()  # Singleton

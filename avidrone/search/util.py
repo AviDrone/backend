@@ -179,35 +179,22 @@ class Mission:
         https://dronekit-python.readthedocs.io/en/latest/examples/guided-set-speed-yaw-demo.html
         """
 
-        currentLocation = (
-            AVIDRONE.location.global_frame
-        )  # was global_relative_frame
-        targetLocation = self.get_location_meters(
-            currentLocation, distance, angle
-        )
-
+        curr_location = (AVIDRONE.location.global_frame)
+        targetLocation = self.get_location_meters(curr_location, distance, angle)
         AVIDRONE.simple_goto(targetLocation)
 
-        loop_count = 0
-        while (
-            AVIDRONE.mode.name == "GUIDED"
-        ):  # Stop action if we are no longer in guided mode.
-            # print "DEBUG: mode: %s" % vehicle.mode.name
+        counter = 0
+        while (AVIDRONE.mode.name == "GUIDED"):  
             remainingDistance = self.get_distance_meters(
                 AVIDRONE.location.global_frame, targetLocation
             )
-            # global_frame was global_relative_frame
-            # remainingDistance=get_distance_meters(vehicle.location.global_frame, targetLocation)
-            # #global_frame was global_relative_frame
             print("Distance to target: ", remainingDistance)
-            # if remainingDistance<=targetDistance*0.01: #Just below target, in case of undershoot.
-
-            loop_count += 1
+            counter += 1
 
             if remainingDistance <= 0.35:
                 print("Reached target")
                 break
-            elif loop_count >= 10:
+            elif counter >= 10:
                 print("Stuck, skipping target")
                 break
             time.sleep(2)
@@ -228,6 +215,7 @@ class Mission:
             * 1.113195e5
         )
         return distance  # in meters
+
 
 MISSION = Mission()
 
