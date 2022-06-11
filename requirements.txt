@@ -14,3 +14,4 @@ datetime
 dronekit-sitl
 mavproxy
 utm
+shortuuid

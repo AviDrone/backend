@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 """
     TRANSCEIVER
+    TODO refactor so that this cannot be run alone
 """
 
 import ctypes
@@ -10,13 +11,8 @@ import logging
 import pathlib
 import time
 
-from util import (
-    get_direction,
-    get_displacement,
-    get_distance_xy,
-    get_theta,
-    normalize,
-)
+from transceiver.util import (get_direction, get_displacement, get_distance_xy,
+                              get_theta, normalize)
 
 # logging
 log = logging.getLogger(__name__)
@@ -166,10 +162,11 @@ uav_pos = [120, 10, 20]  # Example
 beacon_pos = [20, 20, 2]  # Example
 
 
+
 # Mock beacon
 mock_beacon = TRANSCEIVER.mock_transceiver(uav_pos, beacon_pos)
-
-while True:
+run = False
+while run:
     timeout_count += 1
 
     if IS_TEST:

@@ -82,7 +82,7 @@ if __name__ == "__main__":
     print(" - DISPLAY COIL TOGETHER")
 
     # DISPLAY COIL SEPARATELY
-    plot_coil_em_field()
+    # plot_coil_em_field()
 
     # DISPLAY COILS TOGETHER
     plot_transceiver_em_field()

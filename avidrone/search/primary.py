@@ -10,13 +10,15 @@ import logging
 import os
 import time
 
-import drone
 import numpy as np
-import primary_functions as pf
 from dronekit import LocationGlobalRelative, VehicleMode
 from pymavlink import mavutil
+
+import drone
+import primary_functions as pf
 from search import Search
-from util import get_range
+from uav import AVIDRONE
+from util import get_range, save_mission
 
 # logging
 log = logging.getLogger(__name__)
@@ -30,20 +32,20 @@ aviDrone = drone.vehicle
 sitl = drone.sitl
 vector = drone.vector
 mission = drone.mission
-search_mission = Search()
+search = Search()
 
 
 # Switch to secondary search mode
 EN_SECONDARY_SWITCH = False
 
 # width of the search
-width = search_mission.width
+width = search.width
 
 # length of the search
-totalLength = search_mission.length
+totalLength = search.length
 
 # height
-totalAlt = search_mission.height
+totalAlt = search.height
 
 # search strip size
 dLength = 6  # meters
@@ -165,7 +167,7 @@ if reached_end or reached_end_again:
     print("Return to launch")
     aviDrone.mode = VehicleMode("RTL")
     EN_SECONDARY_SWITCH = True
-    pf.save_mission("mission.txt")
+    save_mission("mission.txt")
 
 
 print("Switch to secondary:")
