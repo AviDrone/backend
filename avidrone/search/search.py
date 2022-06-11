@@ -8,6 +8,7 @@ import logging
 import os
 import time
 from operator import le
+from trace import Trace
 
 import numpy as np
 import shortuuid
@@ -16,7 +17,8 @@ from params import ALTITUDE
 from pymavlink import mavutil
 from transceiver.transceiver import TRANSCEIVER
 from uav import AVIDRONE
-from util import MISSION, Vector
+from util import MISSION, VECTOR
+from params import ALTITUDE
 
 # Logging
 log = logging.getLogger(__name__)
@@ -25,8 +27,6 @@ formatter = logging.Formatter("%(asctime)s [%(levelname)s] %(message)s")
 file_handler = logging.FileHandler(os.path.join("log", "search.log"))
 file_handler.setFormatter(formatter)
 log.addHandler(file_handler)
-
-log.info("**************** SEARCH ****************")
 
 
 class Search:
@@ -40,7 +40,6 @@ class Search:
         self.ENABLE_SECONDARY_SEARCH = False
 
         # Mission file settings
-        self.SAVE = True
         self.ID = str(shortuuid.uuid())
         self.file_name = "Primary-"
         self.file_type = ".txt"
@@ -142,84 +141,95 @@ class Primary(Search):
             time.sleep(1)
         return self.reached_end, self.stopping_point
 
-    def rectangular(self, place_h1, place_h2, location, width, length, angle, height=0):
-        max_range = TRANSCEIVER.curr_search_strip_width
+    def rectangular(self, width, length, strip_width, angle, height=0):
+        v_num = (length / strip_width) - 1
+        d_alt = height / v_num
         _commands = AVIDRONE.commands
+        points = []
+        curr_alt = height
+        
         commands = []
-        arr = []
-
-        v_dist = h_dist = step = 0
+        h_dist = v_dist = step = 0
 
         _commands.clear()  # Clears any existing commands
         _commands.add(self.start_waypoint)
 
-        for _ in range(1, max_range):
-            if step == 0:
-                h_dist = 0
-            elif (step == 1) or (step == 3):
-                v_dist += length
-            else:
-                h_dist = width
-            step += 1
-            step = step % 4
-            arr.append([h_dist, v_dist, 0])
-
-        # Rotation
-        initial_vector = np.asarray((arr[1][0], arr[1][1], 0))
-        final_vector = Vector.rotate_vector(self, initial_vector, angle)
-
-        if np.array_equal(final_vector, initial_vector):
-            # do not rotate if equal
-            rotated_vector = np.array(arr)
-        else:
-            # otherwise, rotate
-            rotated_vector = Vector.rotate_cloud(arr, initial_vector, final_vector)
-
-        # def get_location_meters_with_alt(self, original_location, dNorth, dEast, newAlt):
-        for points in rotated_vector:
-            point = MISSION.get_location_meters_with_alt(
-                AVIDRONE.location, points[1], points[0], points[2]
-            )
-            wp_command = Command(
+        # Add MAV_CMD_NAV_TAKEOFF command. This is ignored if the vehicle is already in the air.
+        _commands.add(
+            Command(
                 0,
                 0,
                 0,
                 mavutil.mavlink.MAV_FRAME_GLOBAL_RELATIVE_ALT,
-                mavutil.mavlink.MAV_CMD_NAV_WAYPOINT,
+                mavutil.mavlink.MAV_CMD_NAV_TAKEOFF,
                 0,
                 0,
                 0,
                 0,
                 0,
                 0,
-                point.lat,
-                point.lon,
+                0,
+                0,
                 ALTITUDE,
             )
-            _commands.add(wp_command)
-            commands.append(_commands)
+        )
 
-        if height == 0:
-            # add dummy waypoint at final point (lets us know when have reached destination)
-            final_wp = Command(
-                0,
-                0,
-                0,
-                mavutil.mavlink.MAV_FRAME_GLOBAL_RELATIVE_ALT,
-                mavutil.mavlink.MAV_CMD_NAV_WAYPOINT,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                point.lat,
-                point.lon,
-                point.alt,
+        # Generate points above origin
+        for i in range(1, strip_width):
+            if step == 0:
+                h_dist = 0
+                if i > 1:
+                    curr_alt -= d_alt
+            elif (step == 1) or (step == 3):
+                v_dist += strip_width
+            else:
+                h_dist = width
+                curr_alt -= d_alt
+            step += 1
+            step = step % 4
+
+            # add points to array
+            points.append([h_dist, v_dist, d_alt])
+
+        # setup rotation
+        points = np.asarray(points)
+        initial_vector = (points[1][0], points[1][1], 0)
+        initial_vector = np.asarray(initial_vector)
+        final_vector = VECTOR.rotate_vector(initial_vector, angle)
+        log.debug(final_vector)
+
+
+        # avoid rare case where a divide by 0 occurs if initial_vector = final_vector
+        if np.array_equal(final_vector, initial_vector):
+            # do not rotate if equal
+            rotated = points
+        else:
+            # otherwise, rotate
+            rotated = VECTOR.rotate_cloud(points, initial_vector, final_vector)
+
+        # rotate points
+        for i in rotated:
+            point = MISSION.location_meters_with_alt(i[1], i[0], i[2])
+            commands.add(
+                Command(
+                    0,
+                    0,
+                    0,
+                    mavutil.mavlink.MAV_FRAME_GLOBAL_RELATIVE_ALT,
+                    mavutil.mavlink.MAV_CMD_NAV_WAYPOINT,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    point.lat,
+                    point.lon,
+                    point.alt,
+                )
             )
 
         # add dummy waypoint at final point (lets us know when have reached destination)
-        else:
             final_wp = Command(
                 0,
                 0,
@@ -236,12 +246,13 @@ class Primary(Search):
                 point.lon,
                 0,
             )
+
         _commands.add(final_wp)
         commands.append(_commands)
         log.info(" Upload new commands to vehicle")
         _commands.upload()
 
-    def save_to_file(self, text_file, width, length, height):
+    def save_to_file(self, width, length, height):
         print("adding takeoff to altitude ", ALTITUDE)
         AVIDRONE.commands.add(
             Command(
@@ -264,13 +275,12 @@ class Primary(Search):
         print("adding mission")
         angle = 360 - np.degrees(AVIDRONE.yaw)
 
-        PRIMARY.rectangular(AVIDRONE.location, width, length, angle, angle, height)
+        PRIMARY.save_to_file(width, length, height)
 
         print("returning to launch")
         self.return_to_launch()
-        if SEARCH.SAVE:
-            mission_file = SEARCH.file_name + SEARCH.ID + SEARCH.file_type
-            print(f"Saving to file: {mission_file}")
+        mission_file = SEARCH.file_name + SEARCH.ID + SEARCH.file_type
+        print(f"Saving to file: {mission_file}")
         AVIDRONE.commands.clear()
         print("Mission saved")
 

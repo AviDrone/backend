@@ -131,7 +131,6 @@ def rectangular_primary_search_with_alt(
         # add points to array
         initArray.append([h_dist, v_dist, myAlt])
 
-    # setup rotation
     initArray = np.asarray(initArray)
     vector1 = (initArray[1][0], initArray[1][1], 0)
     vector1 = np.asarray(vector1)

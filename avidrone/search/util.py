@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+
 """
     SEARCH UTIL
 """
@@ -26,9 +27,9 @@ from pymavlink import mavutil
 
 # logging
 log = logging.getLogger(__name__)
-log.setLevel(logging.INFO)
+log.setLevel(logging.DEBUG)
 msg = logging.Formatter("%(asctime)s [%(levelname)s] %(message)s")
-file_handler = logging.FileHandler(os.path.join("log", "util.log"))
+file_handler = logging.FileHandler(os.path.join("log", "util.log"), delay=True)
 file_handler.setFormatter(msg)
 log.addHandler(file_handler)
 
@@ -280,7 +281,12 @@ class Vector:
         self.vector_1 = np.asarray(vector_1)
         self.vector_2 = np.asarray(vector_2)
 
-    def rotate_cloud(self, Points, V1, V2):
+    @staticmethod
+    def get_range(total_length, d_length):
+        return (total_length / d_length) * 2
+
+    @staticmethod
+    def rotate_cloud(Points, V1, V2):
         # V1 is the current vector which the coordinate system is aligned to
         # V2 is the vector we want the system aligned to
         # Points is an (n,3) array of n points (x,y,z)
@@ -329,30 +335,28 @@ class Vector:
                 pts_rotated[i] = p_rotated
         return pts_rotated
 
-    def rotate_vector(self, vector, angle):
-        # vector is the vector being rotated
-        # angle is used to rotate vector and is given in degrees
+    @staticmethod
+    def rotate_vector(vector, angle):
+        """
+        vector is the vector being rotated
+        angle is used to rotate vector and is given in degrees
+        
+        # For more rotation matrix information, 
+        # see https://en.wikipedia.org/wiki/Rotation_matrix
+        """
 
         # Convert angle to radians
-        Angle_Rad = np.radians(angle)
-
-        # rotation matrix
-        # See https://en.wikipedia.org/wiki/Rotation_matrix for more information
+        deg2rad = np.radians(angle)
         r = np.array(
             (
-                (np.cos(Angle_Rad), -np.sin(Angle_Rad)),
-                (np.sin(Angle_Rad), np.cos(Angle_Rad)),
+                (np.cos(deg2rad), -np.sin(deg2rad)),
+                (np.sin(deg2rad), np.cos(deg2rad)),
             )
         )
+        vector_xy = np.asarray(vector[0], vector[1])
+        rotated = r.dot(vector_xy)  # vector after rotation
+        new_vector = (rotated[0], rotated[1], vector[2])
 
-        # we only care about x and y, not z
-        a_vector = (vector[0], vector[1])
-        a_vector = np.asarray(a_vector)
+        return new_vector  # return 3D vector
 
-        # vector after rotation
-        rotated = r.dot(a_vector)
-
-        # return 3D vector
-        NewVector = (rotated[0], rotated[1], vector[2])
-
-        return NewVector
+VECTOR = Vector()
