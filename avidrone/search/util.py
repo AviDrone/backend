@@ -15,7 +15,13 @@ import time
 
 import numpy as np
 from dronekit import Command, LocationGlobal, VehicleMode
-from params import WINDOW_SIZE, WITH_TRANSCEIVER, MAGNITUDE, DEGREE_ERROR, DISTANCE_ERROR
+from params import (
+    DEGREE_ERROR,
+    DISTANCE_ERROR,
+    MAGNITUDE,
+    WINDOW_SIZE,
+    WITH_TRANSCEIVER,
+)
 from pymavlink import mavutil
 
 # logging
@@ -200,24 +206,18 @@ class Mission:
             time.sleep(2)
 
     def simple_goto_wait(self, go_to_checkpoint):
-        self.avidrone.simple_goto(go_to_checkpoint)
-        global_frame = self.avidrone.location.global_frame
-        distance = self.get_distance_meters(
-            AVIDRONE.get_global_pos(global_frame), go_to_checkpoint
-        )
+        AVIDRONE.simple_goto(go_to_checkpoint)
+        distance = self.get_distance_meters(AVIDRONE.location, go_to_checkpoint)
 
-        while distance >= DISTANCE_ERROR and self.avidrone.mode.name == "GUIDED":
-            print(distance)
-            distance = self.get_distance_meters(
-                AVIDRONE.get_global_pos(global_frame), go_to_checkpoint
-            )
+        while distance >= DISTANCE_ERROR and AVIDRONE.mode == "GUIDED":
+            distance = self.get_distance_meters(AVIDRONE.location, go_to_checkpoint)
+            log.info(distance)
             time.sleep(1)
 
-        if self.avidrone.mode.name != "GUIDED":
-            self.avidrone.simple_goto(self.avidrone.location.global_frame)
-            print("Halting simple_go_to")
-
-        print("Checkpoint reached")
+        if AVIDRONE.mode != "GUIDED":
+            AVIDRONE.mode.simple_goto(AVIDRONE.location)
+            log.warning("Halting simple_go_to")
+        log.info("Checkpoint reached")
 
     def get_distance_meters(self, a, b):
         lat_a, lat_b = a.lat, b.lat
