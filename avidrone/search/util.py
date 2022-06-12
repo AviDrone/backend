@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+
 """
-    SEARCH UTIL
+    UTILITIES
 """
 from __future__ import print_function
-
 
 import logging
 import math
@@ -13,14 +13,9 @@ import time
 
 import numpy as np
 from dronekit import LocationGlobal, VehicleMode
-from params import (
-    DISTANCE_ERROR,
-    MAGNITUDE,
-    WINDOW_SIZE,
-)
+from params import DISTANCE_ERROR, MAGNITUDE, WINDOW_SIZE
 from pymavlink import mavutil
 from uav import AVIDRONE
-
 
 # logging
 log = logging.getLogger(__name__)

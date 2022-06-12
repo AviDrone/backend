@@ -9,7 +9,6 @@ import os
 import time
 
 from dronekit import VehicleMode
-
 from params import MISSION_TIMEOUT
 from search import SEARCH, SECONDARY
 from transceiver.transceiver import TRANSCEIVER

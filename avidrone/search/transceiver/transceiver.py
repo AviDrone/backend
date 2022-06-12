@@ -70,7 +70,11 @@ class Transceiver:
         self.distance = -1  # not detected
 
         self.signal_detected = False  # not detected
-        self.mock_location = [46.045030, -118.3911911, 343]  # TODO make settable
+                # Beacon position
+        self.beacon_x = None
+        self.beacon_y = None
+        self.beacon_z = None
+        self.position = [self.beacon_x, self.beacon_y, self.beacon_z] 
 
         # Simulation
         self._frequency = 457  # mHz
@@ -137,12 +141,11 @@ class Transceiver:
         y_1 = uav_pos[1]
         z_1 = uav_pos[2]
 
-        # Beacon position
-        x_2 = beacon_pos[0]
-        y_2 = beacon_pos[1]
-        z_2 = beacon_pos[2]
+        self.beacon_x = beacon_pos[0]
+        self.beacon_x = beacon_pos[0]
+        self.beacon_x = beacon_pos[0]
 
-        displacement = self.get_displacement(x_1, x_2, y_1, y_2, z_1, z_2)
+        displacement = self.get_displacement(x_1, self.beacon_x, y_1, self.beacon_y, z_1, self.beacon_z)
         disp_n = self.normalize(displacement)
         distance = self.get_distance(displacement)
         theta = self.get_theta(disp_n)

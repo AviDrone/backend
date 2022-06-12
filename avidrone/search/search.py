@@ -12,12 +12,12 @@ import numpy as np
 import shortuuid
 from dronekit import Command, VehicleMode
 from pymavlink import mavutil
-
 from params import ALTITUDE, IS_TEST, MISSION_TIMEOUT, DEGREES
+from transceiver.EM_field import EM_FIELD
 from transceiver.transceiver import TRANSCEIVER
 from uav import AVIDRONE
 from util import MISSION, VECTOR
-from transceiver.EM_field import EM_FIELD
+
 # Logging
 log = logging.getLogger(__name__)
 log.setLevel(logging.INFO)
