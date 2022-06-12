@@ -13,7 +13,6 @@ import os
 import dronekit_sitl
 from dronekit import connect
 
-# logging
 log = logging.getLogger(__name__)
 log.setLevel(logging.INFO)
 msg = logging.Formatter("%(asctime)s [%(levelname)s] %(message)s")
@@ -21,7 +20,6 @@ file_handler = logging.FileHandler(os.path.join("log", "uav.log"))
 file_handler.setFormatter(msg)
 log.addHandler(file_handler)
 
-# Connect to UAV
 parser = argparse.ArgumentParser(description="Connect to  a vehicle.")
 parser.add_argument("--connect", help="Connection string to vehicle.")
 args = parser.parse_args()
@@ -46,6 +44,7 @@ class UAV:
         self.location = self.quad.location.global_frame
         self.altitude = self.quad.location.global_relative_frame.alt
         self.yaw = self.quad.attitude.yaw
+        self.angle = 360 - self.yaw
 
         # Missions
         self.mode = self.quad.mode
