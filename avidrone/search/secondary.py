@@ -3,7 +3,6 @@
 
 from __future__ import print_function
 
-
 import datetime
 import logging
 import os
@@ -11,9 +10,9 @@ import time
 
 from dronekit import VehicleMode
 
-from search import SECONDARY, SEARCH
-from transceiver.transceiver import TRANSCEIVER
 from params import MISSION_TIMEOUT
+from search import SEARCH, SECONDARY
+from transceiver.transceiver import TRANSCEIVER
 from uav import AVIDRONE
 
 SEARCH.ENABLE_SECONDARY_SEARCH = True
@@ -38,5 +37,5 @@ log.debug(AVIDRONE.mode)
 log.info("-- set GUIDED mode")
 AVIDRONE.mode = VehicleMode("GUIDED")
 
-assert(SECONDARY.is_enabled)
+assert SECONDARY.is_enabled
 SECONDARY.search()

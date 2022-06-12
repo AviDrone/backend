@@ -5,16 +5,14 @@
 """
 from __future__ import print_function
 
-import argparse
-import asyncio
-import datetime
+
 import logging
 import math
 import os
 import time
 
 import numpy as np
-from dronekit import Command, LocationGlobal, VehicleMode
+from dronekit import LocationGlobal, VehicleMode
 from params import (
     DISTANCE_ERROR,
     MAGNITUDE,
@@ -353,5 +351,6 @@ class Vector:
     @staticmethod
     def get_range(total_length, d_length):
         return (total_length / d_length) * 2
+
 
 VECTOR = Vector()

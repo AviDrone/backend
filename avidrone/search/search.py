@@ -322,7 +322,7 @@ class Secondary(Search):
         self.timeout_counter = 0
         
 
-    def search(transceiver):
+    def search(self):
         if IS_TEST:
             beacon = TRANSCEIVER.mock_transceiver(TRANSCEIVER.mock_location, AVIDRONE.location)
 

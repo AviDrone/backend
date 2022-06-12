@@ -7,11 +7,12 @@
 
 import ctypes
 import datetime
-import math
 import logging
+import math
 import pathlib
-import time
 import random
+import time
+
 import numpy as np
 
 # logging
@@ -78,7 +79,7 @@ class Transceiver:
         self._coil_current = 750  # AAA Battery power source
         self._coil_angle_offset = 45  # degrees
         # seconds in battery at 100%
-        self._battery = (720000 if self.mode == "transmit" else 180000)
+        self._battery = 720000 if self.mode == "transmit" else 180000
 
     def read_transceiver(self):
         shared_ctypes_lib = (
@@ -162,7 +163,7 @@ class Transceiver:
     def get_distance(self, disp):
         if disp[2] == 0:
             distance = math.sqrt((disp[0] ** 2 + disp[1] ** 2))
-        else: 
+        else:
             distance = math.sqrt((disp[0] ** 2 + disp[1] ** 2 + disp[2] ** 2))
         log.debug(f"distance_xyz: {distance}")
         return distance
@@ -171,7 +172,7 @@ class Transceiver:
         fwd = [1, 0]  # UAV's forward vector.
         v_d = [disp[0], disp[1]]
         d_xy = self.get_distance(disp)
-        
+
         if d_xy != 0:
             theta = np.arccos(np.dot(v_d, fwd) / d_xy)
 
@@ -186,7 +187,7 @@ class Transceiver:
         theta_random = theta + random.uniform(-15, 15)
         log.debug(f"theta + random.uniform(-15, 15): {theta + random.uniform(-15, 15)}")
         return theta_random
-        
+
     def get_direction(self, theta):
         """
         led 0: Theta -90 to -30
@@ -225,6 +226,7 @@ class Transceiver:
 
         return direction
 
+
 TRANSCEIVER = Transceiver(0)  # Avidrone model
 
 
@@ -237,7 +239,6 @@ mock_beacon = TRANSCEIVER.mock_transceiver(uav_pos, beacon_pos)
 run = False
 while run:
     timeout_count += 1
-
 
     if timeout_count == TRANSCEIVER._battery:
         IS_TIMEOUT = True
