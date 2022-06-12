@@ -7,17 +7,12 @@
 
 import ctypes
 import datetime
+import math
 import logging
 import pathlib
 import time
-
-from transceiver.util import (
-    get_direction,
-    get_displacement,
-    get_distance_xy,
-    get_theta,
-    normalize,
-)
+import random
+import numpy as np
 
 # logging
 log = logging.getLogger(__name__)
@@ -74,7 +69,7 @@ class Transceiver:
         self.distance = -1  # not detected
 
         self.signal_detected = False  # not detected
-        self.position = [46.045030, -118.3911911, 343]  # Roger's Field
+        self.mock_location = [46.045030, -118.3911911, 343]  # TODO make settable
 
         # Simulation
         self._frequency = 457  # mHz
@@ -82,9 +77,8 @@ class Transceiver:
         self._coil_length = 120  # mm
         self._coil_current = 750  # AAA Battery power source
         self._coil_angle_offset = 45  # degrees
-        self._battery = (
-            720000 if self.mode == "transmit" else 180000  # seconds in battery at 100%
-        )
+        # seconds in battery at 100%
+        self._battery = (720000 if self.mode == "transmit" else 180000)
 
     def read_transceiver(self):
         shared_ctypes_lib = (
@@ -147,15 +141,91 @@ class Transceiver:
         y_2 = beacon_pos[1]
         z_2 = beacon_pos[2]
 
-        displacement = get_displacement(x_1, x_2, y_1, y_2, z_1, z_2)
-        disp_n = normalize(displacement)
-        distance = get_distance_xy(displacement)
-        theta = get_theta(disp_n)
-        direction = get_direction(theta)
+        displacement = self.get_displacement(x_1, x_2, y_1, y_2, z_1, z_2)
+        disp_n = self.normalize(displacement)
+        distance = self.get_distance(displacement)
+        theta = self.get_theta(disp_n)
+        direction = self.get_direction(theta)
         return direction, distance
 
+    def get_displacement(self, x_1, x_2, y_1, y_2, z_1=0, z_2=0):
+        displacement = [x_2 - x_1, y_2 - y_1, z_2 - z_1]
+        log.debug(f"displacement: {displacement}")
+        return displacement
 
-TRANSCEIVER = Transceiver(0)  # Singleton
+    def normalize(self, disp):
+        d_v = disp / np.linalg.norm(disp)
+        d_v_normal = d_v.tolist()
+        log.debug(f"d_v_normal: {d_v_normal}")
+        return d_v_normal
+
+    def get_distance(self, disp):
+        if disp[2] == 0:
+            distance = math.sqrt((disp[0] ** 2 + disp[1] ** 2))
+        else: 
+            distance = math.sqrt((disp[0] ** 2 + disp[1] ** 2 + disp[2] ** 2))
+        log.debug(f"distance_xyz: {distance}")
+        return distance
+
+    def get_theta(self, disp):
+        fwd = [1, 0]  # UAV's forward vector.
+        v_d = [disp[0], disp[1]]
+        d_xy = self.get_distance(disp)
+        
+        if d_xy != 0:
+            theta = np.arccos(np.dot(v_d, fwd) / d_xy)
+
+        else:
+            d_xy = 0.001  # to avoid division by 0
+            theta = np.arccos(np.dot(v_d, fwd) / d_xy)
+
+        # To account for measurement inconsistencies. We use a random value
+        # between -15 and 15. That makes it likely that the beacon gets the
+        # wrong direction roughly a third of the time.
+
+        theta_random = theta + random.uniform(-15, 15)
+        log.debug(f"theta + random.uniform(-15, 15): {theta + random.uniform(-15, 15)}")
+        return theta_random
+        
+    def get_direction(self, theta):
+        """
+        led 0: Theta -90 to -30
+        led 1: Theta -30 to -10
+        led 2: Theta -10 to +10
+        led 3: Theta +10 to +30
+        led 4: Theta +30 to +90
+
+        """
+
+        direction = -1  # direction not acquired
+
+        if theta < -30:
+            log.debug(direction)
+            direction = 0
+
+        elif -30 <= theta < -10:
+            log.debug(direction)
+            direction = 1
+
+        elif -10 <= theta < 10:
+            log.debug(direction)
+            direction = 1
+
+        elif 10 <= theta < 30:
+            log.debug(direction)
+            direction = 2
+
+        elif 30 <= theta < 90:
+            log.debug(direction)
+            direction = 3
+
+        elif theta >= 90:
+            log.debug(direction)
+            direction = 4
+
+        return direction
+
+TRANSCEIVER = Transceiver(0)  # Avidrone model
 
 
 uav_pos = [120, 10, 20]  # Example
@@ -168,14 +238,6 @@ run = False
 while run:
     timeout_count += 1
 
-    if IS_TEST:
-        TRANSCEIVER.direction = mock_beacon[0]
-        TRANSCEIVER.distance = mock_beacon[1]
-
-    else:
-        print("Too bad!!")  # TODO replace with real values
-        # transceiver.direction = int(transceiver.theta[timeout_count])
-        # transceiver.distance = mock_transceiver[1]
 
     if timeout_count == TRANSCEIVER._battery:
         IS_TIMEOUT = True

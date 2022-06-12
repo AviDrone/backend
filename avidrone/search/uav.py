@@ -43,6 +43,8 @@ class UAV:
         # Navigation
         self.location = self.quad.location.global_frame
         self.altitude = self.quad.location.global_relative_frame.alt
+
+        
         self.yaw = self.quad.attitude.yaw
         self.angle = 360 - self.yaw
 

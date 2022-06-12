@@ -16,13 +16,13 @@ import time
 import numpy as np
 from dronekit import Command, LocationGlobal, VehicleMode
 from params import (
-    DEGREE_ERROR,
     DISTANCE_ERROR,
     MAGNITUDE,
     WINDOW_SIZE,
-    WITH_TRANSCEIVER,
 )
 from pymavlink import mavutil
+from uav import AVIDRONE
+
 
 # logging
 log = logging.getLogger(__name__)
@@ -31,14 +31,6 @@ msg = logging.Formatter("%(asctime)s [%(levelname)s] %(message)s")
 file_handler = logging.FileHandler(os.path.join("log", "util.log"))
 file_handler.setFormatter(msg)
 log.addHandler(file_handler)
-
-from uav import AVIDRONE
-
-if WITH_TRANSCEIVER:
-    from transceiver.transceiver import TRANSCEIVER
-
-    log.debug(f"transceiver model: {TRANSCEIVER.curr_model}")
-    log.debug(f"search strip width: {TRANSCEIVER.curr_search_strip_width}")
 
 
 class GpsData:
