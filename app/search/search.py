@@ -11,9 +11,8 @@ import time
 import numpy as np
 import shortuuid
 from dronekit import Command, VehicleMode
-from pymavlink import mavutil
 from parameters import ALTITUDE, IS_TEST, MISSION_TIMEOUT, DEGREES
-from transceiver.EM_field import EM_FIELD
+from pymavlink import mavutil
 from transceiver.transceiver import TRANSCEIVER
 from uav import AVIDRONE
 from util import MISSION, VECTOR

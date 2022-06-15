@@ -40,6 +40,7 @@ class UAV:
         self.connection_string = connection_str
         self.quad = connect(self.connection_string, wait_ready=True)
         self.mode = self.quad.mode.name
+
         # Navigation
         self.location = self.quad.location.global_frame
         self.altitude = self.quad.location.global_relative_frame.alt
@@ -57,9 +58,9 @@ class UAV:
         self.battery = self.quad.battery
 
     def print_parameters(self):
-        log.info("\nPrint all parameters: ")
+        print("\nPrint all parameters: ")
         for key, value in AVIDRONE.parameters.items():
-            log.info(" Key:%s Value:%s" % (key, value))
+            print(" Key:%s Value:%s" % (key, value))
 
     def battery_information(self):
         log.info("Level:", AVIDRONE.battery.level)

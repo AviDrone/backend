@@ -68,13 +68,13 @@ class Transceiver:
         # Transceiver data
         self.direction = -1  # not detected
         self.distance = -1  # not detected
-
         self.signal_detected = False  # not detected
-                # Beacon position
+
+        # Beacon position
         self.beacon_x = None
         self.beacon_y = None
         self.beacon_z = None
-        self.position = [self.beacon_x, self.beacon_y, self.beacon_z] 
+        self.position = [self.beacon_x, self.beacon_y, self.beacon_z]
 
         # Simulation
         self._frequency = 457  # mHz
@@ -145,7 +145,9 @@ class Transceiver:
         self.beacon_x = beacon_pos[0]
         self.beacon_x = beacon_pos[0]
 
-        displacement = self.get_displacement(x_1, self.beacon_x, y_1, self.beacon_y, z_1, self.beacon_z)
+        displacement = self.get_displacement(
+            x_1, self.beacon_x, y_1, self.beacon_y, z_1, self.beacon_z
+            )
         disp_n = self.normalize(displacement)
         distance = self.get_distance(displacement)
         theta = self.get_theta(disp_n)

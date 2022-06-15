@@ -8,7 +8,6 @@ import os
 import time
 
 from dronekit import VehicleMode
-
 from search import PRIMARY, SEARCH
 from transceiver.transceiver import TRANSCEIVER
 from uav import AVIDRONE
