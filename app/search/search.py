@@ -44,10 +44,7 @@ class Search:
         self.file_type = ".txt"
         self.dir_path = "missions/"
 
-    # TODO move this to util.vector
-    #    TODO add utm/lat-long conversion functions here
-    def get_range(self, totalLength, dLength):
-        return (totalLength / dLength) * 2
+    #  TODO add utm/lat-long conversion functions here
 
     # Any condition we want to break the primary search can be done in this command.
     # This will be called repeatedly and return true when the break condition is true.
@@ -134,7 +131,7 @@ class Primary(Search):
                 time.sleep(1)
                 self.stopping_point = self.next_waypoint
 
-            if self.next_waypoint == self.get_range(length, search_strip_width):
+            if self.next_waypoint == VECTOR.get_range(length, search_strip_width):
                 PRIMARY.reached_end = True
                 self.stopping_point = self.next_waypoint
                 break
