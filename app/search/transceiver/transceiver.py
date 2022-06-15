@@ -147,7 +147,7 @@ class Transceiver:
 
         displacement = self.get_displacement(
             x_1, self.beacon_x, y_1, self.beacon_y, z_1, self.beacon_z
-            )
+        )
         disp_n = self.normalize(displacement)
         distance = self.get_distance(displacement)
         theta = self.get_theta(disp_n)
