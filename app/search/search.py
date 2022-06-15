@@ -139,21 +139,12 @@ class Primary(Search):
         return self.reached_end, self.stopping_point
 
     def rectangular(self, width, length, height=0):
-        """
-        Primary search over a sloped plane in the direction of a specified angle,
-            based on dronekit's basic square mission:
-            https://dronekit-python.readthedocs.io/en/latest/examples/mission_basic.html#example-mission-basic
-        a_location: LocationGlobal data type, expected to be drone's current location
-        width: width in meters (horizontal stretch)
-        dLength: search strip size in meters (small vertical stretches)
-        totalLength: length in meters (vertical stretch)
-        totalAlt: height of slop in meters (height of 'mountain')
-        angle: in degrees
-        """
+        # Initialize values
+        v_dist = 0
+        h_dist = 0
+        step = 0
+        commands = []
 
-        print("Running rectangular_primary_search_with_alt")
-
-        # calculated values
         max_range = PRIMARY.strip_width
         v_num = (length / PRIMARY.strip_width) - 1
         d_alt = height / v_num
@@ -162,13 +153,14 @@ class Primary(Search):
 
         _commands = AVIDRONE.commands
 
-        print(" Clear any existing commands")
+        log.info(" Clear any existing commands")
         _commands.clear()
 
-        print(" Define/add new commands.")
-        # Add new commands. The meaning/order of the parameters is documented in the Command class.
+        log.info(" Define/add new commands.")
 
-        # Add MAV_CMD_NAV_TAKEOFF command. This is ignored if the vehicle is already in the air.
+        # Add MAV_CMD_NAV_TAKEOFF command. 
+        # This is ignored if the vehicle is already in the air.
+
         _commands.add(
             Command(
                 0,
@@ -187,12 +179,6 @@ class Primary(Search):
                 10,
             )
         )
-
-        # Initialize values
-        v_dist = 0
-        h_dist = 0
-        step = 0
-        commands = []
 
         # Generate points above origin
         for i in range(1, int(max_range)):

@@ -63,7 +63,7 @@ def get_location_metres(original_location, dNorth, dEast):
     return LocationGlobal(newlat, newlon, original_location.alt)
 
 
-def get_distance_metres(aLocation1, aLocation2):
+def get_distance_metres(a_location1, a_location2):
     """
     Returns the ground distance in metres between two LocationGlobal objects.
 
@@ -71,8 +71,8 @@ def get_distance_metres(aLocation1, aLocation2):
     earth's poles. It comes from the ArduPilot test code:
     https://github.com/diydrones/ardupilot/blob/master/Tools/autotest/common.py
     """
-    dlat = aLocation2.lat - aLocation1.lat
-    dlong = aLocation2.lon - aLocation1.lon
+    dlat = a_location2.lat - a_location1.lat
+    dlong = a_location2.lon - a_location1.lon
     return math.sqrt((dlat * dlat) + (dlong * dlong)) * 1.113195e5
 
 
@@ -104,11 +104,11 @@ def download_mission():
     cmds.wait_ready()  # wait until download is complete.
 
 
-def adds_square_mission(aLocation, aSize):
+def adds_square_mission(a_location, a_size):
     """
     Adds a takeoff command and four waypoint commands to the current mission.
-    The waypoints are positioned to form a square of side length 2*aSize around
-     the specified LocationGlobal (aLocation).
+    The waypoints are positioned to form a square of side length 2*a_size around
+     the specified LocationGlobal (a_location).
 
     The function assumes vehicle.commands matches the vehicle mission state
     (you must have called download at least once in the session and after clearing the mission)
@@ -143,10 +143,10 @@ def adds_square_mission(aLocation, aSize):
     )
 
     # Define the four MAV_CMD_NAV_WAYPOINT locations and add the commands
-    point1 = get_location_metres(aLocation, aSize, -aSize)
-    point2 = get_location_metres(aLocation, aSize, aSize)
-    point3 = get_location_metres(aLocation, -aSize, aSize)
-    point4 = get_location_metres(aLocation, -aSize, -aSize)
+    point1 = get_location_metres(a_location, a_size, -a_size)
+    point2 = get_location_metres(a_location, a_size, a_size)
+    point3 = get_location_metres(a_location, -a_size, a_size)
+    point4 = get_location_metres(a_location, -a_size, -a_size)
     cmds.add(
         Command(
             0,
@@ -243,9 +243,9 @@ def adds_square_mission(aLocation, aSize):
     cmds.upload()
 
 
-def arm_and_takeoff(aTargetAltitude):
+def arm_and_takeoff(a_target_altitude):
     """
-    Arms vehicle and fly to aTargetAltitude.
+    Arms vehicle and fly to a_target_altitude.
     """
 
     print("Basic pre-arm checks")
@@ -264,14 +264,14 @@ def arm_and_takeoff(aTargetAltitude):
         time.sleep(1)
 
     print("Taking off!")
-    vehicle.simple_takeoff(aTargetAltitude)  # Take off to target altitude
+    vehicle.simple_takeoff(a_target_altitude)  # Take off to target altitude
 
     # Wait until the vehicle reaches a safe height before processing the goto (otherwise the command
     #  after Vehicle.simple_takeoff will execute immediately).
     while True:
         print(" Altitude: ", vehicle.location.global_relative_frame.alt)
         if (
-            vehicle.location.global_relative_frame.alt >= aTargetAltitude * 0.95
+            vehicle.location.global_relative_frame.alt >= a_target_altitude * 0.95
         ):  # Trigger just below target alt.
             print("Reached target altitude")
             break
