@@ -57,15 +57,15 @@ class UAV:
         self.battery = self.quad.battery
 
     def print_parameters(self):
-        print("\nPrint all parameters (iterate `aviDrone.parameters`):")
+        log.info("\nPrint all parameters: ")
         for key, value in AVIDRONE.parameters.items():
-            print(" Key:%s Value:%s" % (key, value))
+            log.info(" Key:%s Value:%s" % (key, value))
 
     def battery_information(self):
-        print("Level:", AVIDRONE.battery.level)
-        print("Voltage:", AVIDRONE.battery.voltage)
-        print("Current:", AVIDRONE.battery.current)
-        print("Battery:", AVIDRONE.battery)
+        log.info("Level:", AVIDRONE.battery.level)
+        log.info("Voltage:", AVIDRONE.battery.voltage)
+        log.info("Current:", AVIDRONE.battery.current)
+        log.info("Battery:", AVIDRONE.battery)
 
 
 AVIDRONE = UAV()
