@@ -157,7 +157,7 @@ class Primary(Search):
 
         log.info(" Define/add new commands.")
 
-        # Add MAV_CMD_NAV_TAKEOFF command. 
+        # Add MAV_CMD_NAV_TAKEOFF command.
         # This is ignored if the vehicle is already in the air.
 
         _commands.add(
@@ -285,7 +285,7 @@ class Primary(Search):
         self.return_to_launch()
         if SEARCH.SAVE:
             mission_file = (
-                    SEARCH.dir_path + SEARCH.file_name + SEARCH.ID + SEARCH.file_type
+                SEARCH.dir_path + SEARCH.file_name + SEARCH.ID + SEARCH.file_type
             )
             print(f"Saving to file: {mission_file}")
             MISSION.save_mission(mission_file)
@@ -304,7 +304,10 @@ class Secondary(Search):
 
     def search(self):
         if IS_TEST:
-            beacon = TRANSCEIVER.mock_transceiver(TRANSCEIVER.mock_location, AVIDRONE.location)
+            beacon = TRANSCEIVER.mock_transceiver(
+                TRANSCEIVER.mock_location,
+                AVIDRONE.location,
+            )
 
         else:
             beacon = TRANSCEIVER.read_transceiver()
