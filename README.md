@@ -52,7 +52,7 @@ Go through a few examples so you can learn to
 - Run a transceiver simulation
 - Run a search mission simulation
 
- You can find the examples in [EXAMPLE.md](avidrone/example/EXAMPLE.md).
+ You can find the examples in [EXAMPLE.md](app/example/EXAMPLE.md).
 
 ### Search
 
@@ -82,7 +82,7 @@ avidrone-search --help
 
 ### Simulation
 
-To run a simulated search mission, follow the guide in [SIMULATION.md](avidrone/example/simulation/SIMULATION.md).
+To run a simulated search mission, follow the guide in [SIMULATION.md](app/example/SIMULATION.md).
 
 ## How to contribute
 

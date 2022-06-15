@@ -197,7 +197,7 @@ docs/time-log/w22/Week9.md
 docs/time-log/w22/Week10.md
 docs/time-log/s22/Week2.md
 docs/time-log/s22/Week3.md
-avidrone/gui/build-qgroundcontrol-Desktop_Qt_5_15_2_clang_64bit-Debug
+app/gui/build-qgroundcontrol-Desktop_Qt_5_15_2_clang_64bit-Debug
 docs/time-log/s22/Week4.md
 docs/time-log/s22/Week5.md
 docs/time-log/s22/Week6.md
@@ -207,4 +207,5 @@ docs/time-log/s22/Week7.md
 docs/time-log/s22/Week8.md
 docs/time-log/s22/Week9.md
 docs/time-log/s22/Week10.md
-avidrone/search/r_mission3.txt
+app/search/r_mission3.txt
+app/scripts/git_lint_push.sh

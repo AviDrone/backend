@@ -68,8 +68,10 @@ class EM_field:
         self.B
         B_x = self.B[:, :, 0]
         B_y = self.B[:, :, 1]
-        # B_z = self.B[:, :, 2]
         theta_grid_xy = np.arctan2(B_y, B_x)
         theta = int(math.degrees(theta_grid_xy[uav_pos[0]][uav_pos[1]]))
 
         return theta
+
+
+EM_FIELD = EM_field()

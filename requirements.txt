@@ -14,3 +14,6 @@ datetime
 dronekit-sitl
 mavproxy
 utm
+shortuuid
+geocoder
+geopy
