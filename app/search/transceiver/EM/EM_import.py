@@ -1,5 +1,6 @@
+
 import utm
-from EM import EM_field
+from Transciever.EM import EM_field
 from transceiver.util import get_direction
 
 home = [46.0452822, -118.3930353, 584]  # test: where the beacon is
@@ -17,11 +18,7 @@ for var in latlon2utm:
 
 
 def add_rel_pos(utm_pos, rel_pos):
-    new_ = []
-    new_.append(utm_pos[0] + rel_pos[0])
-    new_.append(utm_pos[1] + rel_pos[1])
-    new_.append(utm_pos[2])
-    new_.append(utm_pos[3])
+    new_ = [utm_pos[0] + rel_pos[0], utm_pos[1] + rel_pos[1], utm_pos[2], utm_pos[3]]
     return new_
 
 

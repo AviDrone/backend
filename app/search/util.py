@@ -34,9 +34,9 @@ class GpsData:
 
     def add_point(self, new_gps_point, new_distance):
         self.gps_points.insert(0, new_gps_point)
-        del self.gps_points[self.window_size :]
+        del self.gps_points[self.window_size:]
         self.distance.insert(0, new_distance)
-        del self.distance[self.window_size :]
+        del self.distance[self.window_size:]
 
     def get_minimum_index(self):
         min_index = 0
@@ -60,33 +60,6 @@ class Mission:
         self.original_yaw = AVIDRONE.yaw
         self.angle = 360 - AVIDRONE.yaw
         self.relative = False
-
-    def arm_and_takeoff(self, target_altitude):
-        # Pre-arm check: Prevent user try to arm until autopilot is ready
-        log.info(" Waiting for vehicle to initialize...")
-        while not AVIDRONE.is_armable:
-            log.debug("Arming motors")  # Copter should arm in GUIDED mode
-            time.sleep(1)
-            AVIDRONE.mode = VehicleMode("GUIDED")
-            AVIDRONE.armed = True
-
-            while not AVIDRONE.armed:
-                log.info(" Waiting for arming...")
-                time.sleep(1)
-
-        log.warning("Taking off!")
-        AVIDRONE.simple_takeoff(target_altitude)  # Take off to target altitude
-
-        # Wait until the vehicle reaches a safe height before continuing
-        # otherwise the command after Vehicle.simple_takeoff will execute immediately.
-        while True:
-            print(" Altitude: ", AVIDRONE.altitude)
-            time.sleep(1)
-            if (
-                AVIDRONE.altitude >= target_altitude * 0.95
-            ):  # Trigger just below target alt.
-                print("Reached target altitude")
-                break
 
     def download_mission(self):
         """
@@ -126,100 +99,6 @@ class Mission:
         with open(text_file, "w") as file_:
             file_.write(output)
 
-    def get_location_meters(self, original_location, distance, angle):
-        lat = math.asin(
-            math.sin(original_location.lat) * math.cos(distance)
-            + math.cos(original_location.lat) * math.sin(distance) * math.cos(angle)
-        )
-
-        d_lon = math.atan2(
-            math.sin(angle) * math.sin(distance) * math.cos(original_location.lat),
-            math.cos(distance) - math.sin(original_location.lat) * math.sin(lat),
-        )
-
-        lon = (original_location.lon - d_lon + math.pi) % (2 * math.pi) - math.pi
-
-        return LocationGlobal(lat, lon, original_location.alt)
-
-    def get_location_meters_with_alt(self, original_location, dNorth, dEast, newAlt):
-        """
-        Returns a LocationGlobal object containing the latitude/longitude `dNorth` and `dEast` metres from the
-        specified `original_location`. The returned Location has the same `alt` value
-        as `original_location`.
-        The function is useful when you want to move the vehicle around specifying locations relative to
-        the current vehicle position.
-        The algorithm is relatively accurate over small distances (10m within 1km) except close to the poles.
-        For more information see:
-        http://gis.stackexchange.com/questions/2951/algorithm-for-offsetting-a-latitude-longitude-by-some-amount-of-meters
-        """
-        earth_radius = 6378137.0  # Radius of "spherical" earth
-        # Coordinate offsets in radians
-        dLat = dNorth / earth_radius
-        dLon = dEast / (earth_radius * math.cos(math.pi * original_location.lat / 180))
-
-        # New position in decimal degrees
-        new_lat = original_location.lat + (dLat * 180 / math.pi)
-        new_lon = original_location.lon + (dLon * 180 / math.pi)
-
-        return LocationGlobal(new_lat, new_lon, newAlt)
-
-    def go_to(self, distance, angle):
-        """
-        Reference:
-        https://dronekit-python.readthedocs.io/en/latest/examples/guided-set-speed-yaw-demo.html
-        """
-
-        curr_location = AVIDRONE.location.global_frame
-        targetLocation = self.get_location_meters(curr_location, distance, angle)
-        AVIDRONE.simple_goto(targetLocation)
-
-        counter = 0
-        while AVIDRONE.mode == "GUIDED":
-            remaining_distance = self.get_distance_meters(
-                AVIDRONE.location.global_frame, targetLocation
-            )
-            print("Distance to target: ", remaining_distance)
-            counter += 1
-
-            if remaining_distance <= 0.35:
-                print("Reached target")
-                break
-            elif counter >= 10:
-                print("Stuck, skipping target")
-                break
-            time.sleep(2)
-
-    def simple_goto_wait(self, go_to_checkpoint):
-        AVIDRONE.simple_goto(go_to_checkpoint)
-        distance = self.get_distance_meters(AVIDRONE.location, go_to_checkpoint)
-
-        while distance >= DISTANCE_ERROR and AVIDRONE.mode == "GUIDED":
-            distance = self.get_distance_meters(AVIDRONE.location, go_to_checkpoint)
-            log.info(distance)
-            time.sleep(1)
-
-        if AVIDRONE.mode != "GUIDED":
-            AVIDRONE.mode.simple_goto(AVIDRONE.location)
-            log.warning("Halting simple_go_to")
-        log.info("Checkpoint reached")
-
-    def get_distance_meters(self, a, b):
-        lat_a, lat_b = a.lat, b.lat
-        lon_a, lon_b = a.lon, b.lon
-        distance = (
-            2
-            * math.asin(
-                math.sqrt(
-                    (math.sin((lat_a - lat_b) / 2)) ** 2
-                    + math.cos(lat_a)
-                    * math.cos(lat_b)
-                    * (math.sin((lon_a - lon_b) / 2)) ** 2
-                )
-            )
-            * 1.113195e5
-        )
-        return distance  # in meters
-
     def condition_yaw(self, heading, relative):
         if relative:
             is_relative = True  # yaw relative to direction of travel
@@ -248,9 +127,7 @@ class Mission:
         AVIDRONE.send_mavlink(msg)  # send command to vehicle
 
     def forward_calculation(self):
-        flight_direction = []
-        flight_direction.append(MAGNITUDE * math.cos(AVIDRONE.yaw))
-        flight_direction.append(MAGNITUDE * math.sin(AVIDRONE.yaw))
+        flight_direction = [MAGNITUDE * math.cos(AVIDRONE.yaw), MAGNITUDE * math.sin(AVIDRONE.yaw)]
         return flight_direction
 
 
@@ -281,8 +158,8 @@ class Vector:
         # Calculate the vector cross product
         V1V2Cross = np.cross(V1, V2)
         V1V2CrossNorm = (
-            V1V2Cross[0] ** 2 + V1V2Cross[1] ** 2 + V1V2Cross[2] ** 2
-        ) ** 0.5
+                                V1V2Cross[0] ** 2 + V1V2Cross[1] ** 2 + V1V2Cross[2] ** 2
+                        ) ** 0.5
         V1V2CrossNormalized = V1V2Cross / V1V2CrossNorm
 
         # Dot product
@@ -299,17 +176,17 @@ class Vector:
         if np.size(Points) == 3:
             p = Points
             p_rotated = (
-                np.cos(Theta) * p
-                + np.sin(Theta) * (np.cross(e, p))
-                + (1 - np.cos(Theta)) * np.dot(e, p) * e
+                    np.cos(Theta) * p
+                    + np.sin(Theta) * (np.cross(e, p))
+                    + (1 - np.cos(Theta)) * np.dot(e, p) * e
             )
             pts_rotated = p_rotated
         else:
             for i, p in enumerate(Points):
                 p_rotated = (
-                    np.cos(Theta) * p
-                    + np.sin(Theta) * (np.cross(e, p))
-                    + (1 - np.cos(Theta)) * np.dot(e, p) * e
+                        np.cos(Theta) * p
+                        + np.sin(Theta) * (np.cross(e, p))
+                        + (1 - np.cos(Theta)) * np.dot(e, p) * e
                 )
                 pts_rotated[i] = p_rotated
         return pts_rotated
@@ -349,3 +226,144 @@ class Vector:
 
 
 VECTOR = Vector()
+
+
+class Navigation:
+    def __init__(self):
+        self.mavutil = mavutil
+        self.global_frame = AVIDRONE.altitude
+        self.original_yaw = AVIDRONE.yaw
+        self.angle = 360 - AVIDRONE.yaw
+        self.relative = False
+
+    def arm_and_takeoff(self, target_altitude):
+        # Pre-arm check: Prevent user try to arm until autopilot is ready
+        log.info(" Waiting for vehicle to initialize...")
+        while not AVIDRONE.is_armable:
+            log.debug("Arming motors")  # Copter should arm in GUIDED mode
+            time.sleep(1)
+            AVIDRONE.mode = VehicleMode("GUIDED")
+            AVIDRONE.armed = True
+
+            while not AVIDRONE.armed:
+                log.info(" Waiting for arming...")
+                time.sleep(1)
+
+        log.warning("Taking off!")
+        AVIDRONE.simple_takeoff(target_altitude)  # Take off to target altitude
+
+        # Wait until the vehicle reaches a safe height before continuing
+        # otherwise the command after Vehicle.simple_takeoff will execute immediately.
+        while True:
+            print(" Altitude: ", AVIDRONE.altitude)
+            time.sleep(1)
+            if (
+                    AVIDRONE.altitude >= target_altitude * 0.95
+            ):  # Trigger just below target alt.
+                print("Reached target altitude")
+                break
+
+    def go_to(self, distance, angle):
+        """
+        Reference:
+        https://dronekit-python.readthedocs.io/en/latest/examples/guided-set-speed-yaw-demo.html
+        """
+
+        curr_location = AVIDRONE.location.global_frame
+        targetLocation = self.get_location_meters(curr_location, distance, angle)
+        AVIDRONE.simple_goto(targetLocation)
+
+        counter = 0
+        while AVIDRONE.mode == "GUIDED":
+            remaining_distance = self.get_distance_meters(
+                AVIDRONE.location.global_frame, targetLocation
+            )
+            print("Distance to target: ", remaining_distance)
+            counter += 1
+
+            if remaining_distance <= 0.35:
+                print("Reached target")
+                break
+            elif counter >= 10:
+                print("Stuck, skipping target")
+                break
+            time.sleep(2)
+
+    def get_location_meters(self, original_location, distance, angle):
+        lat = math.asin(
+            math.sin(original_location.lat) * math.cos(distance)
+            + math.cos(original_location.lat) * math.sin(distance) * math.cos(angle)
+        )
+
+        d_lon = math.atan2(
+            math.sin(angle) * math.sin(distance) * math.cos(original_location.lat),
+            math.cos(distance) - math.sin(original_location.lat) * math.sin(lat),
+        )
+
+        lon = (original_location.lon - d_lon + math.pi) % (2 * math.pi) - math.pi
+
+        return LocationGlobal(lat, lon, original_location.alt)
+
+    def get_location_meters_with_alt(self, original_location, dNorth, dEast, newAlt):
+        """
+        Returns a LocationGlobal object containing the latitude/longitude `dNorth` and `dEast` metres from the
+        specified `original_location`. The returned Location has the same `alt` value
+        as `original_location`.
+        The function is useful when you want to move the vehicle around specifying locations relative to
+        the current vehicle position.
+        The algorithm is relatively accurate over small distances (10m within 1km) except close to the poles.
+        For more information see:
+        http://gis.stackexchange.com/questions/2951/algorithm-for-offsetting-a-latitude-longitude-by-some-amount-of-meters
+        """
+        earth_radius = 6378137.0  # Radius of "spherical" earth
+        # Coordinate offsets in radians
+        dLat = dNorth / earth_radius
+        dLon = dEast / (earth_radius * math.cos(math.pi * original_location.lat / 180))
+
+        # New position in decimal degrees
+        new_lat = original_location.lat + (dLat * 180 / math.pi)
+        new_lon = original_location.lon + (dLon * 180 / math.pi)
+
+        return LocationGlobal(new_lat, new_lon, newAlt)
+
+    def simple_goto_wait(self, go_to_checkpoint):
+        AVIDRONE.simple_goto(go_to_checkpoint)
+        distance = self.get_distance_meters(AVIDRONE.location, go_to_checkpoint)
+
+        while distance >= DISTANCE_ERROR and AVIDRONE.mode == "GUIDED":
+            distance = self.get_distance_meters(AVIDRONE.location, go_to_checkpoint)
+            log.info(distance)
+            time.sleep(1)
+
+        if AVIDRONE.mode != "GUIDED":
+            AVIDRONE.mode.simple_goto(AVIDRONE.location)
+            log.warning("Halting simple_go_to")
+        log.info("Checkpoint reached")
+
+    def get_distance_meters(self, a, b):
+        lat_a, lat_b = a.lat, b.lat
+        lon_a, lon_b = a.lon, b.lon
+        distance = (
+                2
+                * math.asin(
+            math.sqrt(
+                (math.sin((lat_a - lat_b) / 2)) ** 2
+                + math.cos(lat_a)
+                * math.cos(lat_b)
+                * (math.sin((lon_a - lon_b) / 2)) ** 2
+            )
+        )
+                * 1.113195e5
+        )
+        return distance  # in meters
+
+    def utm2latlon(self, utm):
+        latlng = utm.to_latlon(utm)
+        pass
+
+    def latlon2utm(self, latlon):
+        utm = utm.from_latlon(utm)
+        pass
+
+
+NAVIGATION = Navigation()

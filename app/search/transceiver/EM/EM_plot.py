@@ -1,6 +1,9 @@
-from app.search.transceiver.EM import EM_field as beacon
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
 import matplotlib.pyplot as plt
 import numpy as np
+from app.search.transceiver.EM import EM_field as beacon
 
 beacon_EM_field = beacon.EM_field()
 
