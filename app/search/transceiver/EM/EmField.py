@@ -17,7 +17,7 @@ import numpy as np
 """
 
 
-class EM_field:
+class EmField:
     def __init__(self):
         self.home = [46.0452822, -118.3930353, 584]  # test
         self.current = 750  # Amps
@@ -65,7 +65,6 @@ class EM_field:
         return abs_pos
 
     def get_theta_at_pos(self, uav_pos):
-        self.B
         B_x = self.B[:, :, 0]
         B_y = self.B[:, :, 1]
         theta_grid_xy = np.arctan2(B_y, B_x)
@@ -74,4 +73,4 @@ class EM_field:
         return theta
 
 
-EM_FIELD = EM_field()
+EM_FIELD = EmField()

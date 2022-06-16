@@ -10,9 +10,10 @@ import logging
 import math
 import os
 import time
-import utm
 
 import numpy as np
+import utm
+
 from dronekit import LocationGlobal, VehicleMode
 from parameters import DISTANCE_ERROR, MAGNITUDE, WINDOW_SIZE
 from pymavlink import mavutil
