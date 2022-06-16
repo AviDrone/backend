@@ -1,5 +1,4 @@
-import EM_field as beacon
-import magpylib as magpy
+from app.search.transceiver.EM import EM_field as beacon
 import matplotlib.pyplot as plt
 import numpy as np
 
