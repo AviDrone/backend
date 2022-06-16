@@ -4,5 +4,6 @@
 from unittest import TestCase
 
 
-class TestEMplot(TestCase):
-    pass
+class TestEMPlot(TestCase):
+    def test_EM_plot(self):
+        assert True

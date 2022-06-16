@@ -5,4 +5,5 @@ from unittest import TestCase
 
 
 class TestEMField(TestCase):
-    pass
+    def test_EM_field(self):
+        assert True
