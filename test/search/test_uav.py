@@ -5,4 +5,5 @@ from unittest import TestCase
 
 
 class TestUAV(TestCase):
-    pass
+    def test_UAV(self):
+        assert True
