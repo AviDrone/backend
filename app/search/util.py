@@ -365,5 +365,8 @@ class Navigation:
         utm = utm.from_latlon(utm)
         pass
 
+    def add_rel_pos(utm_pos, rel_pos):
+        new_ = [utm_pos[0] + rel_pos[0], utm_pos[1] + rel_pos[1], utm_pos[2], utm_pos[3]]
+        return new_
 
 NAVIGATION = Navigation()
