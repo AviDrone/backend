@@ -10,6 +10,7 @@ import logging
 import math
 import os
 import time
+import utm
 
 import numpy as np
 from dronekit import LocationGlobal, VehicleMode
@@ -61,7 +62,8 @@ class Mission:
         self.angle = 360 - AVIDRONE.yaw
         self.relative = False
 
-    def download_mission(self):
+    @staticmethod
+    def download_mission():
         """
         Downloads the current mission and returns it in a list.
         It is used in save_mission() to get the file information to save.
@@ -76,7 +78,8 @@ class Mission:
 
     def save_mission(self, text_file):
         """
-        Save a mission in the Waypoint file format (http://qgroundcontrol.org/mavlink/waypoint_protocol#waypoint_file_format).
+        Save a mission in the Waypoint file format:
+         (http://qgroundcontrol.org/mavlink/waypoint_protocol#waypoint_file_format).
         """
         missions = self.download_mission()
         output = "QGC WPL 110\n"
@@ -126,7 +129,8 @@ class Mission:
         )  # param 5 ~ 7 not used
         AVIDRONE.send_mavlink(msg)  # send command to vehicle
 
-    def forward_calculation(self):
+    @staticmethod
+    def forward_calculation():
         flight_direction = [MAGNITUDE * math.cos(AVIDRONE.yaw), MAGNITUDE * math.sin(AVIDRONE.yaw)]
         return flight_direction
 
@@ -236,7 +240,8 @@ class Navigation:
         self.angle = 360 - AVIDRONE.yaw
         self.relative = False
 
-    def arm_and_takeoff(self, target_altitude):
+    @staticmethod
+    def arm_and_takeoff(target_altitude):
         # Pre-arm check: Prevent user try to arm until autopilot is ready
         log.info(" Waiting for vehicle to initialize...")
         while not AVIDRONE.is_armable:
@@ -289,7 +294,8 @@ class Navigation:
                 break
             time.sleep(2)
 
-    def get_location_meters(self, original_location, distance, angle):
+    @staticmethod
+    def get_location_meters(original_location, distance, angle):
         lat = math.asin(
             math.sin(original_location.lat) * math.cos(distance)
             + math.cos(original_location.lat) * math.sin(distance) * math.cos(angle)
@@ -304,7 +310,8 @@ class Navigation:
 
         return LocationGlobal(lat, lon, original_location.alt)
 
-    def get_location_meters_with_alt(self, original_location, dNorth, dEast, newAlt):
+    @staticmethod
+    def get_location_meters_with_alt(original_location, dNorth, dEast, newAlt):
         """
         Returns a LocationGlobal object containing the latitude/longitude `dNorth` and `dEast` metres from the
         specified `original_location`. The returned Location has the same `alt` value
@@ -340,7 +347,8 @@ class Navigation:
             log.warning("Halting simple_go_to")
         log.info("Checkpoint reached")
 
-    def get_distance_meters(self, a, b):
+    @staticmethod
+    def get_distance_meters(a, b):
         lat_a, lat_b = a.lat, b.lat
         lon_a, lon_b = a.lon, b.lon
         distance = (
@@ -352,21 +360,25 @@ class Navigation:
                 * math.cos(lat_b)
                 * (math.sin((lon_a - lon_b) / 2)) ** 2
             )
-        )
+    )
                 * 1.113195e5
         )
         return distance  # in meters
 
-    def utm2latlon(self, utm):
-        latlng = utm.to_latlon(utm)
-        pass
+    @staticmethod
+    def utm2latlon(utm):
+        latlon = utm.to_latlon(utm)
+        return latlon
 
-    def latlon2utm(self, latlon):
-        utm = utm.from_latlon(utm)
-        pass
+    @staticmethod
+    def latlon2utm(latlon):
+        utm = utm.from_latlon(latlon)
+        return utm
 
+    @staticmethod
     def add_rel_pos(utm_pos, rel_pos):
         new_ = [utm_pos[0] + rel_pos[0], utm_pos[1] + rel_pos[1], utm_pos[2], utm_pos[3]]
         return new_
+
 
 NAVIGATION = Navigation()
