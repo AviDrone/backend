@@ -13,7 +13,6 @@ import time
 
 import numpy as np
 import utm
-
 from dronekit import LocationGlobal, VehicleMode
 from parameters import DISTANCE_ERROR, MAGNITUDE, WINDOW_SIZE
 from pymavlink import mavutil
@@ -368,13 +367,13 @@ class Navigation:
 
     @staticmethod
     def utm2latlon(utm):
-        latlon = utm.to_latlon(utm)
-        return latlon
+        _latlon = utm.to_latlon(utm)
+        return _latlon
 
     @staticmethod
     def latlon2utm(latlon):
-        utm = utm.from_latlon(latlon)
-        return utm
+        _utm = utm.from_latlon(latlon)
+        return _utm
 
     @staticmethod
     def add_rel_pos(utm_pos, rel_pos):
