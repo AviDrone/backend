@@ -1,12 +1,13 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-import pytest
 from unittest import TestCase
+
+import pytest
 from app.search import parameters as p
 
-class TestParameters(TestCase):
 
+class TestParameters(TestCase):
     def test_parameters(self):
         T_ALTITUDE = 15
         T_DEGREES = 10
@@ -28,12 +29,7 @@ class TestParameters(TestCase):
         self.assertEquals(T_ALTITUDE, p.ALTITUDE, altitude_msg)
         self.assertEquals(T_DEGREES, p.DEGREES, degrees_msg)
         self.assertEquals(T_DEGREE_ERROR, p.DEGREE_ERROR, degree_error_msg)
-        self.assertEquals(
-            T_DISTANCE_ERROR, p.DISTANCE_ERROR, distance_error_msg
-        )
-        self.assertEquals(
-            T_LAND_THRESHOLD, p.LAND_THRESHOLD, land_threshold_msg
-        )
+        self.assertEquals(T_DISTANCE_ERROR, p.DISTANCE_ERROR, distance_error_msg)
+        self.assertEquals(T_LAND_THRESHOLD, p.LAND_THRESHOLD, land_threshold_msg)
         self.assertEquals(T_MAGNITUDE, p.MAGNITUDE, magnitude_msg)
         self.assertEquals(T_WINDOW_SIZE, p.WINDOW_SIZE, window_size_msg)
-
