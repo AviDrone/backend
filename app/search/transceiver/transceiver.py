@@ -12,8 +12,8 @@ import math
 import pathlib
 import random
 import time
-import numpy as np
 
+import numpy as np
 from vectometry import sub
 
 # logging
@@ -137,19 +137,12 @@ class Transceiver:
         print(settings_msg)
 
     def mock_transceiver(self, uav_pos, beacon_pos):
-        
-        displacement = self.get_displacement(beacon_pos, uav_pos)
+        displacement = sub(beacon_pos, uav_pos)
         disp_n = self.normalize(displacement)
         distance = self.get_distance(displacement)
         theta = self.get_theta(disp_n)
         direction = self.get_direction(theta)
         return direction, distance
-
-    @staticmethod
-    def get_displacement(vector_1, vector_2):
-        displacement = sub(vector_2, vector_1)
-        log.debug(f"displacement: {displacement}")
-        return displacement
 
     def normalize(self, disp):
         d_v = disp / np.linalg.norm(disp)
