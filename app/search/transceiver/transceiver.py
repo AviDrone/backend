@@ -14,7 +14,6 @@ import random
 import time
 
 import numpy as np
-from vectometry import sub
 
 # logging
 log = logging.getLogger(__name__)
@@ -137,7 +136,7 @@ class Transceiver:
         print(settings_msg)
 
     def mock_transceiver(self, uav_pos, beacon_pos):
-        displacement = sub(beacon_pos, uav_pos)
+        displacement = np.subtract(uav_pos, beacon_pos)
         disp_n = self.normalize(displacement)
         distance = self.get_distance(displacement)
         theta = self.get_theta(disp_n)
