@@ -35,9 +35,9 @@ class GpsData:
 
     def add_point(self, new_gps_point, new_distance):
         self.gps_points.insert(0, new_gps_point)
-        del self.gps_points[self.window_size:]
+        del self.gps_points[self.window_size :]
         self.distance.insert(0, new_distance)
-        del self.distance[self.window_size:]
+        del self.distance[self.window_size :]
 
     def get_minimum_index(self):
         min_index = 0
@@ -79,7 +79,7 @@ class Mission:
     def save_mission(self, text_file):
         """
         Save a mission in the Waypoint file format:
-         (http://qgroundcontrol.org/mavlink/waypoint_protocol#waypoint_file_format).
+        (http://qgroundcontrol.org/mavlink/waypoint_protocol#waypoint_file_format).
         """
         missions = self.download_mission()
         output = "QGC WPL 110\n"
@@ -131,7 +131,10 @@ class Mission:
 
     @staticmethod
     def forward_calculation():
-        flight_direction = [MAGNITUDE * math.cos(AVIDRONE.yaw), MAGNITUDE * math.sin(AVIDRONE.yaw)]
+        flight_direction = [
+            MAGNITUDE * math.cos(AVIDRONE.yaw),
+            MAGNITUDE * math.sin(AVIDRONE.yaw),
+        ]
         return flight_direction
 
 
@@ -162,8 +165,8 @@ class Vector:
         # Calculate the vector cross product
         V1V2Cross = np.cross(V1, V2)
         V1V2CrossNorm = (
-                                V1V2Cross[0] ** 2 + V1V2Cross[1] ** 2 + V1V2Cross[2] ** 2
-                        ) ** 0.5
+            V1V2Cross[0] ** 2 + V1V2Cross[1] ** 2 + V1V2Cross[2] ** 2
+        ) ** 0.5
         V1V2CrossNormalized = V1V2Cross / V1V2CrossNorm
 
         # Dot product
@@ -180,17 +183,17 @@ class Vector:
         if np.size(Points) == 3:
             p = Points
             p_rotated = (
-                    np.cos(Theta) * p
-                    + np.sin(Theta) * (np.cross(e, p))
-                    + (1 - np.cos(Theta)) * np.dot(e, p) * e
+                np.cos(Theta) * p
+                + np.sin(Theta) * (np.cross(e, p))
+                + (1 - np.cos(Theta)) * np.dot(e, p) * e
             )
             pts_rotated = p_rotated
         else:
             for i, p in enumerate(Points):
                 p_rotated = (
-                        np.cos(Theta) * p
-                        + np.sin(Theta) * (np.cross(e, p))
-                        + (1 - np.cos(Theta)) * np.dot(e, p) * e
+                    np.cos(Theta) * p
+                    + np.sin(Theta) * (np.cross(e, p))
+                    + (1 - np.cos(Theta)) * np.dot(e, p) * e
                 )
                 pts_rotated[i] = p_rotated
         return pts_rotated
@@ -263,7 +266,7 @@ class Navigation:
             print(" Altitude: ", AVIDRONE.altitude)
             time.sleep(1)
             if (
-                    AVIDRONE.altitude >= target_altitude * 0.95
+                AVIDRONE.altitude >= target_altitude * 0.95
             ):  # Trigger just below target alt.
                 print("Reached target altitude")
                 break
@@ -352,16 +355,16 @@ class Navigation:
         lat_a, lat_b = a.lat, b.lat
         lon_a, lon_b = a.lon, b.lon
         distance = (
-                2
-                * math.asin(
-            math.sqrt(
-                (math.sin((lat_a - lat_b) / 2)) ** 2
-                + math.cos(lat_a)
-                * math.cos(lat_b)
-                * (math.sin((lon_a - lon_b) / 2)) ** 2
+            2
+            * math.asin(
+                math.sqrt(
+                    (math.sin((lat_a - lat_b) / 2)) ** 2
+                    + math.cos(lat_a)
+                    * math.cos(lat_b)
+                    * (math.sin((lon_a - lon_b) / 2)) ** 2
+                )
             )
-    )
-                * 1.113195e5
+            * 1.113195e5
         )
         return distance  # in meters
 
@@ -377,7 +380,12 @@ class Navigation:
 
     @staticmethod
     def add_rel_pos(utm_pos, rel_pos):
-        new_ = [utm_pos[0] + rel_pos[0], utm_pos[1] + rel_pos[1], utm_pos[2], utm_pos[3]]
+        new_ = [
+            utm_pos[0] + rel_pos[0],
+            utm_pos[1] + rel_pos[1],
+            utm_pos[2],
+            utm_pos[3],
+        ]
         return new_
 
 
