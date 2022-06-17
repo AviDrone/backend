@@ -15,7 +15,7 @@ from parameters import ALTITUDE, DEGREES, IS_TEST, MISSION_TIMEOUT
 from pymavlink import mavutil
 from transceiver.transceiver import TRANSCEIVER
 from uav import AVIDRONE
-from util import MISSION, VECTOR
+from util import MISSION, VECTOR, NAVIGATION
 
 # Logging
 log = logging.getLogger(__name__)
@@ -212,7 +212,7 @@ class Primary(Search):
 
         # rotate points
         for i in rotated:
-            point = MISSION.get_location_meters_with_alt(
+            point = NAVIGATION.get_location_meters_with_alt(
                 AVIDRONE.location, i[1], i[0], i[2]
             )
             _commands.add(
