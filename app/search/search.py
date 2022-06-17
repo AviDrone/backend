@@ -7,15 +7,16 @@
 import logging
 import os
 import time
+import datetime
 
 import numpy as np
 import shortuuid
 from dronekit import Command, VehicleMode
-from parameters import ALTITUDE, DEGREES, IS_TEST, MISSION_TIMEOUT
+from parameters import ALTITUDE, DEGREES, IS_TEST, MISSION_TIMEOUT, LAND_THRESHOLD, MAGNITUDE
 from pymavlink import mavutil
 from transceiver.transceiver import TRANSCEIVER
 from uav import AVIDRONE
-from util import MISSION, VECTOR, NAVIGATION
+from util import MISSION, VECTOR, NAVIGATION, GPS_DATA
 
 # Logging
 log = logging.getLogger(__name__)
@@ -330,58 +331,58 @@ class Secondary(Search):
             elif TRANSCEIVER.get_direction(beacon[0]) > 2.0:  # Turn right
                 MISSION.condition_yaw(DEGREES, True)
 
-    #         elif transceiver.util.get_direction(mock_theta) == 2.0:  # Keep straight
-    #             gps_window.add_point(search.get_global_pos(), beacon.distance)
+            elif TRANSCEIVER.get_direction(beacon[0]) == 2.0:  # Keep straight
+                GPS_DATA.add_point(SEARCH.get_global_pos(), beacon.distance)
 
-    #         # If the minimum is the center point of the gps_window,
-    #         # we need to go back to that location
-    #         if (
-    #             gps_window.get_minimum_index() == ((gps_window.window_size - 1) / 2)
-    #             and len(gps_window.gps_points) == gps_window.window_size
-    #         ):
-    #             mission.simple_goto_wait(
-    #                 gps_window.gps_points[int((gps_window.window_size - 1) / 2)]
-    #             )
+            # If the minimum is the center point of the gps_window,
+            # we need to go back to that location
+            if (
+                GPS_DATA.get_minimum_index() == ((GPS_DATA.window_size - 1) / 2)
+                and len(GPS_DATA.gps_points) == GPS_DATA.window_size
+            ):
+                NAVIGATION.simple_goto_wait(
+                    GPS_DATA.gps_points[int((GPS_DATA.window_size - 1) / 2)]
+                )
 
-    #             if gps_window.distance[2] <= LAND_THRESHOLD:
-    #                 SIGNAL_FOUND = True
+                if GPS_DATA.distance[2] <= LAND_THRESHOLD:
+                    SIGNAL_FOUND = True
 
-    #             if SIGNAL_FOUND:
-    #                 avidrone.mode = VehicleMode("LAND")
-    #                 log.warning("-- Landing")
-    #                 current_time = datetime.datetime.now()
-    #                 beacon.signal_found_msg()
-    #                 log.info(
-    #                     f"\n-------- VICTIM FOUND: {transceiver.signal_detected} -------- "
-    #                 )
-    #                 log.info(f"-- Time: {current_time}")
-    #                 log.info(f"-- Location: {avidrone.location.global_frame}\n")
+                if SIGNAL_FOUND:
+                    AVIDRONE.mode = VehicleMode("LAND")
+                    log.warning("-- Landing")
+                    current_time = datetime.datetime.now()
+                    beacon.signal_found_msg()
+                    log.info(
+                        f"\n-------- VICTIM FOUND: {TRANSCEIVER.signal_detected} -------- "
+                    )
+                    log.info(f"-- Time: {current_time}")
+                    log.info(f"-- Location: {AVIDRONE.location.global_frame}\n")
 
-    #             else:
-    #                 gps_window.purge_gps_window()
+                else:
+                    GPS_DATA.purge_gps_window()
 
-    #         elif (
-    #             gps_window.get_minimum_index() == (gps_window.window_size - 1)
-    #             and len(gps_window.gps_points) == gps_window.window_size
-    #         ):
-    #             # If the minimum data point is the last one in the array we have gone
-    #             # too far and in the wrong direction
-    #             mission.condition_yaw(180, True)
-    #             mission.simple_goto_wait(gps_window.gps_points[gps_window.window_size - 1])
-    #             gps_window.purge_gps_window()
+            elif (
+                GPS_DATA.get_minimum_index() == (GPS_DATA.window_size - 1)
+                and len(GPS_DATA.gps_points) == GPS_DATA.window_size
+            ):
+                # If the minimum data point is the last one in the array we have gone
+                # too far and in the wrong direction
+                NAVIGATION.condition_yaw(180, True)
+                NAVIGATION.simple_goto_wait(GPS_DATA.gps_points[GPS_DATA.window_size - 1])
+                GPS_DATA.purge_gps_window()
 
-    #         elif gps_window.get_minimum_index() == 0:
-    #             # If the minimum data point is in the first index,
-    #             log.info("continue forward")
-    #             mission.better_goto(MAGNITUDE, avidrone.attitude.yaw)
+            elif GPS_DATA.get_minimum_index() == 0:
+                # If the minimum data point is in the first index,
+                log.info("continue forward")
+                NAVIGATION.better_goto(MAGNITUDE, AVIDRONE.attitude.yaw)
 
-    #         else:
-    #             timeout_counter += 1
-    #             mission.better_goto(MAGNITUDE, avidrone.attitude.yaw)
+            else:
+                timeout_counter += 1
+                NAVIGATION.better_goto(MAGNITUDE, AVIDRONE.attitude.yaw)
 
-    #         if timeout_counter == 100:
-    #             IS_TIMEOUT = True
-    #         time.sleep(2)
+            if timeout_counter == 100:
+                break
+            time.sleep(2)
 
 
 SECONDARY = Secondary()
