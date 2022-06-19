@@ -379,7 +379,9 @@ class Secondary(Search):
                 # If the minimum data point is the last one in the array we have gone
                 # too far and in the wrong direction
                 NAVIGATION.condition_yaw(180, True)
-                NAVIGATION.simple_goto_wait(GPS_DATA.gps_points[GPS_DATA.window_size - 1])
+                NAVIGATION.simple_goto_wait(
+                    GPS_DATA.gps_points[GPS_DATA.window_size - 1]
+                )
                 GPS_DATA.purge_gps_window()
 
             elif GPS_DATA.get_minimum_index() == 0:
@@ -388,10 +390,10 @@ class Secondary(Search):
                 NAVIGATION.better_goto(MAGNITUDE, AVIDRONE.attitude.yaw)
 
             else:
-                timeout_counter += 1
+                self.timeout_counter += 1
                 NAVIGATION.better_goto(MAGNITUDE, AVIDRONE.attitude.yaw)
 
-            if timeout_counter == 100:
+            if self.timeout_counter == 100:
                 break
             time.sleep(2)
 
