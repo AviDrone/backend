@@ -11,8 +11,15 @@ import datetime
 
 import numpy as np
 import shortuuid
-from dronekit import Command, VehicleMode
-from parameters import ALTITUDE, DEGREES, IS_TEST, MISSION_TIMEOUT, LAND_THRESHOLD, MAGNITUDE
+from dronekit import Command, VehicleMode, 
+from parameters import (
+    ALTITUDE,
+    DEGREES,
+    IS_TEST,
+    LAND_THRESHOLD,
+    MAGNITUDE,
+    MISSION_TIMEOUT,
+)
 from pymavlink import mavutil
 from transceiver.transceiver import TRANSCEIVER
 from uav import AVIDRONE
@@ -76,6 +83,8 @@ class Search:
             )
         )
 
+    def get_global_pos(self):
+        return self.global_frame
 
 SEARCH = Search()
 
