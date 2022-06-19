@@ -86,7 +86,9 @@ class Search:
     def get_global_pos(self):
         return self.global_frame
 
+
 SEARCH = Search()
+
 
 if SEARCH.phase == "primary":
     SEARCH.ENABLE_PRIMARY_SEARCH = True
