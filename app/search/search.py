@@ -11,7 +11,7 @@ import datetime
 
 import numpy as np
 import shortuuid
-from dronekit import Command, VehicleMode, 
+from dronekit import Command, VehicleMode
 from parameters import (
     ALTITUDE,
     DEGREES,
@@ -23,7 +23,7 @@ from parameters import (
 from pymavlink import mavutil
 from transceiver.transceiver import TRANSCEIVER
 from uav import AVIDRONE
-from util import MISSION, VECTOR, NAVIGATION, GPS_DATA
+from util import GPS_DATA, MISSION, NAVIGATION, VECTOR
 
 # Logging
 log = logging.getLogger(__name__)
