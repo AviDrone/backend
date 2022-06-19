@@ -4,10 +4,10 @@
 """
     SEARCH
 """
+import datetime
 import logging
 import os
 import time
-import datetime
 
 import numpy as np
 import shortuuid
