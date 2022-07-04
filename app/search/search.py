@@ -51,8 +51,6 @@ class Search:
         self.file_type = ".txt"
         self.dir_path = "missions/"
 
-    #  TODO add utm/lat-long conversion functions here
-
     # Any condition we want to break the primary search can be done in this command.
     # This will be called repeatedly and return true when the break condition is true.
     def break_condition(self):
