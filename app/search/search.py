@@ -47,9 +47,9 @@ class Search:
         # Mission file settings
         self.SAVE = True
         self.ID = str(shortuuid.uuid())
-        self.file_name = "primary-"
+        self.file_name = "primary-search-"
         self.file_type = ".txt"
-        self.dir_path = "missions/"
+        self.dir_path = "app/missions/"
 
     # Any condition we want to break the primary search can be done in this command.
     # This will be called repeatedly and return true when the break condition is true.
@@ -294,11 +294,12 @@ class Primary(Search):
         print("returning to launch")
         self.return_to_launch()
         if SEARCH.SAVE:
-            mission_file = (
+            MISSION.filename = (
                 SEARCH.dir_path + SEARCH.file_name + SEARCH.ID + SEARCH.file_type
             )
-            print(f"Saving to file: {mission_file}")
-            MISSION.save_mission(mission_file)
+            print(f"Saving to file: {MISSION.filename }")
+            
+            MISSION.save_mission(MISSION.filename)
         AVIDRONE.commands.clear()
         print("Mission saved")
 
@@ -315,8 +316,8 @@ class Secondary(Search):
     def search(self):
         if IS_TEST:
             beacon = TRANSCEIVER.mock_transceiver(
-                TRANSCEIVER.mock_location,
-                AVIDRONE.location,
+                TRANSCEIVER.position,
+                [AVIDRONE.location],
             )
 
         else:

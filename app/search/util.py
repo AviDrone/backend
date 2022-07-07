@@ -28,7 +28,13 @@ log.addHandler(file_handler)
 
 
 class GpsData:
+    """
+    GPS Data
+
+    """
+
     def __init__(self):
+        self.name = "GPS Data"
         self.window_size = WINDOW_SIZE
         self.gps_points = []
         self.distance = []
@@ -56,31 +62,35 @@ GPS_DATA = GpsData()  # singleton
 
 class Mission:
     def __init__(self):
+        self.name = "Mission"
         self.mavutil = mavutil
         self.global_frame = AVIDRONE.altitude
         self.original_yaw = AVIDRONE.yaw
         self.angle = 360 - AVIDRONE.yaw
-        self.relative = False
+        self._filename = None
 
     @staticmethod
     def download_mission():
         """
         Downloads the current mission and returns it in a list.
-        It is used in save_mission() to get the file information to save.
+
         """
-        missions = []
+
+        mission = []
         commands = AVIDRONE.commands
         commands.download()
         commands.wait_ready()
         for command in commands:
-            missions.append(command)
-        return missions
+            mission.append(command)
+        return mission
 
     def save_mission(self, text_file):
         """
         Save a mission in the Waypoint file format:
         (http://qgroundcontrol.org/mavlink/waypoint_protocol#waypoint_file_format).
+
         """
+
         missions = self.download_mission()
         output = "QGC WPL 110\n"
         for cmd in missions:
@@ -103,6 +113,11 @@ class Mission:
             file_.write(output)
 
     def condition_yaw(self, heading, relative):
+        """
+        Turns the UAV left or right based on a condition.
+
+        """
+
         if relative:
             is_relative = True  # yaw relative to direction of travel
         else:
@@ -129,16 +144,8 @@ class Mission:
         )  # param 5 ~ 7 not used
         AVIDRONE.send_mavlink(msg)  # send command to vehicle
 
-    @staticmethod
-    def forward_calculation():
-        flight_direction = [
-            MAGNITUDE * math.cos(AVIDRONE.yaw),
-            MAGNITUDE * math.sin(AVIDRONE.yaw),
-        ]
-        return flight_direction
 
-
-MISSION = Mission()
+MISSION = Mission()  # Singleton
 
 
 class Vector:
@@ -387,6 +394,14 @@ class Navigation:
             utm_pos[3],
         ]
         return new_
+
+    @staticmethod
+    def forward_calculation():
+        flight_direction = [
+            MAGNITUDE * math.cos(AVIDRONE.yaw),
+            MAGNITUDE * math.sin(AVIDRONE.yaw),
+        ]
+        return flight_direction
 
 
 NAVIGATION = Navigation()

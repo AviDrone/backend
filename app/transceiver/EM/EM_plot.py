@@ -1,9 +1,12 @@
-import EmField as beacon
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+from EM_field import EM_FIELD
 import magpylib as magpy
 import matplotlib.pyplot as plt
 import numpy as np
 
-beacon_EM_field = beacon.EmField()
+beacon_EM =EM_FIELD()
 
 
 def plot_coil_em_field():
@@ -11,25 +14,25 @@ def plot_coil_em_field():
     fig, [ax1, ax2] = plt.subplots(1, 2, figsize=(9, 4))
 
     sp_1 = ax1.streamplot(
-        beacon_EM_field.grid[:, :, 0],
-        beacon_EM_field.grid[:, :, 2],
-        beacon_EM_field.B_1[:, :, 0],
-        beacon_EM_field.B_1[:, :, 2],
+        beacon_EM.grid[:, :, 0],
+        beacon_EM.grid[:, :, 2],
+        beacon_EM.B_1[:, :, 0],
+        beacon_EM.B_1[:, :, 2],
         density=8,
-        color=beacon_EM_field.Bamp_1,
-        linewidth=np.sqrt(beacon_EM_field.Bamp_1) * 2,
+        color=beacon_EM.Bamp_1,
+        linewidth=np.sqrt(beacon_EM.Bamp_1) * 2,
         cmap="coolwarm",
     )
 
     # coil 2 plot
     sp_2 = ax2.streamplot(
-        beacon_EM_field.grid[:, :, 0],
-        beacon_EM_field.grid[:, :, 2],
-        beacon_EM_field.B_2[:, :, 0],
-        beacon_EM_field.B_2[:, :, 2],
+        beacon_EM.grid[:, :, 0],
+        beacon_EM.grid[:, :, 2],
+        beacon_EM.B_2[:, :, 0],
+        beacon_EM.B_2[:, :, 2],
         density=8,
-        color=beacon_EM_field.Bamp_2,
-        linewidth=np.sqrt(beacon_EM_field.Bamp_2) * 2,
+        color=beacon_EM.Bamp_2,
+        linewidth=np.sqrt(beacon_EM.Bamp_2) * 2,
         cmap="coolwarm",
     )
 
@@ -60,13 +63,13 @@ def plot_transceiver_em_field():
     # Creating plot
     plt.figure(figsize=(12, 7))
     plt.streamplot(
-        beacon_EM_field.grid[:, :, 0],
-        beacon_EM_field.grid[:, :, 2],
-        beacon_EM_field.B[:, :, 0],
-        beacon_EM_field.B[:, :, 2],
+        beacon_EM.grid[:, :, 0],
+        beacon_EM.grid[:, :, 2],
+        beacon_EM.B[:, :, 0],
+        beacon_EM.B[:, :, 2],
         density=10,
-        color=beacon_EM_field.B_amp,
-        linewidth=np.sqrt(beacon_EM_field.B_amp) * 3,
+        color=beacon_EM.B_amp,
+        linewidth=np.sqrt(beacon_EM.B_amp) * 3,
         cmap="coolwarm",
     )
 
@@ -85,4 +88,4 @@ if __name__ == "__main__":
     # plot_coil_em_field()
 
     # DISPLAY COILS TOGETHER
-    # plot_transceiver_em_field()
+    plot_transceiver_em_field()

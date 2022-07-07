@@ -17,9 +17,9 @@ import numpy as np
 """
 
 
-class EmField:
+class EMField:
     def __init__(self):
-        self.home = [46.0452822, -118.3930353, 584]  # test
+        self.home = [0, 0, 0]  # test
         self.current = 750  # Amps
         self.coil_length = 120  # Millimeters
 
@@ -57,12 +57,12 @@ class EmField:
         B_amp /= np.amax(B_amp)
         self.B_amp = B_amp
 
-    def get_rel2abs_pos(self, rel_pos):
-        x = self.home[0] + rel_pos[0]
-        y = self.home[1] + rel_pos[1]
-        z = self.home[2] + rel_pos[2]
-        abs_pos = [x, y, z]
-        return abs_pos
+    # def get_rel2abs_pos(self, rel_pos):
+    #     x = self.home[0] + rel_pos[0]
+    #     y = self.home[1] + rel_pos[1]
+    #     z = self.home[2] + rel_pos[2]
+    #     abs_pos = [x, y, z]
+    #     return abs_pos
 
     def get_theta_at_pos(self, uav_pos):
         B_x = self.B[:, :, 0]
@@ -73,4 +73,4 @@ class EmField:
         return theta
 
 
-EM_FIELD = EmField()
+EM_FIELD = EMField()
