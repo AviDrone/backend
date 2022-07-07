@@ -12,6 +12,7 @@ import math
 import pathlib
 import random
 import time
+import os
 
 import numpy as np
 
@@ -19,14 +20,13 @@ import numpy as np
 log = logging.getLogger(__name__)
 log.setLevel(logging.INFO)
 formatter = logging.Formatter("%(asctime)s  [%(levelname)s]  %(message)s")
-file_handler = logging.FileHandler("transceiver.log")
+file_handler = logging.FileHandler(os.path.join("log", "transceiver.log"))
 file_handler.setFormatter(formatter)
 log.addHandler(file_handler)
 
 IS_TEST = True  # set to true to use mock transceiver simulation
 IS_TIMEOUT = False
 timeout_count = 0
-
 
 class Transceiver:
     """
@@ -136,28 +136,13 @@ class Transceiver:
         print(settings_msg)
 
     def mock_transceiver(self, uav_pos, beacon_pos):
-        # UAV position
-        x_1 = uav_pos[0]
-        y_1 = uav_pos[1]
-        z_1 = uav_pos[2]
-
-        self.beacon_x = beacon_pos[0]
-        self.beacon_x = beacon_pos[0]
-        self.beacon_x = beacon_pos[0]
-
-        displacement = self.get_displacement(
-            x_1, self.beacon_x, y_1, self.beacon_y, z_1, self.beacon_z
-        )
+        list_uav_pos = [uav_pos[0],uav_pos[1],uav_pos[2]]
+        displacement = np.subtract(list_uav_pos, beacon_pos)
         disp_n = self.normalize(displacement)
         distance = self.get_distance(displacement)
         theta = self.get_theta(disp_n)
         direction = self.get_direction(theta)
         return direction, distance
-
-    def get_displacement(self, x_1, x_2, y_1, y_2, z_1=0, z_2=0):
-        displacement = [x_2 - x_1, y_2 - y_1, z_2 - z_1]
-        log.debug(f"displacement: {displacement}")
-        return displacement
 
     def normalize(self, disp):
         d_v = disp / np.linalg.norm(disp)
@@ -241,7 +226,7 @@ beacon_pos = [20, 20, 2]  # Example
 
 # Mock beacon
 mock_beacon = TRANSCEIVER.mock_transceiver(uav_pos, beacon_pos)
-run = False
+run = True
 while run:
     timeout_count += 1
 

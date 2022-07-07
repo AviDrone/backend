@@ -4,6 +4,7 @@
 """
     SEARCH
 """
+import datetime
 import logging
 import os
 import time
@@ -11,11 +12,18 @@ import time
 import numpy as np
 import shortuuid
 from dronekit import Command, VehicleMode
-from parameters import ALTITUDE, DEGREES, IS_TEST, MISSION_TIMEOUT
+from parameters import (
+    ALTITUDE,
+    DEGREES,
+    IS_TEST,
+    LAND_THRESHOLD,
+    MAGNITUDE,
+    MISSION_TIMEOUT,
+)
 from pymavlink import mavutil
 from transceiver.transceiver import TRANSCEIVER
 from uav import AVIDRONE
-from util import MISSION, VECTOR
+from util import GPS_DATA, MISSION, NAVIGATION, VECTOR
 
 # Logging
 log = logging.getLogger(__name__)
@@ -39,11 +47,9 @@ class Search:
         # Mission file settings
         self.SAVE = True
         self.ID = str(shortuuid.uuid())
-        self.file_name = "primary-"
+        self.file_name = "primary-search-"
         self.file_type = ".txt"
-        self.dir_path = "missions/"
-
-    #  TODO add utm/lat-long conversion functions here
+        self.dir_path = "app/missions/"
 
     # Any condition we want to break the primary search can be done in this command.
     # This will be called repeatedly and return true when the break condition is true.
@@ -75,8 +81,12 @@ class Search:
             )
         )
 
+    def get_global_pos(self):
+        return self.global_frame
+
 
 SEARCH = Search()
+
 
 if SEARCH.phase == "primary":
     SEARCH.ENABLE_PRIMARY_SEARCH = True
@@ -212,7 +222,7 @@ class Primary(Search):
 
         # rotate points
         for i in rotated:
-            point = MISSION.get_location_meters_with_alt(
+            point = NAVIGATION.get_location_meters_with_alt(
                 AVIDRONE.location, i[1], i[0], i[2]
             )
             _commands.add(
@@ -284,11 +294,12 @@ class Primary(Search):
         print("returning to launch")
         self.return_to_launch()
         if SEARCH.SAVE:
-            mission_file = (
+            MISSION.filename = (
                 SEARCH.dir_path + SEARCH.file_name + SEARCH.ID + SEARCH.file_type
             )
-            print(f"Saving to file: {mission_file}")
-            MISSION.save_mission(mission_file)
+            print(f"Saving to file: {MISSION.filename }")
+            
+            MISSION.save_mission(MISSION.filename)
         AVIDRONE.commands.clear()
         print("Mission saved")
 
@@ -305,8 +316,8 @@ class Secondary(Search):
     def search(self):
         if IS_TEST:
             beacon = TRANSCEIVER.mock_transceiver(
-                TRANSCEIVER.mock_location,
-                AVIDRONE.location,
+                TRANSCEIVER.position,
+                [AVIDRONE.location],
             )
 
         else:
@@ -330,58 +341,60 @@ class Secondary(Search):
             elif TRANSCEIVER.get_direction(beacon[0]) > 2.0:  # Turn right
                 MISSION.condition_yaw(DEGREES, True)
 
-    #         elif transceiver.util.get_direction(mock_theta) == 2.0:  # Keep straight
-    #             gps_window.add_point(search.get_global_pos(), beacon.distance)
+            elif TRANSCEIVER.get_direction(beacon[0]) == 2.0:  # Keep straight
+                GPS_DATA.add_point(SEARCH.get_global_pos(), beacon.distance)
 
-    #         # If the minimum is the center point of the gps_window,
-    #         # we need to go back to that location
-    #         if (
-    #             gps_window.get_minimum_index() == ((gps_window.window_size - 1) / 2)
-    #             and len(gps_window.gps_points) == gps_window.window_size
-    #         ):
-    #             mission.simple_goto_wait(
-    #                 gps_window.gps_points[int((gps_window.window_size - 1) / 2)]
-    #             )
+            # If the minimum is the center point of the gps_window,
+            # we need to go back to that location
+            if (
+                GPS_DATA.get_minimum_index() == ((GPS_DATA.window_size - 1) / 2)
+                and len(GPS_DATA.gps_points) == GPS_DATA.window_size
+            ):
+                NAVIGATION.simple_goto_wait(
+                    GPS_DATA.gps_points[int((GPS_DATA.window_size - 1) / 2)]
+                )
 
-    #             if gps_window.distance[2] <= LAND_THRESHOLD:
-    #                 SIGNAL_FOUND = True
+                if GPS_DATA.distance[2] <= LAND_THRESHOLD:
+                    SIGNAL_FOUND = True
 
-    #             if SIGNAL_FOUND:
-    #                 avidrone.mode = VehicleMode("LAND")
-    #                 log.warning("-- Landing")
-    #                 current_time = datetime.datetime.now()
-    #                 beacon.signal_found_msg()
-    #                 log.info(
-    #                     f"\n-------- VICTIM FOUND: {transceiver.signal_detected} -------- "
-    #                 )
-    #                 log.info(f"-- Time: {current_time}")
-    #                 log.info(f"-- Location: {avidrone.location.global_frame}\n")
+                if SIGNAL_FOUND:
+                    AVIDRONE.mode = VehicleMode("LAND")
+                    log.warning("-- Landing")
+                    current_time = datetime.datetime.now()
+                    beacon.signal_found_msg()
+                    log.info(
+                        f"\n-------- VICTIM FOUND: {TRANSCEIVER.signal_detected} -------- "
+                    )
+                    log.info(f"-- Time: {current_time}")
+                    log.info(f"-- Location: {AVIDRONE.location.global_frame}\n")
 
-    #             else:
-    #                 gps_window.purge_gps_window()
+                else:
+                    GPS_DATA.purge_gps_window()
 
-    #         elif (
-    #             gps_window.get_minimum_index() == (gps_window.window_size - 1)
-    #             and len(gps_window.gps_points) == gps_window.window_size
-    #         ):
-    #             # If the minimum data point is the last one in the array we have gone
-    #             # too far and in the wrong direction
-    #             mission.condition_yaw(180, True)
-    #             mission.simple_goto_wait(gps_window.gps_points[gps_window.window_size - 1])
-    #             gps_window.purge_gps_window()
+            elif (
+                GPS_DATA.get_minimum_index() == (GPS_DATA.window_size - 1)
+                and len(GPS_DATA.gps_points) == GPS_DATA.window_size
+            ):
+                # If the minimum data point is the last one in the array we have gone
+                # too far and in the wrong direction
+                NAVIGATION.condition_yaw(180, True)
+                NAVIGATION.simple_goto_wait(
+                    GPS_DATA.gps_points[GPS_DATA.window_size - 1]
+                )
+                GPS_DATA.purge_gps_window()
 
-    #         elif gps_window.get_minimum_index() == 0:
-    #             # If the minimum data point is in the first index,
-    #             log.info("continue forward")
-    #             mission.better_goto(MAGNITUDE, avidrone.attitude.yaw)
+            elif GPS_DATA.get_minimum_index() == 0:
+                # If the minimum data point is in the first index,
+                log.info("continue forward")
+                NAVIGATION.better_goto(MAGNITUDE, AVIDRONE.attitude.yaw)
 
-    #         else:
-    #             timeout_counter += 1
-    #             mission.better_goto(MAGNITUDE, avidrone.attitude.yaw)
+            else:
+                self.timeout_counter += 1
+                NAVIGATION.better_goto(MAGNITUDE, AVIDRONE.attitude.yaw)
 
-    #         if timeout_counter == 100:
-    #             IS_TIMEOUT = True
-    #         time.sleep(2)
+            if self.timeout_counter == 100:
+                break
+            time.sleep(2)
 
 
 SECONDARY = Secondary()

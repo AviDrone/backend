@@ -12,6 +12,7 @@ import os
 import time
 
 import numpy as np
+import utm
 from dronekit import LocationGlobal, VehicleMode
 from parameters import DISTANCE_ERROR, MAGNITUDE, WINDOW_SIZE
 from pymavlink import mavutil
@@ -27,16 +28,22 @@ log.addHandler(file_handler)
 
 
 class GpsData:
+    """
+    GPS Data
+
+    """
+
     def __init__(self):
+        self.name = "GPS Data"
         self.window_size = WINDOW_SIZE
         self.gps_points = []
         self.distance = []
 
     def add_point(self, new_gps_point, new_distance):
         self.gps_points.insert(0, new_gps_point)
-        del self.gps_points[self.window_size:]
+        del self.gps_points[self.window_size :]
         self.distance.insert(0, new_distance)
-        del self.distance[self.window_size:]
+        del self.distance[self.window_size :]
 
     def get_minimum_index(self):
         min_index = 0
@@ -55,29 +62,35 @@ GPS_DATA = GpsData()  # singleton
 
 class Mission:
     def __init__(self):
+        self.name = "Mission"
         self.mavutil = mavutil
         self.global_frame = AVIDRONE.altitude
         self.original_yaw = AVIDRONE.yaw
         self.angle = 360 - AVIDRONE.yaw
-        self.relative = False
+        self._filename = None
 
-    def download_mission(self):
+    @staticmethod
+    def download_mission():
         """
         Downloads the current mission and returns it in a list.
-        It is used in save_mission() to get the file information to save.
+
         """
-        missions = []
+
+        mission = []
         commands = AVIDRONE.commands
         commands.download()
         commands.wait_ready()
         for command in commands:
-            missions.append(command)
-        return missions
+            mission.append(command)
+        return mission
 
     def save_mission(self, text_file):
         """
-        Save a mission in the Waypoint file format (http://qgroundcontrol.org/mavlink/waypoint_protocol#waypoint_file_format).
+        Save a mission in the Waypoint file format:
+        (http://qgroundcontrol.org/mavlink/waypoint_protocol#waypoint_file_format).
+
         """
+
         missions = self.download_mission()
         output = "QGC WPL 110\n"
         for cmd in missions:
@@ -100,6 +113,11 @@ class Mission:
             file_.write(output)
 
     def condition_yaw(self, heading, relative):
+        """
+        Turns the UAV left or right based on a condition.
+
+        """
+
         if relative:
             is_relative = True  # yaw relative to direction of travel
         else:
@@ -126,12 +144,8 @@ class Mission:
         )  # param 5 ~ 7 not used
         AVIDRONE.send_mavlink(msg)  # send command to vehicle
 
-    def forward_calculation(self):
-        flight_direction = [MAGNITUDE * math.cos(AVIDRONE.yaw), MAGNITUDE * math.sin(AVIDRONE.yaw)]
-        return flight_direction
 
-
-MISSION = Mission()
+MISSION = Mission()  # Singleton
 
 
 class Vector:
@@ -158,8 +172,8 @@ class Vector:
         # Calculate the vector cross product
         V1V2Cross = np.cross(V1, V2)
         V1V2CrossNorm = (
-                                V1V2Cross[0] ** 2 + V1V2Cross[1] ** 2 + V1V2Cross[2] ** 2
-                        ) ** 0.5
+            V1V2Cross[0] ** 2 + V1V2Cross[1] ** 2 + V1V2Cross[2] ** 2
+        ) ** 0.5
         V1V2CrossNormalized = V1V2Cross / V1V2CrossNorm
 
         # Dot product
@@ -176,17 +190,17 @@ class Vector:
         if np.size(Points) == 3:
             p = Points
             p_rotated = (
-                    np.cos(Theta) * p
-                    + np.sin(Theta) * (np.cross(e, p))
-                    + (1 - np.cos(Theta)) * np.dot(e, p) * e
+                np.cos(Theta) * p
+                + np.sin(Theta) * (np.cross(e, p))
+                + (1 - np.cos(Theta)) * np.dot(e, p) * e
             )
             pts_rotated = p_rotated
         else:
             for i, p in enumerate(Points):
                 p_rotated = (
-                        np.cos(Theta) * p
-                        + np.sin(Theta) * (np.cross(e, p))
-                        + (1 - np.cos(Theta)) * np.dot(e, p) * e
+                    np.cos(Theta) * p
+                    + np.sin(Theta) * (np.cross(e, p))
+                    + (1 - np.cos(Theta)) * np.dot(e, p) * e
                 )
                 pts_rotated[i] = p_rotated
         return pts_rotated
@@ -236,7 +250,8 @@ class Navigation:
         self.angle = 360 - AVIDRONE.yaw
         self.relative = False
 
-    def arm_and_takeoff(self, target_altitude):
+    @staticmethod
+    def arm_and_takeoff(target_altitude):
         # Pre-arm check: Prevent user try to arm until autopilot is ready
         log.info(" Waiting for vehicle to initialize...")
         while not AVIDRONE.is_armable:
@@ -258,7 +273,7 @@ class Navigation:
             print(" Altitude: ", AVIDRONE.altitude)
             time.sleep(1)
             if (
-                    AVIDRONE.altitude >= target_altitude * 0.95
+                AVIDRONE.altitude >= target_altitude * 0.95
             ):  # Trigger just below target alt.
                 print("Reached target altitude")
                 break
@@ -289,7 +304,8 @@ class Navigation:
                 break
             time.sleep(2)
 
-    def get_location_meters(self, original_location, distance, angle):
+    @staticmethod
+    def get_location_meters(original_location, distance, angle):
         lat = math.asin(
             math.sin(original_location.lat) * math.cos(distance)
             + math.cos(original_location.lat) * math.sin(distance) * math.cos(angle)
@@ -304,7 +320,8 @@ class Navigation:
 
         return LocationGlobal(lat, lon, original_location.alt)
 
-    def get_location_meters_with_alt(self, original_location, dNorth, dEast, newAlt):
+    @staticmethod
+    def get_location_meters_with_alt(original_location, dNorth, dEast, newAlt):
         """
         Returns a LocationGlobal object containing the latitude/longitude `dNorth` and `dEast` metres from the
         specified `original_location`. The returned Location has the same `alt` value
@@ -340,33 +357,51 @@ class Navigation:
             log.warning("Halting simple_go_to")
         log.info("Checkpoint reached")
 
-    def get_distance_meters(self, a, b):
+    @staticmethod
+    def get_distance_meters(a, b):
         lat_a, lat_b = a.lat, b.lat
         lon_a, lon_b = a.lon, b.lon
         distance = (
-                2
-                * math.asin(
-            math.sqrt(
-                (math.sin((lat_a - lat_b) / 2)) ** 2
-                + math.cos(lat_a)
-                * math.cos(lat_b)
-                * (math.sin((lon_a - lon_b) / 2)) ** 2
+            2
+            * math.asin(
+                math.sqrt(
+                    (math.sin((lat_a - lat_b) / 2)) ** 2
+                    + math.cos(lat_a)
+                    * math.cos(lat_b)
+                    * (math.sin((lon_a - lon_b) / 2)) ** 2
+                )
             )
-        )
-                * 1.113195e5
+            * 1.113195e5
         )
         return distance  # in meters
 
-    def utm2latlon(self, utm):
-        latlng = utm.to_latlon(utm)
-        pass
+    @staticmethod
+    def utm2latlon(utm):
+        _latlon = utm.to_latlon(utm)
+        return _latlon
 
-    def latlon2utm(self, latlon):
-        utm = utm.from_latlon(utm)
-        pass
+    @staticmethod
+    def latlon2utm(latlon):
+        _utm = utm.from_latlon(latlon)
+        return _utm
 
+    @staticmethod
     def add_rel_pos(utm_pos, rel_pos):
-        new_ = [utm_pos[0] + rel_pos[0], utm_pos[1] + rel_pos[1], utm_pos[2], utm_pos[3]]
+        new_ = [
+            utm_pos[0] + rel_pos[0],
+            utm_pos[1] + rel_pos[1],
+            utm_pos[2],
+            utm_pos[3],
+        ]
         return new_
+
+    @staticmethod
+    def forward_calculation():
+        flight_direction = [
+            MAGNITUDE * math.cos(AVIDRONE.yaw),
+            MAGNITUDE * math.sin(AVIDRONE.yaw),
+        ]
+        return flight_direction
+
 
 NAVIGATION = Navigation()

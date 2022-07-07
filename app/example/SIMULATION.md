@@ -43,7 +43,7 @@ dronekit-sitl copter --home=46.045577,-118.391351,584,127
 In another terminal, run:
 
 ```{bash}
-python3 mavproxy.py --master tcp:127.0.0.1:5760 --sitl 127.0.0.1:5501 --out 127.0.0.1:14550 --out 127.0.0.1:14551 --out 127.0.0.1:14552
+cd MAVproxy/MAVproxy && python3 mavproxy.py --master tcp:127.0.0.1:5760 --sitl 127.0.0.1:5501 --out 127.0.0.1:14550 --out 127.0.0.1:14551 --out 127.0.0.1:14552
 ```
 
 >**Note:** You will need to be in the MAVproxy/MAVproxy directory to run this script. You might need to clone the [MAVproxy](https://github.com/ArduPilot/MAVProxy) repository to your machine
