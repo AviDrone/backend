@@ -26,14 +26,14 @@ from pymavlink import mavutil
 parser = argparse.ArgumentParser(description="Demonstrates basic mission operations.")
 parser.add_argument(
     "--connect",
-    help="vehicle connection target string. If not specified, SITL automatically started and used.",
+    help="vehicle connection target string. If not specified, SITL Software in the Loop) automatically started and used.",
 )
 args = parser.parse_args()
 
 connection_string = args.connect
 sitl = None
 
-# Start SITL if no connection string specified
+# Start SITL Software in the Loop) if no connection string specified
 if not connection_string:
     import dronekit_sitl
 

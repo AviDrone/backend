@@ -86,7 +86,7 @@ SEARCH = Search()
 class File(Search):
     def __init__(self):
         self.dir_path = "app/missions/"
-        self.file_type = ".txt"
+        self.file_type = "txt"
         self.file_handle = ""
         
         
