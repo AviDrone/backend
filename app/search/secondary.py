@@ -14,7 +14,7 @@ from search import SEARCH, SECONDARY
 from transceiver.transceiver import TRANSCEIVER
 from uav import AVIDRONE
 
-SEARCH.ENABLE_SECONDARY_SEARCH = True
+SEARCH.is_enabled_secondary = True
 
 log = logging.getLogger(__name__)
 log.setLevel(logging.INFO)
@@ -29,7 +29,7 @@ log.debug(f"transceiver model: {TRANSCEIVER.curr_model}")
 log.debug(f"search strip width: {TRANSCEIVER.curr_search_strip_width}")
 
 
-if SEARCH.ENABLE_SECONDARY_SEARCH:
+if SEARCH.is_enabled_secondary:
     SECONDARY.is_enabled = True
 
 log.debug(AVIDRONE.mode)

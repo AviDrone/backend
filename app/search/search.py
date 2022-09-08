@@ -10,7 +10,7 @@ import os
 import time
 
 import numpy as np
-import shortuuid
+from shortuuid import uuid
 from dronekit import Command, VehicleMode
 from parameters import (
     ALTITUDE,
@@ -33,23 +33,19 @@ file_handler = logging.FileHandler(os.path.join("log", "search.log"))
 file_handler.setFormatter(formatter)
 log.addHandler(file_handler)
 
-
 class Search:
     def __init__(self):
+        """
+        Search
+        """
         self.commands = AVIDRONE.commands
         self.width = 50
-        self.length = 100
+        self.length = 104
         self.height = 0
         self.phase = "primary"  # Initial phase
-        self.ENABLE_PRIMARY_SEARCH = False
-        self.ENABLE_SECONDARY_SEARCH = False
-
-        # Mission file settings
-        self.SAVE = True
-        self.ID = str(shortuuid.uuid())
-        self.file_name = "primary-search-"
-        self.file_type = ".txt"
-        self.dir_path = "app/missions/"
+        self._id = str(uuid())
+        self.is_enabled_primary = False
+        self.is_enabled_secondary = False
 
     # Any condition we want to break the primary search can be done in this command.
     # This will be called repeatedly and return true when the break condition is true.
@@ -87,14 +83,30 @@ class Search:
 
 SEARCH = Search()
 
+class File(Search):
+    def __init__(self):
+        self.dir_path = "app/missions/"
+        self.file_type = ".txt"
+        self.file_handle = ""
+        
+        
+    def create_filename(self, lat, lon):
+        # Getting the current date and time
+        date_time = datetime.now()
+        self.file_handle = (f"{str(lat)}_{str(lon)}_{str(date_time)}")
+        return (f"{self.dir_path}{SEARCH.phase}_{self.file_handle}_{SEARCH._id}.{self.file_type}")
+
+    def minimize_filename(self):
+        search_phase = "P" if SEARCH.phase == "primary" else "S"
+        return (f"{self.dir_path}{search_phase}_{self.file_handle}{self.file_type}")
 
 if SEARCH.phase == "primary":
-    SEARCH.ENABLE_PRIMARY_SEARCH = True
-    log.debug(f"ENABLE_PRIMARY_SEARCH: {SEARCH.ENABLE_PRIMARY_SEARCH}")
+    SEARCH.is_enabled_primary = True
+    log.debug(f"ENABLE_PRIMARY_SEARCH: {SEARCH.is_enabled_primary}")
 
 elif SEARCH.phase == "secondary":
-    SEARCH.ENABLE_SECONDARY_SEARCH = True
-    log.debug(f"ENABLE_SECONDARY_SEARCH{SEARCH.ENABLE_PRIMARY_SEARCH}")
+    SEARCH.is_enabled_secondary = True
+    log.debug(f"ENABLE_SECONDARY_SEARCH{SEARCH.is_enabled_primary}")
 
 else:
     log.error("Unknown mode")
