@@ -11,6 +11,8 @@
 
 - [Avidrone Avalanche Rescue 🏔⛑](#avidrone-avalanche-rescue-)
   - [Table of Contents](#table-of-contents)
+  - [AviDrone Project Introduction](#avidrone-project-introduction)
+  - [AviDrone GitHub Page Introduction](#avidrone-github-page-introduction)
   - [Getting Started](#getting-started)
     - [Set up](#set-up)
   - [How to use](#how-to-use)
@@ -21,6 +23,16 @@
   - [Contributors](#contributors)
   - [License](#license)
   - [Contact](#contact)
+
+## AviDrone Project Introduction
+
+This project continues the AviDrone Project from last year, whose goal was to create a drone capable of completing this search process autonomously. This year, our goals were to resolve the hardware's shortcomings, expand the search procedure algorithms by implementing the primary search procedure, test tools for secondary search, and create a user-friendly interface to lead to a faster and safer victim search.
+
+During the 2021-2022 academic year, we expanded search missions by implementing primary search and creating testing tools for both search algorithms. We improved hardware by fixing pre-existing shortcomings which prevented practical use. Additionally, we designed a user interface for fast deployment and an improved user experience. We successfully improved the drone on all fronts, bringing it closer to real-life deployment.
+
+## AviDrone GitHub Page Introduction
+
+This page is primarily set up with the code, software explanations, and relevant documentation required to set up the software portion of this project. To access further hardware documentation, as well as documentation created for our class requirements, contact us. This code is currently specifically configured and set up to simulate the various aspects of the AviDrone search stages, additional work would be required before running it on a physical drone.
 
 ## Getting Started
 
